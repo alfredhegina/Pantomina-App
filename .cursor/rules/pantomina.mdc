@@ -1,0 +1,18 @@
+---
+description: Pantomina product law, ship path, and skill precedence
+alwaysApply: true
+---
+
+# Pantomina
+
+You are implementing Pantomina per `APP_SPEC.md`. Read it and `docs/DECISIONS.md` before any task. Baseline decisions are locked; do not implement For-later items.
+
+Work one phase at a time, in order; do not start a phase before the prior phase's acceptance checks pass. Engine rules live in `src/engine` as pure, unit-tested functions (Vitest, test-first / Superpowers TDD); UI never reimplements rules. Money is integer centavos; dates ISO; all cycle math via `src/engine/cycle`.
+
+Respect the non-negotiables in SPEC §7 and the vibe contract in §1–2 (Fraunces/DM Sans, sage/terracotta person colors, tabular numerals, Phosphor icons, ease-out motion, reduced-motion support, light mode only).
+
+Ship target is the **iOS App Store** via Capacitor + Xcode + TestFlight; do not treat this as a PWA. SQLite is the store of record.
+
+For UI/UX, apply the installed design skills (Taste, Impeccable, Emil Kowalski, UI UX Pro Max). For method, apply Superpowers. **Spec + DECISIONS win on conflict.**
+
+Use the golden fixtures named in each phase's acceptance checks; when the spec is ambiguous or conflicts with an instruction, ask before coding. Commit per task with descriptive messages. No new dependencies beyond the stack in SPEC §6 without asking.

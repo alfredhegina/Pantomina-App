@@ -18,7 +18,7 @@
  * SPEC-ONLY (not in this file): Checklist view · statement-day reconciliation ·
  * projections engine · funding-plan tranches · Balance Day snapshots · AI parse
  * pipeline + Shortcut inbox · onboarding · CoA manager/migration · backup
- * serialization/restore · persistence (Dexie) · sync (Phase 8).
+ * serialization/restore · persistence (SQLite via Capacitor) · sync (Phase 8).
  */
 import { useState, useMemo } from "react";
 import {
