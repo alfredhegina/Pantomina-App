@@ -20,6 +20,21 @@ struct MoreView: View {
                     }
                 }
 
+                NavigationLink {
+                    StatementDayView()
+                } label: {
+                    Label {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Statement day")
+                            Text("Count card swipes")
+                                .font(PantominaFont.caption)
+                                .foregroundStyle(Color.pantomina.muted)
+                        }
+                    } icon: {
+                        Image(systemName: "creditcard")
+                    }
+                }
+
                 Section {
                     EmptyView()
                 } footer: {

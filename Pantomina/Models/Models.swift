@@ -152,7 +152,10 @@ final class TransactionRecord {
     }
 
     var paidBy: PersonId { PersonId(rawValue: paidByRaw) ?? .fern }
-    var realizedStatus: RealizedStatus { RealizedStatus(rawValue: realizedStatusRaw) ?? .realized }
+    var realizedStatus: RealizedStatus {
+        get { RealizedStatus(rawValue: realizedStatusRaw) ?? .realized }
+        set { realizedStatusRaw = newValue.rawValue }
+    }
     var allocation: Allocation { Allocation(fern: allocFernC, stark: allocStarkC) }
 }
 

@@ -7,7 +7,8 @@ Shared finance for exactly two people — **Fern** (payer) and **Stark** (contri
 
 ## Status
 
-**Phase 1** — identity, seed CoA/accounts, onboarding, Receipts filters, Add entry, Settings rename → live labels.
+**Phase 2** — realization engine, TBD drawer, Statement day (count card swipes).  
+Phase 1 — identity, seed CoA/accounts, onboarding, Receipts filters, Add entry, Settings rename.
 
 ## Run
 

@@ -44,6 +44,31 @@ struct ReceiptsView: View {
         return rows.compactMap { kept.contains($0.0.id) ? $0.0 : nil }
     }
 
+    /// Realized (and projected) rows for the main list — pending live in the TBD drawer.
+    private var ledgerRows: [TransactionRecord] {
+        if statusFilter == .pending { return filtered }
+        return filtered.filter { $0.realizedStatus != .pending }
+    }
+
+    private var pendingRows: [TransactionRecord] {
+        filtered.filter { $0.realizedStatus == .pending }
+    }
+
+    private var tbdSum: Int {
+        Realization.tbdSumCentavos(
+            pendingRows.map { Realization.TBDItem(id: $0.id, amountC: $0.amountC, status: $0.realizedStatus) }
+        )
+    }
+
+    private var groupedByRealized: [(key: String, rows: [TransactionRecord])] {
+        let groups = Dictionary(grouping: ledgerRows) { tx in
+            tx.realizedDate ?? tx.purchaseDate
+        }
+        return groups.keys.sorted(by: >).map { key in
+            (key, groups[key]!.sorted { $0.purchaseDate > $1.purchaseDate })
+        }
+    }
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
@@ -51,10 +76,54 @@ struct ReceiptsView: View {
                 if filtered.isEmpty {
                     empty
                 } else {
-                    List(filtered, id: \.id) { tx in
-                        receiptRow(tx)
+                    List {
+                        if !pendingRows.isEmpty, statusFilter != .pending {
+                            Section {
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("Still in the pile")
+                                            .font(PantominaFont.body.weight(.medium))
+                                        Text("\(pendingRows.count) waiting · \(formatPeso(tbdSum))")
+                                            .font(PantominaFont.caption)
+                                            .foregroundStyle(Color.pantomina.muted)
+                                    }
+                                    Spacer()
+                                    NavigationLink {
+                                        StatementDayView()
+                                    } label: {
+                                        Text("Statement day")
+                                            .font(PantominaFont.caption.weight(.semibold))
+                                            .foregroundStyle(Color.pantomina.sage)
+                                    }
+                                }
+                                ForEach(pendingRows.prefix(5), id: \.id) { tx in
+                                    receiptRow(tx, dateISO: tx.proposedRealizedDate ?? tx.purchaseDate)
+                                }
+                                if pendingRows.count > 5 {
+                                    Text("+\(pendingRows.count - 5) more")
+                                        .font(PantominaFont.caption)
+                                        .foregroundStyle(Color.pantomina.muted)
+                                }
+                            } header: {
+                                Text("TBD")
+                            }
+                        }
+
+                        if statusFilter == .pending {
+                            ForEach(pendingRows, id: \.id) { tx in
+                                receiptRow(tx, dateISO: tx.proposedRealizedDate ?? tx.purchaseDate)
+                            }
+                        } else {
+                            ForEach(groupedByRealized, id: \.key) { group in
+                                Section(DisplayLabels.displayDate(iso: group.key)) {
+                                    ForEach(group.rows, id: \.id) { tx in
+                                        receiptRow(tx, dateISO: tx.purchaseDate)
+                                    }
+                                }
+                            }
+                        }
                     }
-                    .listStyle(.plain)
+                    .listStyle(.insetGrouped)
                 }
             }
             .background(Color.pantomina.ground.ignoresSafeArea())
@@ -67,6 +136,14 @@ struct ReceiptsView: View {
                             .font(PantominaFont.caption)
                             .foregroundStyle(Color.pantomina.muted)
                     }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink {
+                        StatementDayView()
+                    } label: {
+                        Image(systemName: "creditcard")
+                    }
+                    .accessibilityLabel("Statement day")
                 }
             }
         }
@@ -145,7 +222,7 @@ struct ReceiptsView: View {
         .frame(maxWidth: .infinity)
     }
 
-    private func receiptRow(_ tx: TransactionRecord) -> some View {
+    private func receiptRow(_ tx: TransactionRecord, dateISO: String) -> some View {
         let account = accounts.first { $0.id == tx.accountId }
         let category = categories.first { $0.id == tx.categoryId }
         let label = account?.displayLabel(fernName: fernName, starkName: starkName) ?? "Account"
@@ -166,7 +243,7 @@ struct ReceiptsView: View {
                     .foregroundStyle(amountColor)
             }
             HStack {
-                Text(DisplayLabels.displayDate(iso: tx.purchaseDate))
+                Text(DisplayLabels.displayDate(iso: dateISO))
                 Text("·")
                 Text(label)
                 Spacer()

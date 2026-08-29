@@ -402,24 +402,17 @@ struct AddEntryView: View {
         }
 
         let account = selectedAccount
-        let status: RealizedStatus
-        let realized: String?
-        let proposed: String?
-        if account?.settlement == .statement {
-            status = .pending
-            realized = nil
-            proposed = Cycle.cycleFor(isoDate: purchaseISO).anchorISO
-        } else {
-            status = .realized
-            realized = Cycle.cycleFor(isoDate: purchaseISO).anchorISO
-            proposed = nil
-        }
+        let decision = Realization.decide(
+            purchaseISO: purchaseISO,
+            settlement: account?.settlement ?? .instant,
+            statementCutoff: account?.statementCutoff
+        )
 
         let tx = TransactionRecord(
             purchaseDate: purchaseISO,
-            realizedDate: realized,
-            realizedStatus: status,
-            proposedRealizedDate: proposed,
+            realizedDate: decision.realizedDate,
+            realizedStatus: decision.status,
+            proposedRealizedDate: decision.proposedRealizedDate,
             amountC: amountC,
             accountId: accountId,
             categoryId: categoryId,
