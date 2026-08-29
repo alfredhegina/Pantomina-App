@@ -115,6 +115,7 @@ final class TransactionRecord {
     var allocStarkC: Int
     var settlementRoleRaw: String?
     var linkedId: String?
+    var recurringRuleId: String?
     var note: String?
     var merchant: String?
     var createdAt: Date
@@ -133,6 +134,7 @@ final class TransactionRecord {
         allocation: Allocation,
         settlementRole: SettlementRole? = nil,
         linkedId: String? = nil,
+        recurringRuleId: String? = nil,
         note: String? = nil,
         merchant: String? = nil,
         createdAt: Date = .now,
@@ -151,6 +153,7 @@ final class TransactionRecord {
         self.allocStarkC = allocation.stark
         self.settlementRoleRaw = settlementRole?.rawValue
         self.linkedId = linkedId
+        self.recurringRuleId = recurringRuleId
         self.note = note
         self.merchant = merchant
         self.createdAt = createdAt
@@ -169,6 +172,82 @@ final class TransactionRecord {
             return SettlementRole(rawValue: settlementRoleRaw)
         }
         set { settlementRoleRaw = newValue?.rawValue }
+    }
+}
+
+@Model
+final class RecurringRuleRecord {
+    @Attribute(.unique) var id: String
+    var title: String
+    var amountC: Int
+    var accountId: String
+    var categoryId: String
+    var paidByRaw: String
+    var allocFernC: Int
+    var allocStarkC: Int
+    var cadenceRaw: String
+    var anchorDayRaw: String
+    var amountBehaviorRaw: String
+    var startCycleISO: String
+    var endCycleISO: String?
+    var paused: Bool
+    var flowRaw: String
+    var fixedVariableRaw: String?
+
+    init(
+        id: String = UUID().uuidString,
+        title: String,
+        amountC: Int,
+        accountId: String,
+        categoryId: String,
+        paidBy: PersonId,
+        allocation: Allocation,
+        cadence: Projection.Cadence,
+        anchorDay: Projection.AnchorDay,
+        amountBehavior: Projection.AmountBehavior,
+        startCycleISO: String,
+        endCycleISO: String? = nil,
+        paused: Bool = false,
+        flow: FlowType,
+        fixedVariable: FixedVariable? = nil
+    ) {
+        self.id = id
+        self.title = title
+        self.amountC = amountC
+        self.accountId = accountId
+        self.categoryId = categoryId
+        self.paidByRaw = paidBy.rawValue
+        self.allocFernC = allocation.fern
+        self.allocStarkC = allocation.stark
+        self.cadenceRaw = cadence.rawValue
+        self.anchorDayRaw = anchorDay.rawValue
+        self.amountBehaviorRaw = amountBehavior.rawValue
+        self.startCycleISO = startCycleISO
+        self.endCycleISO = endCycleISO
+        self.paused = paused
+        self.flowRaw = flow.rawValue
+        self.fixedVariableRaw = fixedVariable?.rawValue
+    }
+
+    var engineRule: Projection.Rule {
+        Projection.Rule(
+            id: id,
+            amountC: amountC,
+            accountId: accountId,
+            categoryId: categoryId,
+            paidBy: PersonId(rawValue: paidByRaw) ?? .fern,
+            allocationFernC: allocFernC,
+            allocationStarkC: allocStarkC,
+            cadence: Projection.Cadence(rawValue: cadenceRaw) ?? .biweekly,
+            anchorDay: Projection.AnchorDay(rawValue: anchorDayRaw) ?? .both,
+            amountBehavior: Projection.AmountBehavior(rawValue: amountBehaviorRaw) ?? .exact,
+            startCycleISO: startCycleISO,
+            endCycleISO: endCycleISO,
+            paused: paused,
+            title: title,
+            flow: FlowType(rawValue: flowRaw) ?? .expense,
+            fixedVariable: fixedVariableRaw.flatMap(FixedVariable.init(rawValue:))
+        )
     }
 }
 

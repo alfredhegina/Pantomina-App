@@ -106,6 +106,65 @@ enum SeedCatalog {
                 )
             )
         }
+
+        try seedDemoRulesIfNeeded(into: context)
         try context.save()
+    }
+
+    /// Demo recurring rules for Forecast/Checklist (additive backfill).
+    @MainActor
+    static func seedDemoRulesIfNeeded(into context: ModelContext) throws {
+        let existing = try context.fetch(FetchDescriptor<RecurringRuleRecord>())
+        guard existing.isEmpty else { return }
+
+        let accounts = try context.fetch(FetchDescriptor<AccountRecord>())
+        let categories = try context.fetch(FetchDescriptor<CategoryRecord>())
+        guard
+            let cash = accounts.first(where: { $0.baseName == "House cash box" && $0.scope == .household }),
+            let rent = categories.first(where: { $0.group == "Rent" && $0.item == "House" }),
+            let internet = categories.first(where: { $0.group == "Utilities" && $0.item == "Internet PLDT" })
+        else { return }
+
+        let start = Cycle.cycleFor(isoDate: {
+            let f = DateFormatter()
+            f.calendar = Calendar(identifier: .gregorian)
+            f.locale = Locale(identifier: "en_US_POSIX")
+            f.timeZone = TimeZone.current
+            f.dateFormat = "yyyy-MM-dd"
+            return f.string(from: Date())
+        }()).anchorISO
+
+        context.insert(
+            RecurringRuleRecord(
+                title: rent.displayName,
+                amountC: 20_000_00,
+                accountId: cash.id,
+                categoryId: rent.id,
+                paidBy: .fern,
+                allocation: Allocation(fern: 10_000_00, stark: 10_000_00),
+                cadence: .biweekly,
+                anchorDay: .both,
+                amountBehavior: .exact,
+                startCycleISO: start,
+                flow: .expense,
+                fixedVariable: .fixed
+            )
+        )
+        context.insert(
+            RecurringRuleRecord(
+                title: internet.displayName,
+                amountC: 1_799_00,
+                accountId: cash.id,
+                categoryId: internet.id,
+                paidBy: .fern,
+                allocation: Allocation(fern: 1_799_00, stark: 0),
+                cadence: .monthly,
+                anchorDay: .fifteenth,
+                amountBehavior: .exact,
+                startCycleISO: start,
+                flow: .expense,
+                fixedVariable: .fixed
+            )
+        )
     }
 }

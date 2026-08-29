@@ -110,6 +110,22 @@ struct Seg: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
+        Group {
+            if options.count <= 4 {
+                equalWidthBar
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    barContent(equalWidth: false)
+                }
+            }
+        }
+    }
+
+    private var equalWidthBar: some View {
+        barContent(equalWidth: true)
+    }
+
+    private func barContent(equalWidth: Bool) -> some View {
         HStack(spacing: 0) {
             ForEach(options.indices, id: \.self) { index in
                 Button {
@@ -119,12 +135,16 @@ struct Seg: View {
                 } label: {
                     Text(options[index])
                         .font(PantominaFont.caption)
-                        .frame(maxWidth: .infinity)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.85)
+                        .padding(.horizontal, equalWidth ? Spacing.sm : Spacing.md)
+                        .frame(maxWidth: equalWidth ? .infinity : nil)
                         .frame(minHeight: 44)
                         .background(selection == index ? Color.pantomina.sage : Color.clear)
                         .foregroundStyle(selection == index ? Color.white : Color.pantomina.muted)
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel(options[index])
             }
         }
         .background(Color.pantomina.hairline)

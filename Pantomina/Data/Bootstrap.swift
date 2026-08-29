@@ -9,6 +9,7 @@ enum PantominaSchema {
             AccountRecord.self,
             CategoryRecord.self,
             TransactionRecord.self,
+            RecurringRuleRecord.self,
             AppMeta.self,
         ])
         let config = ModelConfiguration(isStoredInMemoryOnly: false)

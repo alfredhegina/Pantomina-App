@@ -7,8 +7,10 @@ Shared finance for exactly two people — **Fern** (payer) and **Stark** (contri
 
 ## Status
 
-**Phase 3** — allocations & settlement, Love Tab, Bills split + Fern share; Statement day cycle pick.  
-**Phase 4** — skills locked (Forecast, Checklist, funding, Cookie Jar); build next.  
+**Paused after Phase 4 Slice A** (+ Bills/Receipts polish + Receipts swipe Edit/Delete, contribution amount edit). **Next:** Slice B (funding) then C (Cookie Jar).  
+**Phase 4 Slice A** — Projection / Forecast / Checklist on Bills; recurring rules seed; Things We Keep Doing (read-only).  
+**Receipts hygiene** — swipe Edit / Delete; contributions amount-only Edit.  
+Phase 3 — allocations & settlement, Love Tab, Bills split + Fern share; Statement day cycle pick.  
 Phase 2 — realization engine, TBD drawer, Statement day.  
 Phase 1 — identity, seed CoA/accounts, onboarding, Receipts filters, Add entry, Settings rename.
 

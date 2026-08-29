@@ -8,6 +8,7 @@ struct BillsView: View {
     @Query private var accounts: [AccountRecord]
     @Query private var categories: [CategoryRecord]
     @Query private var people: [PersonRecord]
+    @Query private var recurringRules: [RecurringRuleRecord]
 
     @State private var pane = 0
     @State private var selectedAnchor: String?
@@ -15,7 +16,14 @@ struct BillsView: View {
     @State private var contributionText = ""
     @State private var contributionError: String?
     @State private var toast: String?
+    @State private var estimateTask: Checklist.Task?
+    @State private var estimateText = ""
+    @State private var statementRoute: String?
+    @AppStorage("checklistDoneIds") private var checklistDoneRaw = ""
 
+    private var checklistDoneIds: Set<String> {
+        Set(checklistDoneRaw.split(separator: ",").map(String.init).filter { !$0.isEmpty })
+    }
     private var accountById: [String: AccountRecord] {
         Dictionary(uniqueKeysWithValues: accounts.map { ($0.id, $0) })
     }
@@ -70,20 +78,95 @@ struct BillsView: View {
         Settlement.householdShares(cycleAnchorISO: activeAnchor, rows: ledgerRows)
     }
 
+    private var projectionRules: [Projection.Rule] {
+        recurringRules.map(\.engineRule)
+    }
+
+    private var forecastResult: Forecast.Result {
+        let projected = Projection.rows(forCycleISO: activeAnchor, rules: projectionRules)
+        let income = transactions.compactMap { tx -> Forecast.IncomeRow? in
+            guard tx.realizedStatus == .realized,
+                  let cat = categories.first(where: { $0.id == tx.categoryId }),
+                  cat.flow == .income,
+                  tx.realizedDate.map({ Cycle.cycleFor(isoDate: $0).anchorISO }) == activeAnchor
+            else { return nil }
+            return Forecast.IncomeRow(id: tx.id, title: cat.displayName, amountC: tx.amountC)
+        }
+        let pendingCards = transactions.compactMap { tx -> Forecast.PendingCard? in
+            guard tx.realizedStatus == .pending,
+                  tx.proposedRealizedDate == activeAnchor,
+                  let cat = categories.first(where: { $0.id == tx.categoryId })
+            else { return nil }
+            return Forecast.PendingCard(id: tx.id, title: cat.displayName, amountC: tx.amountC)
+        }
+        return Forecast.build(
+            cycleISO: activeAnchor,
+            incomeRows: income,
+            projected: projected,
+            pendingCards: pendingCards,
+            trancheLines: [],
+            typicalVariableC: 8_000_00
+        )
+    }
+
+    private var checklistTasks: [Checklist.Task] {
+        let statementPending = Set(
+            transactions.compactMap { tx -> String? in
+                guard tx.realizedStatus == .pending else { return nil }
+                let account = accountById[tx.accountId]
+                guard account?.settlement == .statement else { return nil }
+                return tx.accountId
+            }
+        )
+        return Checklist.tasks(
+            cycleISO: activeAnchor,
+            todayISO: Self.todayISO(),
+            rules: projectionRules,
+            statementAccountsWithPending: Array(statementPending).sorted(),
+            trancheTasks: [],
+            doneIds: checklistDoneIds
+        )
+    }
+
     var body: some View {
         let snap = currentSnapshot
         let fern = people.first { $0.id == .fern }?.name ?? "Fern"
         let stark = people.first { $0.id == .stark }?.name ?? "Stark"
+        let forecast = forecastResult
+        let tasks = checklistTasks
+        let summary = Checklist.summary(tasks: tasks)
         NavigationStack {
             VStack(spacing: 0) {
-                Seg(options: ["The split", "The Love Tab"], selection: $pane)
-                    .padding(.horizontal, Spacing.lg)
-                    .padding(.vertical, Spacing.sm)
+                Seg(
+                    options: ["Split", "Forecast", "Checklist", "Love Tab"],
+                    selection: $pane
+                )
+                .padding(.horizontal, Spacing.lg)
+                .padding(.vertical, Spacing.sm)
 
-                if pane == 0 {
-                    splitPane(snap: snap, fernName: fern, starkName: stark)
-                } else {
+                switch pane {
+                case 1:
+                    BillsForecastPane(
+                        cycleISO: activeAnchor,
+                        forecast: forecast,
+                        onPickCycle: { AnyView(cycleMenu) }
+                    )
+                case 2:
+                    BillsChecklistPane(
+                        cycleISO: activeAnchor,
+                        tasks: tasks,
+                        summary: summary,
+                        accountLabels: Dictionary(uniqueKeysWithValues: accounts.map {
+                            ($0.id, $0.displayLabel(fernName: fern, starkName: stark))
+                        }),
+                        onPickCycle: { AnyView(cycleMenu) },
+                        onToggle: handleChecklistToggle,
+                        onOpenStatement: { statementRoute = $0 }
+                    )
+                case 3:
                     loveTabPane(fernName: fern, starkName: stark)
+                default:
+                    splitPane(snap: snap, fernName: fern, starkName: stark)
                 }
             }
             .background(Color.pantomina.ground)
@@ -97,6 +180,15 @@ struct BillsView: View {
                             .foregroundStyle(Color.pantomina.muted)
                     }
                 }
+            }
+            .navigationDestination(isPresented: Binding(
+                get: { statementRoute != nil },
+                set: { if !$0 { statementRoute = nil } }
+            )) {
+                StatementDayView()
+            }
+            .sheet(item: $estimateTask) { task in
+                estimateSheet(task)
             }
             .sheet(isPresented: $showLogContribution) {
                 contributionSheet(starkName: stark)
@@ -115,8 +207,138 @@ struct BillsView: View {
                 if selectedAnchor == nil {
                     selectedAnchor = anchors.last
                 }
+                try? SeedCatalog.seedDemoRulesIfNeeded(into: modelContext)
+                try? modelContext.save()
             }
         }
+    }
+
+    private var cycleMenu: some View {
+        Group {
+            if !anchors.isEmpty {
+                Picker("Cycle", selection: Binding(
+                    get: { activeAnchor },
+                    set: { selectedAnchor = $0 }
+                )) {
+                    ForEach(anchors.reversed(), id: \.self) { anchor in
+                        Text(DisplayLabels.displayDate(iso: anchor)).tag(anchor)
+                    }
+                }
+                .pickerStyle(.menu)
+                .accessibilityLabel("Cycle")
+            }
+        }
+    }
+
+    private func handleChecklistToggle(_ task: Checklist.Task) {
+        guard !task.done else { return }
+        if task.amountBehavior == .estimate {
+            estimateText = String(format: "%.2f", Double(task.amountC) / 100)
+            estimateTask = task
+            return
+        }
+        confirmChecklistTask(task, amountC: task.amountC)
+    }
+
+    private func confirmChecklistTask(_ task: Checklist.Task, amountC: Int) {
+        guard let ruleId = task.linkedId,
+              let rule = recurringRules.first(where: { $0.id == ruleId })
+        else {
+            markChecklistDone(task.id)
+            return
+        }
+        let fernShare: Int
+        let starkShare: Int
+        if rule.allocFernC + rule.allocStarkC == rule.amountC, rule.amountC > 0 {
+            fernShare = Int((Double(rule.allocFernC) / Double(rule.amountC) * Double(amountC)).rounded())
+            starkShare = amountC - fernShare
+        } else {
+            fernShare = amountC
+            starkShare = 0
+        }
+        let draft = Projection.DraftRow(
+            id: task.id,
+            recurringRuleId: rule.id,
+            title: rule.title,
+            amountC: amountC,
+            accountId: rule.accountId,
+            categoryId: rule.categoryId,
+            paidBy: PersonId(rawValue: rule.paidByRaw) ?? .fern,
+            allocationFernC: fernShare,
+            allocationStarkC: starkShare,
+            status: .projected,
+            realizedDate: nil,
+            proposedRealizedDate: activeAnchor,
+            amountBehavior: Projection.AmountBehavior(rawValue: rule.amountBehaviorRaw) ?? .exact,
+            flow: FlowType(rawValue: rule.flowRaw) ?? .expense,
+            fixedVariable: rule.fixedVariableRaw.flatMap(FixedVariable.init(rawValue:))
+        )
+        let confirmed = rule.amountBehaviorRaw == Projection.AmountBehavior.estimate.rawValue
+            ? Projection.confirmEstimate(draft, cycleISO: activeAnchor, amountC: amountC)
+            : Projection.confirmExact(draft, cycleISO: activeAnchor)
+        let routed = AllocationRouting.record(
+            intended: Allocation(fern: confirmed.allocationFernC, stark: confirmed.allocationStarkC),
+            accountScope: accountById[confirmed.accountId]?.scope ?? .household,
+            paidBy: confirmed.paidBy
+        )
+        let tx = TransactionRecord(
+            purchaseDate: activeAnchor,
+            realizedDate: confirmed.realizedDate,
+            realizedStatus: .realized,
+            amountC: confirmed.amountC,
+            accountId: confirmed.accountId,
+            categoryId: confirmed.categoryId,
+            paidBy: confirmed.paidBy,
+            allocation: routed,
+            recurringRuleId: confirmed.recurringRuleId,
+            note: confirmed.title
+        )
+        modelContext.insert(tx)
+        try? modelContext.save()
+        markChecklistDone(task.id)
+        Task { @MainActor in
+            PantominaMotion.run(reduceMotion) { toast = "Counted. Updates everywhere." }
+            try? await Task.sleep(nanoseconds: 1_400_000_000)
+            PantominaMotion.run(reduceMotion) { toast = nil }
+        }
+    }
+
+    private func markChecklistDone(_ id: String) {
+        var ids = checklistDoneIds
+        ids.insert(id)
+        checklistDoneRaw = ids.sorted().joined(separator: ",")
+    }
+
+    private func estimateSheet(_ task: Checklist.Task) -> some View {
+        NavigationStack {
+            Form {
+                Section {
+                    TextField("Amount", text: $estimateText)
+                        .keyboardType(.decimalPad)
+                } header: {
+                    Text(task.title)
+                } footer: {
+                    Text("Confirm what actually hit for \(DisplayLabels.displayDate(iso: activeAnchor)).")
+                }
+            }
+            .navigationTitle("Confirm amount")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { estimateTask = nil }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") {
+                        guard let amountC = InputBounds.centavos(fromPesosText: estimateText), amountC > 0 else {
+                            return
+                        }
+                        estimateTask = nil
+                        confirmChecklistTask(task, amountC: amountC)
+                    }
+                }
+            }
+        }
+        .presentationDetents([.medium])
     }
 
     @ViewBuilder
@@ -198,38 +420,40 @@ struct BillsView: View {
                         }
                     }
 
-                    if shares.fernC > 0 || shares.starkC > 0 {
-                        fernShareCard(shares, fernName: fernName, starkName: starkName)
-                    }
+                    VStack(alignment: .leading, spacing: Spacing.md) {
+                        if shares.fernC > 0 || shares.starkC > 0 {
+                            fernShareCard(shares, fernName: fernName, starkName: starkName)
+                        }
 
-                    Button {
-                        contributionText = ""
-                        contributionError = nil
-                        showLogContribution = true
-                    } label: {
-                        Text("Log a contribution")
-                            .font(PantominaFont.body.weight(.semibold))
-                            .frame(maxWidth: .infinity)
-                            .frame(minHeight: 48)
-                            .background(Color.pantomina.sage)
-                            .foregroundStyle(.white)
-                            .clipShape(RoundedRectangle(cornerRadius: Spacing.radius, style: .continuous))
-                    }
-                    .buttonStyle(SageButtonStyle())
-
-                    if result.remainingC > 0 {
                         Button {
-                            postReceivable(remainingC: result.remainingC, anchor: activeAnchor)
+                            contributionText = ""
+                            contributionError = nil
+                            showLogContribution = true
                         } label: {
-                            Text("Post remaining to Love Tab")
+                            Text("Log a contribution")
                                 .font(PantominaFont.body.weight(.semibold))
                                 .frame(maxWidth: .infinity)
                                 .frame(minHeight: 48)
-                                .background(Color.pantomina.terra.opacity(0.2))
-                                .foregroundStyle(Color.pantomina.terraDeep)
+                                .background(Color.pantomina.sage)
+                                .foregroundStyle(.white)
                                 .clipShape(RoundedRectangle(cornerRadius: Spacing.radius, style: .continuous))
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(SageButtonStyle())
+
+                        if result.remainingC > 0 {
+                            Button {
+                                postReceivable(remainingC: result.remainingC, anchor: activeAnchor)
+                            } label: {
+                                Text("Post remaining to Love Tab")
+                                    .font(PantominaFont.body.weight(.semibold))
+                                    .frame(maxWidth: .infinity)
+                                    .frame(minHeight: 48)
+                                    .background(Color.pantomina.terra.opacity(0.2))
+                                    .foregroundStyle(Color.pantomina.terraDeep)
+                                    .clipShape(RoundedRectangle(cornerRadius: Spacing.radius, style: .continuous))
+                            }
+                            .buttonStyle(.plain)
+                        }
                     }
                 } else {
                     Text("Nothing settled in this cycle yet.")

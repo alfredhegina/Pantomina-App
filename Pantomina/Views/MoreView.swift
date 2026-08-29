@@ -35,10 +35,25 @@ struct MoreView: View {
                     }
                 }
 
+                NavigationLink {
+                    ThingsWeKeepDoingView()
+                } label: {
+                    Label {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Things We Keep Doing")
+                            Text("Recurring")
+                                .font(PantominaFont.caption)
+                                .foregroundStyle(Color.pantomina.muted)
+                        }
+                    } icon: {
+                        Image(systemName: "arrow.triangle.2.circlepath")
+                    }
+                }
+
                 Section {
                     EmptyView()
                 } footer: {
-                    Text("Settings for now — more rooms later.")
+                    Text("Settings, Statement day, and recurring for now — more rooms later.")
                         .font(PantominaFont.caption)
                 }
             }

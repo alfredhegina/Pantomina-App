@@ -11,6 +11,8 @@ struct AddEntryView: View {
 
     /// When false, view is presented as a sheet and dismisses after save.
     var presentsAsSheet: Bool = true
+    /// When set, Save updates this row instead of inserting.
+    var editingTransaction: TransactionRecord? = nil
 
     @AppStorage("recentCategoryIds") private var recentCategoryIdsRaw = ""
     @AppStorage("recentAccountIds") private var recentAccountIdsRaw = ""
@@ -28,11 +30,15 @@ struct AddEntryView: View {
     @State private var savedToast = false
     @State private var showCategoryPicker = false
     @State private var showAccountPicker = false
+    @State private var didPrefillEdit = false
+    @State private var skipAccountDefaults = false
     @FocusState private var focusedField: Field?
 
     private enum Field {
         case amount, customFern, customStark, note
     }
+
+    private var isEditing: Bool { editingTransaction != nil }
 
     private var pickerCategories: [CategoryRecord] {
         categories.filter { !$0.system }.sorted { $0.displayName < $1.displayName }
@@ -96,8 +102,8 @@ struct AddEntryView: View {
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     VStack(spacing: 2) {
-                        PetTitle("Add to the pile")
-                        Text("New entry")
+                        PetTitle(isEditing ? "Edit the pile" : "Add to the pile")
+                        Text(isEditing ? "Update entry" : "New entry")
                             .font(PantominaFont.caption)
                             .foregroundStyle(Color.pantomina.muted)
                     }
@@ -108,7 +114,7 @@ struct AddEntryView: View {
             }
             .overlay(alignment: .bottom) {
                 if savedToast {
-                    Text("Saved. Team effort.")
+                    Text(isEditing ? "Updated." : "Saved. Team effort.")
                         .padding(.horizontal, Spacing.lg)
                         .padding(.vertical, Spacing.sm)
                         .background(Color.pantomina.ink)
@@ -133,18 +139,27 @@ struct AddEntryView: View {
                 )
             }
             .onAppear {
-                if selectedAccountId == nil {
-                    selectedAccountId = orderedAccounts().first?.id
+                if let tx = editingTransaction, !didPrefillEdit {
+                    prefill(from: tx)
+                    didPrefillEdit = true
+                } else if editingTransaction == nil {
+                    if selectedAccountId == nil {
+                        selectedAccountId = orderedAccounts().first?.id
+                    }
+                    if selectedCategoryId == nil {
+                        selectedCategoryId = orderedCategories().first?.id
+                    }
+                    applyAccountDefaults()
                 }
-                if selectedCategoryId == nil {
-                    selectedCategoryId = orderedCategories().first?.id
-                }
-                applyAccountDefaults()
             }
             .onDisappear {
                 focusedField = nil
             }
             .onChange(of: selectedAccountId) { _, _ in
+                if skipAccountDefaults {
+                    skipAccountDefaults = false
+                    return
+                }
                 applyAccountDefaults()
             }
         }
@@ -350,6 +365,29 @@ struct AddEntryView: View {
         }
     }
 
+    private func prefill(from tx: TransactionRecord) {
+        skipAccountDefaults = true
+        amountText = String(format: "%.2f", Double(tx.amountC) / 100)
+        selectedAccountId = tx.accountId
+        selectedCategoryId = tx.categoryId
+        paidBy = tx.paidBy
+        note = tx.note ?? ""
+        purchaseDate = Self.date(fromISO: tx.purchaseDate) ?? Date()
+
+        let half = tx.amountC / 2
+        let justMine = (tx.paidBy == .fern && tx.allocStarkC == 0 && tx.allocFernC == tx.amountC)
+            || (tx.paidBy == .stark && tx.allocFernC == 0 && tx.allocStarkC == tx.amountC)
+        if justMine {
+            splitMode = 0
+        } else if abs(tx.allocFernC - half) <= 1 && abs(tx.allocStarkC - (tx.amountC - half)) <= 1 {
+            splitMode = 1
+        } else {
+            splitMode = 2
+            customFern = String(format: "%.2f", Double(tx.allocFernC) / 100)
+            customStark = String(format: "%.2f", Double(tx.allocStarkC) / 100)
+        }
+    }
+
     private func amountCentavos() -> Int? {
         InputBounds.centavos(fromPesosText: amountText)
     }
@@ -426,35 +464,56 @@ struct AddEntryView: View {
             }
         }()
 
-        let tx = TransactionRecord(
-            purchaseDate: purchaseISO,
-            realizedDate: decision.realizedDate,
-            realizedStatus: decision.status,
-            proposedRealizedDate: decision.proposedRealizedDate,
-            amountC: amountC,
-            accountId: accountId,
-            categoryId: categoryId,
-            paidBy: paidBy,
-            allocation: allocation,
-            settlementRole: settlementRole,
-            note: {
-                let trimmed = InputBounds.clampNote(note).trimmingCharacters(in: .whitespacesAndNewlines)
-                return trimmed.isEmpty ? nil : trimmed
-            }()
-        )
-        modelContext.insert(tx)
+        let noteValue: String? = {
+            let trimmed = InputBounds.clampNote(note).trimmingCharacters(in: .whitespacesAndNewlines)
+            return trimmed.isEmpty ? nil : trimmed
+        }()
+
+        if let existing = editingTransaction {
+            existing.purchaseDate = purchaseISO
+            existing.realizedDate = decision.realizedDate
+            existing.realizedStatus = decision.status
+            existing.proposedRealizedDate = decision.proposedRealizedDate
+            existing.amountC = amountC
+            existing.accountId = accountId
+            existing.categoryId = categoryId
+            existing.paidByRaw = paidBy.rawValue
+            existing.allocFernC = allocation.fern
+            existing.allocStarkC = allocation.stark
+            existing.settlementRole = settlementRole
+            existing.note = noteValue
+            existing.updatedAt = .now
+        } else {
+            let tx = TransactionRecord(
+                purchaseDate: purchaseISO,
+                realizedDate: decision.realizedDate,
+                realizedStatus: decision.status,
+                proposedRealizedDate: decision.proposedRealizedDate,
+                amountC: amountC,
+                accountId: accountId,
+                categoryId: categoryId,
+                paidBy: paidBy,
+                allocation: allocation,
+                settlementRole: settlementRole,
+                note: noteValue
+            )
+            modelContext.insert(tx)
+        }
+
         do {
             try modelContext.save()
-            // Defer AppStorage + UI state so we don't mutate during an in-flight view update cycle.
             let catId = categoryId
             let accId = accountId
+            let editing = isEditing
             Task { @MainActor in
                 bumpRecent(id: catId, raw: &recentCategoryIdsRaw)
                 bumpRecent(id: accId, raw: &recentAccountIdsRaw)
                 PantominaMotion.run(reduceMotion) { savedToast = true }
-                amountText = ""
-                note = ""
-                applyAccountDefaults()
+                if !editing {
+                    amountText = ""
+                    note = ""
+                    applyAccountDefaults()
+                }
                 try? await Task.sleep(nanoseconds: 1_200_000_000)
                 PantominaMotion.run(reduceMotion) { savedToast = false }
                 if presentsAsSheet { dismiss() }
@@ -471,6 +530,15 @@ struct AddEntryView: View {
         f.timeZone = TimeZone.current
         f.dateFormat = "yyyy-MM-dd"
         return f.string(from: date)
+    }
+
+    private static func date(fromISO iso: String) -> Date? {
+        let f = DateFormatter()
+        f.calendar = Calendar(identifier: .gregorian)
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.timeZone = TimeZone.current
+        f.dateFormat = "yyyy-MM-dd"
+        return f.date(from: iso)
     }
 }
 

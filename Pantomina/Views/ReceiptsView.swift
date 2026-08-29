@@ -2,6 +2,8 @@ import SwiftUI
 import SwiftData
 
 struct ReceiptsView: View {
+    @Environment(\.modelContext) private var modelContext
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Query(sort: \TransactionRecord.purchaseDate, order: .reverse) private var transactions: [TransactionRecord]
     @Query private var accounts: [AccountRecord]
     @Query private var categories: [CategoryRecord]
@@ -11,6 +13,13 @@ struct ReceiptsView: View {
     @State private var scopeFilter: Scope?
     @State private var flowFilter: FlowType?
     @State private var statusFilter: RealizedStatus?
+    @State private var showMoreFilters = false
+    @State private var editingTx: TransactionRecord?
+    @State private var editingContribution: TransactionRecord?
+    @State private var contributionEditText = ""
+    @State private var contributionEditError: String?
+    @State private var pendingDelete: TransactionRecord?
+    @State private var toast: String?
 
     private enum Route: Hashable {
         case statementDay
@@ -18,6 +27,14 @@ struct ReceiptsView: View {
 
     private var filtersActive: Bool {
         personFilter != nil || scopeFilter != nil || flowFilter != nil || statusFilter != nil
+    }
+
+    private var sheetFiltersActive: Bool {
+        flowFilter != nil || statusFilter != nil
+    }
+
+    private var sheetFilterCount: Int {
+        (flowFilter != nil ? 1 : 0) + (statusFilter != nil ? 1 : 0)
     }
 
     var body: some View {
@@ -143,7 +160,53 @@ struct ReceiptsView: View {
                     StatementDayView()
                 }
             }
+            .sheet(isPresented: $showMoreFilters) {
+                moreFiltersSheet
+            }
+            .sheet(item: $editingTx) { tx in
+                AddEntryView(presentsAsSheet: true, editingTransaction: tx)
+            }
+            .sheet(item: $editingContribution) { tx in
+                contributionEditSheet(tx, starkName: stark)
+            }
+            .confirmationDialog(
+                deleteDialogTitle,
+                isPresented: Binding(
+                    get: { pendingDelete != nil },
+                    set: { if !$0 { pendingDelete = nil } }
+                ),
+                titleVisibility: .visible
+            ) {
+                Button("Remove", role: .destructive) {
+                    if let tx = pendingDelete {
+                        deleteTransaction(tx)
+                    }
+                    pendingDelete = nil
+                }
+                Button("Cancel", role: .cancel) {
+                    pendingDelete = nil
+                }
+            }
+            .overlay(alignment: .bottom) {
+                if let toast {
+                    Text(toast)
+                        .padding(.horizontal, Spacing.lg)
+                        .padding(.vertical, Spacing.sm)
+                        .background(Color.pantomina.ink)
+                        .foregroundStyle(.white)
+                        .clipShape(Capsule())
+                        .padding(.bottom, 24)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+            }
         }
+    }
+
+    private var deleteDialogTitle: String {
+        if pendingDelete?.settlementRole != nil {
+            return "This was posted from Bills. Remove it?"
+        }
+        return "Remove from the pile?"
     }
 
     private static func filteredTransactions(
@@ -191,41 +254,114 @@ struct ReceiptsView: View {
     }
 
     private func filterBar(fernName: String, starkName: String) -> some View {
-        VStack(alignment: .leading, spacing: Spacing.sm) {
-            FlowLayout(spacing: Spacing.sm) {
-                filterChip("All people", selected: personFilter == nil) { personFilter = nil }
-                filterChip(fernName, selected: personFilter == .fern) { personFilter = .fern }
-                filterChip(starkName, selected: personFilter == .stark) { personFilter = .stark }
-                filterChip("Shared", selected: scopeFilter == .household) {
-                    scopeFilter = scopeFilter == .household ? nil : .household
+        FlowLayout(spacing: Spacing.sm) {
+            filterChip("All", selected: personFilter == nil && scopeFilter == nil) {
+                personFilter = nil
+                scopeFilter = nil
+            }
+            filterChip(fernName, selected: personFilter == .fern) {
+                personFilter = personFilter == .fern ? nil : .fern
+                if personFilter != nil { scopeFilter = nil }
+            }
+            filterChip(starkName, selected: personFilter == .stark) {
+                personFilter = personFilter == .stark ? nil : .stark
+                if personFilter != nil { scopeFilter = nil }
+            }
+            filterChip("Shared", selected: scopeFilter == .household) {
+                scopeFilter = scopeFilter == .household ? nil : .household
+                if scopeFilter != nil { personFilter = nil }
+            }
+            filterChip(
+                sheetFilterCount > 0 ? "Filters · \(sheetFilterCount)" : "Filters",
+                selected: sheetFiltersActive
+            ) {
+                showMoreFilters = true
+            }
+            if filtersActive {
+                filterChip("Clear", selected: false) {
+                    clearAllFilters()
                 }
-                filterChip("Expense", selected: flowFilter == .expense) {
-                    flowFilter = flowFilter == .expense ? nil : .expense
+            }
+        }
+        .padding(.horizontal, Spacing.lg)
+        .padding(.vertical, Spacing.sm)
+    }
+
+    private var moreFiltersSheet: some View {
+        NavigationStack {
+            List {
+                Section("Flow") {
+                    sheetToggleRow("Expense", selected: flowFilter == .expense) {
+                        flowFilter = flowFilter == .expense ? nil : .expense
+                    }
+                    sheetToggleRow("Income", selected: flowFilter == .income) {
+                        flowFilter = flowFilter == .income ? nil : .income
+                    }
                 }
-                filterChip("Income", selected: flowFilter == .income) {
-                    flowFilter = flowFilter == .income ? nil : .income
-                }
-                filterChip(DisplayLabels.statusFilter(.pending), selected: statusFilter == .pending) {
-                    statusFilter = statusFilter == .pending ? nil : .pending
-                }
-                if filtersActive {
-                    filterChip("Clear", selected: false) {
-                        personFilter = nil
-                        scopeFilter = nil
-                        flowFilter = nil
-                        statusFilter = nil
+                Section("Status") {
+                    sheetToggleRow(
+                        DisplayLabels.statusFilterShort(.pending),
+                        selected: statusFilter == .pending
+                    ) {
+                        statusFilter = statusFilter == .pending ? nil : .pending
+                    }
+                    sheetToggleRow(
+                        DisplayLabels.statusFilterShort(.projected),
+                        selected: statusFilter == .projected
+                    ) {
+                        statusFilter = statusFilter == .projected ? nil : .projected
                     }
                 }
             }
-            .padding(.horizontal, Spacing.lg)
-            .padding(.vertical, Spacing.sm)
+            .listStyle(.insetGrouped)
+            .navigationTitle("Filters")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Clear") {
+                        flowFilter = nil
+                        statusFilter = nil
+                    }
+                    .disabled(!sheetFiltersActive)
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { showMoreFilters = false }
+                        .fontWeight(.semibold)
+                }
+            }
         }
+        .presentationDetents([.medium])
+    }
+
+    private func sheetToggleRow(_ title: String, selected: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack {
+                Text(title)
+                    .foregroundStyle(Color.pantomina.ink)
+                Spacer()
+                if selected {
+                    Image(systemName: "checkmark")
+                        .foregroundStyle(Color.pantomina.sage)
+                }
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(selected ? [.isSelected, .isButton] : .isButton)
+    }
+
+    private func clearAllFilters() {
+        personFilter = nil
+        scopeFilter = nil
+        flowFilter = nil
+        statusFilter = nil
     }
 
     private func filterChip(_ title: String, selected: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Text(title)
                 .font(PantominaFont.caption)
+                .lineLimit(1)
                 .padding(.horizontal, Spacing.md)
                 .frame(minHeight: 44)
                 .background(selected ? Color.pantomina.sage : Color.pantomina.hairline)
@@ -249,10 +385,7 @@ struct ReceiptsView: View {
                 .multilineTextAlignment(.center)
             if filtersActive {
                 Button("Clear filters") {
-                    personFilter = nil
-                    scopeFilter = nil
-                    flowFilter = nil
-                    statusFilter = nil
+                    clearAllFilters()
                 }
                 .font(PantominaFont.body.weight(.semibold))
                 .foregroundStyle(Color.pantomina.sage)
@@ -296,12 +429,152 @@ struct ReceiptsView: View {
                 Text(label)
                 Spacer()
                 if let status = DisplayLabels.status(tx.realizedStatus) {
-                    Chip(label: status, tone: tx.realizedStatus == .pending ? .terra : .neutral)
+                    Chip(
+                        label: status,
+                        tone: tx.realizedStatus == .pending ? .terra : .neutral
+                    )
                 }
             }
             .font(PantominaFont.caption)
             .foregroundStyle(Color.pantomina.muted)
         }
+        .opacity(tx.realizedStatus == .projected ? 0.72 : 1)
         .listRowBackground(Color.pantomina.card)
+        .swipeActions(edge: .leading, allowsFullSwipe: false) {
+            if tx.settlementRole == nil {
+                Button {
+                    editingTx = tx
+                } label: {
+                    Label("Edit", systemImage: "pencil")
+                }
+                .tint(Color.pantomina.sage)
+            } else if tx.settlementRole == .contribution {
+                Button {
+                    contributionEditText = String(format: "%.2f", Double(tx.amountC) / 100)
+                    contributionEditError = nil
+                    editingContribution = tx
+                } label: {
+                    Label("Edit", systemImage: "pencil")
+                }
+                .tint(Color.pantomina.sage)
+            }
+        }
+        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+            Button(role: .destructive) {
+                pendingDelete = tx
+            } label: {
+                Label("Delete", systemImage: "trash")
+            }
+        }
+        .accessibilityAction(named: "Delete") {
+            pendingDelete = tx
+        }
+        .modifier(EditAccessibilityModifier(
+            kind: {
+                if tx.settlementRole == nil { return .full }
+                if tx.settlementRole == .contribution { return .contribution }
+                return .none
+            }()
+        ) {
+            if tx.settlementRole == nil {
+                editingTx = tx
+            } else if tx.settlementRole == .contribution {
+                contributionEditText = String(format: "%.2f", Double(tx.amountC) / 100)
+                contributionEditError = nil
+                editingContribution = tx
+            }
+        })
+    }
+
+    private func contributionEditSheet(_ tx: TransactionRecord, starkName: String) -> some View {
+        NavigationStack {
+            Form {
+                Section {
+                    TextField("Amount", text: $contributionEditText)
+                        .keyboardType(.decimalPad)
+                    if let contributionEditError {
+                        Text(contributionEditError)
+                            .foregroundStyle(Color.pantomina.terraDeep)
+                    }
+                } header: {
+                    Text("Contribution")
+                } footer: {
+                    Text("Updates \(starkName)'s sent amount for this cycle.")
+                }
+            }
+            .scrollContentBackground(.hidden)
+            .background(Color.pantomina.ground)
+            .navigationTitle("Edit contribution")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { editingContribution = nil }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") { saveContributionEdit(tx) }
+                        .fontWeight(.semibold)
+                }
+            }
+        }
+        .presentationDetents([.medium])
+        .presentationDragIndicator(.visible)
+    }
+
+    private func saveContributionEdit(_ tx: TransactionRecord) {
+        contributionEditError = nil
+        guard let amountC = InputBounds.centavos(fromPesosText: contributionEditText), amountC > 0 else {
+            contributionEditError = "Enter an amount."
+            return
+        }
+        tx.amountC = amountC
+        tx.allocFernC = 0
+        tx.allocStarkC = 0
+        tx.updatedAt = .now
+        do {
+            try modelContext.save()
+            Task { @MainActor in
+                editingContribution = nil
+                PantominaMotion.run(reduceMotion) { toast = "Updated." }
+                try? await Task.sleep(nanoseconds: 1_200_000_000)
+                PantominaMotion.run(reduceMotion) { toast = nil }
+            }
+        } catch {
+            contributionEditError = "Couldn't save. Try again."
+        }
+    }
+
+    private func deleteTransaction(_ tx: TransactionRecord) {
+        modelContext.delete(tx)
+        do {
+            try modelContext.save()
+            Task { @MainActor in
+                PantominaMotion.run(reduceMotion) { toast = "Removed." }
+                try? await Task.sleep(nanoseconds: 1_200_000_000)
+                PantominaMotion.run(reduceMotion) { toast = nil }
+            }
+        } catch {
+            Task { @MainActor in
+                PantominaMotion.run(reduceMotion) { toast = "Couldn't remove. Try again." }
+                try? await Task.sleep(nanoseconds: 1_400_000_000)
+                PantominaMotion.run(reduceMotion) { toast = nil }
+            }
+        }
+    }
+}
+
+private enum ReceiptEditKind {
+    case none, full, contribution
+}
+
+private struct EditAccessibilityModifier: ViewModifier {
+    let kind: ReceiptEditKind
+    let action: () -> Void
+
+    func body(content: Content) -> some View {
+        if kind != .none {
+            content.accessibilityAction(named: "Edit") { action() }
+        } else {
+            content
+        }
     }
 }

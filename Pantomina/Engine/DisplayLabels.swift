@@ -19,6 +19,15 @@ enum DisplayLabels {
         }
     }
 
+    /// Compact filter-sheet labels (row chips still use `status`).
+    static func statusFilterShort(_ status: RealizedStatus) -> String {
+        switch status {
+        case .realized: return "Counted"
+        case .pending: return "Pending"
+        case .projected: return "Projected"
+        }
+    }
+
     static func scope(_ scope: Scope, fernName: String, starkName: String) -> String {
         switch scope {
         case .household: return "Shared"
@@ -65,6 +74,27 @@ enum DisplayLabels {
         case .settled: return "Settled"
         case .partial: return "Partial"
         case .overpaid: return "Overpaid"
+        }
+    }
+
+    static func forecastReason(_ reason: Forecast.Reason) -> String {
+        switch reason {
+        case .income: return "Income"
+        case .fixed: return "Fixed"
+        case .estimate: return "Estimate"
+        case .cardLandsHere: return "Card lands here"
+        case .tranche: return "Tranche"
+        }
+    }
+
+    static func forecastVerdict(_ verdict: Forecast.Verdict, roomC: Int) -> String {
+        switch verdict {
+        case .breathingRoom:
+            return "\(formatPeso(roomC)) breathing room"
+        case .over:
+            return "Over by \(formatPeso(abs(roomC)))"
+        case .tight:
+            return "Right on the line"
         }
     }
 }

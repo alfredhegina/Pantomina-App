@@ -136,3 +136,35 @@ Skills: Impeccable Operate, Humanizer, Emil / apple-design, UI UX Pro Max (mobil
 ### Explicit non-changes (Phase 4 skills)
 
 Phase order 1–8; Love Tab floor-0; statement auto-proposal rule; person ids `fern`/`stark`; centavos; light mode + Fraunces/DM Sans. Fund raids / snowball / loans = Phase 5; Empire = Phase 6; chat Add = Phase 7.
+
+---
+
+## Phase 4 Slice A micro-pass (2026-08-29)
+
+Shipped: engines + Bills Forecast/Checklist + read-only rules. Skills check: short Seg labels, shared cycle, no fake contribution, empty teach copy, estimate sheet, Projected filter. Next: Slice B funding.
+
+## Bills + Receipts UI polish (2026-08-29)
+
+Skills: Impeccable Operate, Humanizer, Emil. UI-only after Slice A.
+
+| Surface | Change |
+| --- | --- |
+| Bills Seg | Equal-width tabs when ≤4 options (no sparse horizontal scroll) |
+| Split | Log / Post CTAs stacked with `Spacing.md` under settle + Fern cards |
+| Forecast | Shortfall tip in verdict card; stacked In / Committed / Typical variable; omit booked footer when lists exist; semibold row amounts |
+| Receipts | People/scope row (All · names · Shared) + Filters sheet (Expense / Income / Pending / Projected); Filters · n when active |
+
+Next product: Phase 4 Slice B (funding).
+
+## Receipts hygiene — swipe Edit / Delete (2026-08-29)
+
+Skills: Operate, Emil, Apple HIG. Before Slice B.
+
+| Action | Behavior |
+| --- | --- |
+| Leading swipe | Edit → prefilled Add sheet; re-runs AllocationRouting + Realization; same `id` |
+| Trailing swipe | Delete → confirm (“Remove from the pile?”); hard delete |
+| Contribution rows | Edit → amount-only sheet; Delete with Bills confirm |
+| Other settlementRole | Delete only; confirm “This was posted from Bills. Remove it?” |
+
+**Paused here.** Next product when resumed: Phase 4 Slice B (funding).
