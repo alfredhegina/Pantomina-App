@@ -46,6 +46,7 @@ Living log of locked **Baseline** choices and parked **For later** work. The pro
 | 2026-08-29 | Bills **The split** shows pending statement Stark-share as **Still in the pile** (not in due); due stays realized-household-only. | Spec §4.3 pending never count as actuals; avoids empty “Settled ₱0” confusion on CC swipes. |
 | 2026-08-29 | Bills **The split** adds **Fern’s share of shared spends** (`Settlement.householdShares`) under Stark settle — includes pending statement by `proposedRealizedDate`. Planning/covers only; **not** reverse Love Tab. | Spreadsheet: Stark pays household card → Fern half still planned for statement; settle due unchanged. |
 | 2026-08-29 | **Pre–Phase 4 polish:** Bills settle → Fern covers → actions order; humanized captions; account picker `Shared · Statement`; cycle picker always when anchors exist; seed **Income · Side hustle** (backfill on existing installs). | Skills Operate/Humanizer/Emil before Forecast/Checklist. |
+| 2026-08-29 | **Phase 4 UX locks (pre-build):** Bills four panes (scrollable Seg); Forecast verdict-first + booked-nothing footer; “over” → Phase 5 raid pointer only; Projected chip/ghost never in actuals; Checklist header + tick=pay/realize; CC task → Statement day typed link; funding under More/Checklist not a fifth pane; Cookie Jar in More with running balance / who’s-paid / no nag. Engines + accept fixtures before chrome. | Skills Operate/Humanizer/Emil/UI UX Pro Max; `docs/SKILLS_REVIEW.md`. |
 
 ## For later
 

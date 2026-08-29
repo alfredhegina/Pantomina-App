@@ -7,8 +7,9 @@ Shared finance for exactly two people — **Fern** (payer) and **Stark** (contri
 
 ## Status
 
-**Phase 3** — allocations & settlement, Love Tab, Bills split + Fern share; pre–Phase 4 polish.  
-Phase 2 — realization engine, TBD drawer, Statement day (pick real statement cycle; tick all pending for the card).
+**Phase 3** — allocations & settlement, Love Tab, Bills split + Fern share; Statement day cycle pick.  
+**Phase 4** — skills locked (Forecast, Checklist, funding, Cookie Jar); build next.  
+Phase 2 — realization engine, TBD drawer, Statement day.  
 Phase 1 — identity, seed CoA/accounts, onboarding, Receipts filters, Add entry, Settings rename.
 
 ## Run

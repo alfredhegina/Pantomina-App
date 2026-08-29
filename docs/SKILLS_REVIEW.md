@@ -100,3 +100,39 @@ Skills: Impeccable Operate, Humanizer, Emil / apple-design, UI UX Pro Max (mobil
 | Salary-only income seed | + **Income · Side hustle** (backfill) | Matches how people actually earn |
 
 Next product phase: **Phase 4** (Forecast, Checklist, funding plans, Cookie Jar).
+
+---
+
+## Statement day cycle pick (2026-08-29)
+
+Skills: Impeccable Operate, Emil / apple-design, Humanizer, UI UX Pro Max (mobile Operate). Smoke confirmed; shipped in `7e1cdb2`.
+
+| Before | After | Why |
+|---|---|---|
+| Counts on = only stored `proposedRealizedDate`s | Cutoff-matching candidates ∪ proposals | Paper statement may not match auto guess |
+| Pending list filtered by proposal | **All** pending for the card (“Still in the pile”) | Tick what’s on *this* statement; rest stay TBD |
+| Header “On this statement” for whole pile | “Still in the pile” + “Guessed · …” when proposal ≠ Counts on | Operate honesty |
+| Changing Counts on risked losing context | Keep ticks across cycle change; clear on **card** change | Interruptibility |
+| Wanted to change Phase 2 `07/04→08/15` | Auto proposal **unchanged** | Spec acceptance fixture |
+
+---
+
+## Phase 4 skills critique (2026-08-29, pre-build)
+
+Skills: Impeccable Operate, Humanizer, Emil / apple-design, UI UX Pro Max (mobile Operate). **Docs lock only — no Phase 4 product code in this pass.**
+
+| Surface | Recommendation | Why |
+|---|---|---|
+| Bills IA | Four panes: The split · Forecast · The Checklist · The Love Tab; scrollable Seg / 44pt targets; no fifth tab | Spec §5; Operate density without cramming |
+| Forecast / Checklist | Shared cycle picker (same language as Split) | One cycle mental model |
+| Forecast | Verdict card first (breathing room / over + in − committed − variable); then Expected in / Committed with `DisplayLabels` reason chips; footer “Nothing here is booked yet.” | Scan money → lists; no engine nouns |
+| Forecast “over” | Quiet link to fund-raid; copy that raid is **Phase 5** (pointer only) | For-later discipline; no raid engine now |
+| Projected rows | Ghosted + **Projected** chip; never in actuals/settlement/YTD; exact = one-tap confirm, estimate = edit-then-confirm | Spec §4.5; cheese quarantine on chips |
+| Checklist | Header “N of M paid · ₱X still to send”; tick = pay + realize; past-cutoff one gentle flag; CC task → Statement day via typed `NavigationLink` | Emil / AttributeGraph lesson |
+| Funding plans | More → Things We Keep Doing (with rules) and/or Checklist tranche rows — **not** a fifth Bills pane; chips `funded k/n` → `paid`; Forecast charges tranche per cycle | Spec §4.9; distill Bills |
+| Cookie Jar | More grid **The Cookie Jar**; running balance; borrows parenthesized; who’s-paid strip; filter by source; Love-Tab tone (visible, never nagged) | Spec §4.13; cheese on title only |
+| Method | Pure engine modules + Swift Testing first; Phase 4 accept fixtures before chrome polish | Superpowers / write-swift |
+
+### Explicit non-changes (Phase 4 skills)
+
+Phase order 1–8; Love Tab floor-0; statement auto-proposal rule; person ids `fern`/`stark`; centavos; light mode + Fraunces/DM Sans. Fund raids / snowball / loans = Phase 5; Empire = Phase 6; chat Add = Phase 7.
