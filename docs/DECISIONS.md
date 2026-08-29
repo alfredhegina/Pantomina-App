@@ -17,16 +17,26 @@ Living log of locked **Baseline** choices and parked **For later** work. The pro
 |---|---|---|
 | 2026-08-23 | Product is an **iOS App Store** app. Build and archive in **Xcode**, beta on **TestFlight**, release via **App Store Connect**. Not a PWA, not browser-only. | Stated ship path for this project. |
 | 2026-08-23 | **iPhone-first.** Design and QA against a modern iPhone viewport with safe-area insets. | Spec layout is mobile-first iOS; iPad is For later. |
-| 2026-08-23 | UI stays **Vite + React 18 + TypeScript + Tailwind + restyled shadcn + Recharts + Phosphor**. Native shell is **Capacitor** (`ios/` Xcode project). Not SwiftUI, not React Native, for MVP. | Spec UI (shadcn, Recharts, web Phosphor) is DOM. Capacitor produces an `.ipa` without rewriting the design system. |
-| 2026-08-23 | Persistence is **SQLite on device** via Capacitor. **IndexedDB / Dexie is not the store of record.** | iOS can evict WKWebView web storage. This is a finance ledger. Supersedes the v2.2 Dexie line in the spec. |
+| 2026-08-23 | UI stays **Vite + React 18 + TypeScript + Tailwind + restyled shadcn + Recharts + Phosphor**. Native shell is **Capacitor** (`ios/` Xcode project). Not SwiftUI, not React Native, for MVP. **superseded** → 2026-08-29 SwiftUI row. | Spec UI was DOM; Capacitor was the first ship bet. |
+| 2026-08-23 | Persistence is **SQLite on device** via Capacitor. **IndexedDB / Dexie is not the store of record.** **superseded** → 2026-08-29 SwiftData row. | iOS can evict WKWebView web storage. |
 | 2026-08-23 | **Local-first, single-device MVP.** Sync is Phase 8 only. | Spec §6 / §8. |
-| 2026-08-23 | Optional Gemini API key lives in the **iOS Keychain**. Never in SQLite, JSON backups, logs, or screenshots. | App Store + finance-app hygiene. |
+| 2026-08-23 | Optional Gemini API key lives in the **iOS Keychain**. Never in SwiftData / SQLite, JSON backups, logs, or screenshots. | App Store + finance-app hygiene. |
 | 2026-08-23 | Capture from **iOS Shortcuts / App Intents** into the unconfirmed-entries inbox (same parse pipeline as in-app chat). Not a public webhook. | Native equivalent of the spec's Shortcut door. |
 | 2026-08-23 | Backups use the **iOS share sheet / Files / document picker**. Cadence is checked on **open and foreground**, plus manual "Back up now." Do not depend on background fetch as the only trigger. | iOS background work is opportunistic; a missed backup of a ledger is unacceptable. |
-| 2026-08-23 | Engine work is **test-first** (Vitest, Superpowers TDD). UI consumes `src/engine` and does not reimplement rules. | Spec §6–§7. |
+| 2026-08-23 | Engine work is **test-first** (Vitest, Superpowers TDD). UI consumes `src/engine` and does not reimplement rules. **superseded** → 2026-08-29 Swift Testing row. | Spec §6–§7. |
 | 2026-08-23 | Installed design/method skills (Taste, Impeccable, Emil Kowalski, UI UX Pro Max, Superpowers) inform UI/UX and process. **`APP_SPEC.md` + this file win** if a skill conflicts (e.g. skill wants Inter/dark mode/confetti; spec forbids them). | Skills are taste and method, not product law. |
 | 2026-08-23 | Spec visual direction stays **Soft UI Evolution** on warm paper: Fraunces + DM Sans, sage/terracotta, light mode only, cheese quarantine. Skills may refine craft; they may not replace the system. | Spec §1–§2. |
-| 2026-08-23 | For **product UI** (ledger, bills, sheets), prefer **Impeccable, UI UX Pro Max, Emil (`emil-design-eng` / `apple-design` / `animate`), and Taste `high-end-visual-design`**. Taste `design-taste-frontend` is landing-page oriented — use it for marketing/onboarding polish only, not for data tables. | Taste v2 SKILL.md explicitly excludes dashboards and multi-step product UI. |
+| 2026-08-23 | For **product UI** (ledger, bills, sheets), prefer **Impeccable, UI UX Pro Max, Emil (`emil-design-eng` / `apple-design` / `animate`), and Taste `high-end-visual-design`**. Taste `design-taste-frontend` is landing-page oriented — use it for marketing/onboarding polish only, not for data tables. Also use **`write-swift`** for Swift code. | Taste v2 excludes dashboards; native stack needs write-swift. |
+| 2026-08-29 | UI is **Swift + SwiftUI** (MVVM + `@Observable`). Persistence is **SwiftData** on device. Not Capacitor, not React Native, not a PWA for MVP. Charts via **Swift Charts**. | Human lock after playbook review; iPhone-only native fit. Supersedes Capacitor/React/SQLite-Capacitor. |
+| 2026-08-29 | Engine rules are **pure Swift** (value types), test-first with **Swift Testing / XCTest**. UI never reimplements rules. Money is integer **centavos**. | Same product law as before; language follows UI stack. |
+| 2026-08-29 | Stable person ids are **`fern`** (payer, sage) and **`stark`** (contributor, terracotta). Display names are editable; ids never shown and never renamed. | Human amendment to skills review; replaces `larr` / `len`. |
+| 2026-08-29 | Monetization: **paid App Store download**. No freemium, no IAP, no paywall. | Sell from day one; Apple listing price gates install. |
+| 2026-08-29 | **PostHog** for diagnostics (paying users). Hard PII/ledger firewall: never amounts, names, notes, merchants, categories, Gemini text, backups, or Keychain material. | Proactive monitoring without leaking the ledger. |
+| 2026-08-29 | Bundle IDs: Prod `pantomina.heginaholdings.com`, Preprod `pantomina.heginaholdings.com.preprod`. Schemes: **Preprod** + **Prod** only (no separate Dev bundle). Min iOS **17.6**. iPhone only (`TARGETED_DEVICE_FAMILY = 1`). | Side-by-side TestFlight; browser prototype is reference only. |
+| 2026-08-29 | Skills review findings in `docs/SKILLS_REVIEW.md` are approved (with fern/stark). Phase skip requires a dated Why in this file. | Conscious override pattern from Uswag playbook. |
+| 2026-08-29 | **Phase 1** shipped: SwiftData ledger, onboarding, seed CoA/accounts, Receipts filters, Add form, Settings rename → computed labels. | Spec §6 Phase 1 acceptance. |
+| 2026-08-29 | **Input bounds:** display name ≤40 graphemes, pet ≤24, note ≤200; money **₱1…₱100,000,000** (1…10_000_000_000 centavos). Engine helpers + UI clamp/reject. | Harden free-text and amount entry; salary/transfers need a sane ceiling. |
+| 2026-08-29 | UI date label is **When it happened**; schema/engine field stays `purchaseDate`. | Salary and transfers are not purchases; avoid leaking engine nouns. |
 
 ## For later
 
@@ -34,23 +44,26 @@ Do not implement until a human moves the row to Baseline.
 
 | Date | Item | Notes |
 |---|---|---|
-| 2026-08-23 | Android / Play Store | Capacitor can add `android/` later; do not add the project now. |
+| 2026-08-23 | Android / Play Store | Do not add now. |
 | 2026-08-23 | iPad, landscape, Split View, Stage Manager | iPhone-only until then. |
-| 2026-08-23 | Minimum iOS version, bundle ID, Team ID, signing, App Store category copy, screenshots, privacy nutrition labels | Set when the Xcode project and Apple Developer account are wired. Draft category: Finance. |
+| 2026-08-23 | Team ID, signing details, App Store category copy, screenshots, privacy nutrition labels (draft content) | Wire with Apple Developer account; category Finance; nutrition labels must disclose PostHog. |
 | 2026-08-23 | Face ID / passcode lock on open | Nice for a ledger; not MVP. |
-| 2026-08-23 | Home Screen widgets, Live Activities, Apple Watch, Lock Screen | Native surfaces beyond the Capacitor WebView. |
-| 2026-08-23 | iCloud Drive as a backup destination / CloudKit | Phase 8 is still the named sync path (Supabase). Revisit CloudKit vs Supabase then; do not pick a second sync now. |
-| 2026-08-23 | Push / local notifications for cycle due, checklist leftover, Love Tab nudge | Easy to nag; spec forbids nagging. Design copy first if this is ever opened. |
+| 2026-08-23 | Home Screen widgets, Live Activities, Apple Watch, Lock Screen | Native surfaces beyond MVP. |
+| 2026-08-23 | iCloud Drive as a backup destination / CloudKit | Phase 8 sync path still Supabase-named; revisit later. |
+| 2026-08-23 | Push / local notifications for cycle due, checklist leftover, Love Tab nudge | Spec forbids nagging. Design copy first if opened. |
 | 2026-08-23 | BGTaskScheduler for backups | Unreliable; on-open cadence is Baseline. |
 | 2026-08-23 | Dark mode | Spec is light mode only. |
 | 2026-08-23 | Web / desktop companion | App Store is the product. |
-| 2026-08-23 | React Native / Expo / SwiftUI rewrite | Only if Capacitor + WKWebView fails App Review or performance. |
+| 2026-08-29 | Capacitor + React / Vite rewrite | Only if SwiftUI path is abandoned; inverse of prior For-later SwiftUI row. |
 | 2026-08-23 | Household-scoped funds | Spec: personal-scope in MVP. |
 | 2026-08-23 | Swappable payer / contributor roles | Spec §7.9. |
 | 2026-08-23 | Third person / family seat | Spec §7.1. |
 | 2026-08-23 | Currency other than PHP | Spec §2. |
-| 2026-08-23 | Impeccable `buildPath` (comp-first vs code-first), `/impeccable init` PRODUCT.md/DESIGN.md, and the Impeccable **before-edit hook** | Skill files are installed; the hook was not. Run `npx impeccable install --providers=cursor --scope=project` if you want live detectors. Do not invent a second design system before Phase 0. |
+| 2026-08-23 | Impeccable before-edit hook | Optional: `npx impeccable install --providers=cursor --scope=project`. |
 | 2026-08-23 | App Review edge cases (export compliance, account deletion, support URL) | Handle when first TestFlight/App Store listing is prepared. |
+| 2026-08-29 | Freemium / StoreKit IAP | Rejected for MVP; reopen only if monetization model changes. |
+| 2026-08-29 | NetworkMonitor / SoundService / EmojiPicker from Uswag | Not in vibe. |
+| 2026-08-29 | Rename SwiftData/`purchaseDate` → `occurredDate` (or similar) | UI already says “When it happened”; schema rename needs migration. |
 
 ## Instructions to the agent
 
@@ -67,9 +80,11 @@ Project-local. Cursor reads `.cursor/skills/` (symlinks into `.agents/skills/` w
 |---|---|---|
 | [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill) | Taste family (`design-taste-frontend`, `high-end-visual-design`, image-gen, etc.) | Visual craft. Product screens: `high-end-visual-design`. Landing/onboarding: `design-taste-frontend`. |
 | [pbakaus/impeccable](https://github.com/pbakaus/impeccable) | `.cursor/skills/impeccable` | Shape, critique, polish, iOS-aware audit. Hook not installed. |
-| [emilkowalski/skills](https://github.com/emilkowalski/skills) | `emil-design-eng`, `animate`, `apple-design`, `write-swift`, … | Motion, Apple HIG translation, sheets. |
+| [emilkowalski/skills](https://github.com/emilkowalski/skills) | `emil-design-eng`, `animate`, `apple-design`, `write-swift`, … | Motion, Apple HIG, Swift. |
 | [obra/superpowers](https://github.com/obra/superpowers) | TDD, plans, debugging, review | Engine work and phase execution. |
-| [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | `.cursor/skills/ui-ux-pro-max` (+ design/brand helpers) | Searchable UI styles, UX rules, stack notes (React, Capacitor/iOS). |
+| [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | `.cursor/skills/ui-ux-pro-max` | UX rules; stack notes are not product law. |
+| Uswag playbook copy (2026-08-29) | `.cursor/skills/greenlight` | App Store pre-submit scan. |
+| Uswag playbook copy (2026-08-29) | `.cursor/skills/humanizer` | De-AI listing and cheese copy. |
+| Uswag playbook copy (2026-08-29) | `.cursor/skills/aso-appstore-screenshots` (+ `compose.py`) | ASO frames 1290×2796. |
 
-Refresh Taste / Emil / Superpowers with `npx skills update -p -y`. Refresh UI UX Pro Max with `npx ui-ux-pro-max-cli update`. Impeccable: copy from upstream or `npx impeccable install --providers=cursor --scope=project` (installs the hook too).
-
+Refresh Taste / Emil / Superpowers with `npx skills update -p -y`. Greenlight / Humanizer / ASO: re-copy from the Uswag skills tree when needed.

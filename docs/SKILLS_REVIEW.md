@@ -1,0 +1,87 @@
+# Skills review — remove / add / improve
+
+**Date:** 2026-08-29  
+**Target:** SwiftUI rebuild (human lock). Prototype = visual reference only.  
+**Status:** **Approved** 2026-08-29 with amendment: stable person ids are **`fern` / `stark`** (not `larr` / `len`). Centavos integer money kept.
+
+Skills run: Impeccable (Operate critique), Humanizer (sample copy), Greenlight (`preflight .`), ASO (benefit hypotheses), write-swift / apple-design (advisory).
+
+---
+
+## Remove
+
+| Item | Why |
+|---|---|
+| Capacitor + React + Vite as **MVP ship path** | Human lock: SwiftUI. Supersede DECISIONS Baseline + SPEC §6 / §7.10 / cursor rule. |
+| SQLite-via-Capacitor as store of record | Replace with **SwiftData** on device (same “won’t get WebView-evicted” intent). |
+| Vitest / `src/engine` TypeScript as the engine home | Engines become pure Swift + Swift Testing/XCTest. |
+| Promoting `pantomina-app.jsx` or the throwaway Vite host into production | Keep as reference; do not port float pesos / `you`/`partner` ids. |
+| Freemium / StoreKit Paywall / EntitlementStore from Uswag | Paid App Store download only. |
+| Uswag RPG domain, Cinzel/gold XP world | SPEC Soft UI / Fraunces+DM Sans / sage+terracotta. |
+| Prototype string **“Edit entry — coming soon”** | Greenlight §2.1 App Completeness; never ship placeholders. |
+| Shipping without `PrivacyInfo.xcprivacy` | Greenlight CRITICAL once an Xcode app exists (blocked until then). |
+| Treating UI UX Pro Max “React/Capacitor stack notes” as product law | Skills inform craft; SPEC + new DECISIONS win. |
+
+---
+
+## Add
+
+| Item | Why |
+|---|---|
+| Xcode iPhone-only app (17.6+), bundles `pantomina.heginaholdings.com` + `.preprod` | Ship path + side-by-side TestFlight. |
+| Uswag-style shell (copy/rename): App, Environment, Design tokens, Keychain, Analytics, Haptics, StringLimit, UndoToast | Playbook ship habits; not domain. |
+| PostHog iOS SDK + PII/ledger allowlist firewall | Monitoring for paying users. |
+| Paid Apps Agreement / banking / tax on ASC checklist | Required for paid download. |
+| `PrivacyInfo.xcprivacy` + privacy nutrition labels (PostHog Device ID) | Greenlight + ASC. |
+| Privacy / Terms / Support URLs | ASC won’t wait. |
+| Bundled Fraunces + DM Sans | SPEC type; register in Info.plist. |
+| Swift Charts (or equivalent) for Empire / YTD / Love Tab | Recharts unavailable. |
+| Engine module: `Centavo`/`Money`, `Cycle`, settlement pure functions — value types first (`write-swift`) | SPEC §7; test-first preserved. |
+| Productization law in Swift: stored `baseName` + computed labels from `Person.name` | SPEC §3. |
+| Preprod-only demo/fixture seeder | Screenshots without contaminating Prod. |
+| Docs after approval: app-store checklist, ASC paste pack, screenshot brief, same-pass docs rule | Playbook habits. |
+| Impeccable `PRODUCT.md` / iOS `DESIGN.md` (or equivalent) when Phase 0 starts | Operate-mode native brief; optional `/impeccable init`. |
+
+---
+
+## Improve
+
+| Item | Why |
+|---|---|
+| SPEC §6 Phase 0 acceptance | Drop `cap sync` / Vitest / storybook route; accept: Swift cycle tests, Simulator launch, token primitives in SwiftUI, Reduce Motion. |
+| SPEC delivery paragraph + `.cursor/rules/pantomina.mdc` | Say SwiftUI + SwiftData + Xcode, not Capacitor. |
+| Prototype → rebuild map | Pet titles, 5-tab IA, Add sheet, Bills/Love Tab, Cookie Jar, War Chest — rebuild; fix ids to `fern`/`stark`, money to `Int` centavos. |
+| Cheese copy (Humanizer) | Keep knowingly cheesy pet titles / empty “Nothing here yet. Rare quiet moment.” Soften or gate nudge tone like “say thank you” if it feels pushy; never cheese on amounts/errors. Toast “Saved. Team effort.” / “Added to the jar.” are fine. |
+| Sheets / motion (apple-design + Emil) | Map prototype springs to SwiftUI interruptible sheets; honor Reduce Motion globally. |
+| Greenlight scan scope | After Xcode exists, run on the app target; exclude `.agents/skills` noise (false “Android” / console.warn hits). |
+| ASO (hypotheses only — no frames yet) | Candidate benefit lines: **Two of us, one ledger** · **Settle the cycle together** · **See the Love Tab clearly** · **Watch net worth climb** (negative-OK) · **Cookie Jar without shame**. Lock verb/desc in screenshot brief before `compose.py`. Avoid empty-state frames. |
+| Onboarding “Shall we dance?” | Keep; Humanizer-pass final microcopy in Phase 1. |
+| Gemini BYOK + age/compliance | Still Phase 7; copy Uswag *Keychain* pattern, not roast prompts; revisit Gemini consumer-app legal note. |
+| README | Replace “Couple finance app” with SwiftUI ship pointer + SPEC link (after DECISIONS supersede). |
+
+---
+
+## Greenlight snapshot (2026-08-29)
+
+Ran `greenlight preflight .` on current tree (no Xcode app yet):
+
+- **CRITICAL:** No `PrivacyInfo.xcprivacy` — expected; add with Phase 0/1 app target.
+- **WARN:** “Edit entry — coming soon” in prototype — do not carry into SwiftUI.
+- **WARN/INFO:** Hits inside skill scripts — ignore for product; scope scans to the app later.
+
+**Blocked until Xcode project exists:** entitlements, usage strings, real privacy manifest contents, IPA scan.
+
+---
+
+## Suggested next plan (after you approve)
+
+1. Supersede Capacitor/React/SQLite-Capacitor in DECISIONS; lock SwiftUI + SwiftData + paid + PostHog + bundles + Preprod/Prod.  
+2. Patch APP_SPEC §6 / §7.10 + cursor rule.  
+3. Phase 0: new Xcode project, shell copy from Uswag, tokens, cycle engine tests, Simulator.  
+4. Then feature phases 1–7 per SPEC (engines in Swift).
+
+---
+
+## Explicit non-changes
+
+Product IA, bi-weekly cycle, Love Tab rules, cheese quarantine, two-person non-negotiables, PHP centavos, Phase feature order (1–8) stay. Only delivery stack and Phase 0 tooling change.

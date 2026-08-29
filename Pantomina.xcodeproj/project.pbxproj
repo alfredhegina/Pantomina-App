@@ -1,0 +1,598 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		058DF10F5B2262209C6F1C74 /* Primitives.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EFCF0FB550B4A59D85E89E4 /* Primitives.swift */; };
+		0CC4AD15DA2DEF6DC46FF174 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 750E8203BBAB2B9E6AD5BF54 /* PrivacyInfo.xcprivacy */; };
+		1591FD697D08466A15478DD6 /* Cycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5CAA1BF8684554DB59D6838 /* Cycle.swift */; };
+		3936D37B22728DD086E09C63 /* AllocationDefaultsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3E691C1BF781061756C3D47 /* AllocationDefaultsTests.swift */; };
+		3DD058C8C0E182D9693F3464 /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1561D7E09988563B27DBCE28 /* Typography.swift */; };
+		4143427B70772B07CA6A2F81 /* CycleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBD750FCC71323491E6FB04E /* CycleTests.swift */; };
+		46781C0E4CEE8ECCC6570F71 /* LedgerFilters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B14EF3277DB4072ECEC8D04 /* LedgerFilters.swift */; };
+		4AEF6E6E3900DD2A3842865E /* LedgerFiltersTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29DE9CCC311070037631895C /* LedgerFiltersTests.swift */; };
+		4F8DA4BE26855679929703AC /* Money.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C5305498BDA3098A03D2A1 /* Money.swift */; };
+		502E098278508D5D20B01FB5 /* PantominaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2615DF508DE79DB10AD3A2DC /* PantominaApp.swift */; };
+		50F8634082A077A4568EB2C2 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B823599C2B79C430C92D7047 /* SettingsView.swift */; };
+		633ADDCCC050E38BE657AC4B /* AccountLabelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8712B6D306342B28E31BD3D3 /* AccountLabelsTests.swift */; };
+		6BC0EABFFBDD2FC20EA77EE7 /* CoAMigration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EFD9E7141F46FA7130E90F8 /* CoAMigration.swift */; };
+		6E30F6E19D6251AEE068D3AB /* ReceiptsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9249B8779319C89636800F82 /* ReceiptsView.swift */; };
+		7915D32C0B7A596E1FD4BCA3 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4923488F708E4B94BBF1653 /* HomeView.swift */; };
+		8A1F130BBF8F0C613FCC2421 /* AppEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = E071C8B79EE8A5BEB39FEDFA /* AppEnvironment.swift */; };
+		8C98C5507A11EC8EC389B310 /* CoAMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13494702B3F803138913FE88 /* CoAMigrationTests.swift */; };
+		99111A488DF210754F7ACCCD /* MoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB543846A4324090D51BE2F8 /* MoreView.swift */; };
+		A5ADB0AF24C90E23F113AE14 /* SeedCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F25187A8EBD065FB0589B4 /* SeedCatalog.swift */; };
+		B997C3A666C2A4AEBE062F2E /* MoneyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D52988F0894815DC945A48B0 /* MoneyTests.swift */; };
+		BE588C56B3A912055F87FF0F /* Domain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D4D90A0EE53692CCB069F1C /* Domain.swift */; };
+		C3E95F51368FD5AAA375FDE0 /* AddEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6CC6980CF58C89BB7D7B9FE /* AddEntryView.swift */; };
+		D0CF173B57B48D82ED1A42B1 /* Bootstrap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6325E061F64F2C2AC149C4EC /* Bootstrap.swift */; };
+		D6E7015F5A609B97D9B8BB33 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9910C65AB0FB2798C53F726A /* Colors.swift */; };
+		ED1981E2EB7ABD01F59A5446 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99353A11AE11E00DBA319353 /* RootView.swift */; };
+		F987A6153F784EEFDEB25060 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26660CD12EC0C748508FB5B6 /* OnboardingView.swift */; };
+		FD3D73171D3C2B1E21A7E40A /* InputBounds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83F045E3D61777046C8B88BD /* InputBounds.swift */; };
+		FF47120EA49A691C5B2BC666 /* InputBoundsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C123A96441A24DE527E16E1 /* InputBoundsTests.swift */; };
+		FFC9A6E9019200880611406C /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87AB3749B7F1155B2AD09A01 /* Models.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		FA3165D5708B90BBCA202C7D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 180215CF6A9B920363A75BB1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6371E70CD0F3D70010D0CE85;
+			remoteInfo = Pantomina;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		13494702B3F803138913FE88 /* CoAMigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoAMigrationTests.swift; sourceTree = "<group>"; };
+		1561D7E09988563B27DBCE28 /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
+		1EFCF0FB550B4A59D85E89E4 /* Primitives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Primitives.swift; sourceTree = "<group>"; };
+		2615DF508DE79DB10AD3A2DC /* PantominaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PantominaApp.swift; sourceTree = "<group>"; };
+		26660CD12EC0C748508FB5B6 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		26CD764F81C2AD9EEA664436 /* PantominaTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = PantominaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		29DE9CCC311070037631895C /* LedgerFiltersTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LedgerFiltersTests.swift; sourceTree = "<group>"; };
+		2B14EF3277DB4072ECEC8D04 /* LedgerFilters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LedgerFilters.swift; sourceTree = "<group>"; };
+		4C123A96441A24DE527E16E1 /* InputBoundsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputBoundsTests.swift; sourceTree = "<group>"; };
+		6325E061F64F2C2AC149C4EC /* Bootstrap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bootstrap.swift; sourceTree = "<group>"; };
+		750E8203BBAB2B9E6AD5BF54 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		7EFD9E7141F46FA7130E90F8 /* CoAMigration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoAMigration.swift; sourceTree = "<group>"; };
+		83F045E3D61777046C8B88BD /* InputBounds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputBounds.swift; sourceTree = "<group>"; };
+		8712B6D306342B28E31BD3D3 /* AccountLabelsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountLabelsTests.swift; sourceTree = "<group>"; };
+		87AB3749B7F1155B2AD09A01 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		8D4D90A0EE53692CCB069F1C /* Domain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Domain.swift; sourceTree = "<group>"; };
+		9249B8779319C89636800F82 /* ReceiptsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptsView.swift; sourceTree = "<group>"; };
+		9910C65AB0FB2798C53F726A /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
+		99353A11AE11E00DBA319353 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		B823599C2B79C430C92D7047 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		B8C5305498BDA3098A03D2A1 /* Money.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Money.swift; sourceTree = "<group>"; };
+		C3E691C1BF781061756C3D47 /* AllocationDefaultsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllocationDefaultsTests.swift; sourceTree = "<group>"; };
+		C4923488F708E4B94BBF1653 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		C8F25187A8EBD065FB0589B4 /* SeedCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeedCatalog.swift; sourceTree = "<group>"; };
+		C9175B58105513FE21762F11 /* Pantomina.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Pantomina.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D52988F0894815DC945A48B0 /* MoneyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneyTests.swift; sourceTree = "<group>"; };
+		D9505F4A33598A4C2021201C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		E071C8B79EE8A5BEB39FEDFA /* AppEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEnvironment.swift; sourceTree = "<group>"; };
+		E6CC6980CF58C89BB7D7B9FE /* AddEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEntryView.swift; sourceTree = "<group>"; };
+		EB543846A4324090D51BE2F8 /* MoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreView.swift; sourceTree = "<group>"; };
+		EBD750FCC71323491E6FB04E /* CycleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CycleTests.swift; sourceTree = "<group>"; };
+		F5CAA1BF8684554DB59D6838 /* Cycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cycle.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		30559B81A6E6760A8580F7FB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C9175B58105513FE21762F11 /* Pantomina.app */,
+				26CD764F81C2AD9EEA664436 /* PantominaTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		47FD6F548E866979689E6FE1 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				E071C8B79EE8A5BEB39FEDFA /* AppEnvironment.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		4828FD3179268025905BE159 = {
+			isa = PBXGroup;
+			children = (
+				A5FC5C7470858280BC7EAC83 /* Pantomina */,
+				5663CF51DD7673038A5386EA /* PantominaTests */,
+				30559B81A6E6760A8580F7FB /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		5663CF51DD7673038A5386EA /* PantominaTests */ = {
+			isa = PBXGroup;
+			children = (
+				8712B6D306342B28E31BD3D3 /* AccountLabelsTests.swift */,
+				C3E691C1BF781061756C3D47 /* AllocationDefaultsTests.swift */,
+				13494702B3F803138913FE88 /* CoAMigrationTests.swift */,
+				EBD750FCC71323491E6FB04E /* CycleTests.swift */,
+				4C123A96441A24DE527E16E1 /* InputBoundsTests.swift */,
+				29DE9CCC311070037631895C /* LedgerFiltersTests.swift */,
+				D52988F0894815DC945A48B0 /* MoneyTests.swift */,
+			);
+			path = PantominaTests;
+			sourceTree = "<group>";
+		};
+		A5FC5C7470858280BC7EAC83 /* Pantomina */ = {
+			isa = PBXGroup;
+			children = (
+				D9505F4A33598A4C2021201C /* Info.plist */,
+				2615DF508DE79DB10AD3A2DC /* PantominaApp.swift */,
+				750E8203BBAB2B9E6AD5BF54 /* PrivacyInfo.xcprivacy */,
+				47FD6F548E866979689E6FE1 /* App */,
+				E5682135CD916A0C692EACA7 /* Components */,
+				DBCD5C068D8A0D3799835F58 /* Data */,
+				FB560903F7228155ED8BC3C9 /* Engine */,
+				D95CB301C97E6900835B6170 /* Models */,
+				CAD65B19C7306405BBE545A3 /* Resources */,
+				C77E0742022A44671E4C3983 /* Views */,
+			);
+			path = Pantomina;
+			sourceTree = "<group>";
+		};
+		C77E0742022A44671E4C3983 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				E6CC6980CF58C89BB7D7B9FE /* AddEntryView.swift */,
+				C4923488F708E4B94BBF1653 /* HomeView.swift */,
+				EB543846A4324090D51BE2F8 /* MoreView.swift */,
+				26660CD12EC0C748508FB5B6 /* OnboardingView.swift */,
+				9249B8779319C89636800F82 /* ReceiptsView.swift */,
+				99353A11AE11E00DBA319353 /* RootView.swift */,
+				B823599C2B79C430C92D7047 /* SettingsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		CAD65B19C7306405BBE545A3 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				D62CA4642A626FC1B186D3E3 /* Design */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		D62CA4642A626FC1B186D3E3 /* Design */ = {
+			isa = PBXGroup;
+			children = (
+				9910C65AB0FB2798C53F726A /* Colors.swift */,
+				1561D7E09988563B27DBCE28 /* Typography.swift */,
+			);
+			path = Design;
+			sourceTree = "<group>";
+		};
+		D95CB301C97E6900835B6170 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				87AB3749B7F1155B2AD09A01 /* Models.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		DBCD5C068D8A0D3799835F58 /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				6325E061F64F2C2AC149C4EC /* Bootstrap.swift */,
+				C8F25187A8EBD065FB0589B4 /* SeedCatalog.swift */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		E5682135CD916A0C692EACA7 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				1EFCF0FB550B4A59D85E89E4 /* Primitives.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		FB560903F7228155ED8BC3C9 /* Engine */ = {
+			isa = PBXGroup;
+			children = (
+				7EFD9E7141F46FA7130E90F8 /* CoAMigration.swift */,
+				F5CAA1BF8684554DB59D6838 /* Cycle.swift */,
+				8D4D90A0EE53692CCB069F1C /* Domain.swift */,
+				83F045E3D61777046C8B88BD /* InputBounds.swift */,
+				2B14EF3277DB4072ECEC8D04 /* LedgerFilters.swift */,
+				B8C5305498BDA3098A03D2A1 /* Money.swift */,
+			);
+			path = Engine;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1A6FBD36C91B48A53CF6456C /* PantominaTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E50FED541C592AAC9B018A38 /* Build configuration list for PBXNativeTarget "PantominaTests" */;
+			buildPhases = (
+				906AD4FDE117A7F0F23424B8 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D48090732906186F4C107210 /* PBXTargetDependency */,
+			);
+			name = PantominaTests;
+			packageProductDependencies = (
+			);
+			productName = PantominaTests;
+			productReference = 26CD764F81C2AD9EEA664436 /* PantominaTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		6371E70CD0F3D70010D0CE85 /* Pantomina */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3907343495E3F69BD7442FA1 /* Build configuration list for PBXNativeTarget "Pantomina" */;
+			buildPhases = (
+				55B8BC2204B5B86495C4C8BB /* Sources */,
+				0C13AA6F1F39B1C8512D9C5D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Pantomina;
+			packageProductDependencies = (
+			);
+			productName = Pantomina;
+			productReference = C9175B58105513FE21762F11 /* Pantomina.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		180215CF6A9B920363A75BB1 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = 4D09B142C047DAE7744885E8 /* Build configuration list for PBXProject "Pantomina" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 4828FD3179268025905BE159;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 30559B81A6E6760A8580F7FB /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				6371E70CD0F3D70010D0CE85 /* Pantomina */,
+				1A6FBD36C91B48A53CF6456C /* PantominaTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		0C13AA6F1F39B1C8512D9C5D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0CC4AD15DA2DEF6DC46FF174 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		55B8BC2204B5B86495C4C8BB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C3E95F51368FD5AAA375FDE0 /* AddEntryView.swift in Sources */,
+				8A1F130BBF8F0C613FCC2421 /* AppEnvironment.swift in Sources */,
+				D0CF173B57B48D82ED1A42B1 /* Bootstrap.swift in Sources */,
+				6BC0EABFFBDD2FC20EA77EE7 /* CoAMigration.swift in Sources */,
+				D6E7015F5A609B97D9B8BB33 /* Colors.swift in Sources */,
+				1591FD697D08466A15478DD6 /* Cycle.swift in Sources */,
+				BE588C56B3A912055F87FF0F /* Domain.swift in Sources */,
+				7915D32C0B7A596E1FD4BCA3 /* HomeView.swift in Sources */,
+				FD3D73171D3C2B1E21A7E40A /* InputBounds.swift in Sources */,
+				46781C0E4CEE8ECCC6570F71 /* LedgerFilters.swift in Sources */,
+				FFC9A6E9019200880611406C /* Models.swift in Sources */,
+				4F8DA4BE26855679929703AC /* Money.swift in Sources */,
+				99111A488DF210754F7ACCCD /* MoreView.swift in Sources */,
+				F987A6153F784EEFDEB25060 /* OnboardingView.swift in Sources */,
+				502E098278508D5D20B01FB5 /* PantominaApp.swift in Sources */,
+				058DF10F5B2262209C6F1C74 /* Primitives.swift in Sources */,
+				6E30F6E19D6251AEE068D3AB /* ReceiptsView.swift in Sources */,
+				ED1981E2EB7ABD01F59A5446 /* RootView.swift in Sources */,
+				A5ADB0AF24C90E23F113AE14 /* SeedCatalog.swift in Sources */,
+				50F8634082A077A4568EB2C2 /* SettingsView.swift in Sources */,
+				3DD058C8C0E182D9693F3464 /* Typography.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		906AD4FDE117A7F0F23424B8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				633ADDCCC050E38BE657AC4B /* AccountLabelsTests.swift in Sources */,
+				3936D37B22728DD086E09C63 /* AllocationDefaultsTests.swift in Sources */,
+				8C98C5507A11EC8EC389B310 /* CoAMigrationTests.swift in Sources */,
+				4143427B70772B07CA6A2F81 /* CycleTests.swift in Sources */,
+				FF47120EA49A691C5B2BC666 /* InputBoundsTests.swift in Sources */,
+				4AEF6E6E3900DD2A3842865E /* LedgerFiltersTests.swift in Sources */,
+				B997C3A666C2A4AEBE062F2E /* MoneyTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D48090732906186F4C107210 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6371E70CD0F3D70010D0CE85 /* Pantomina */;
+			targetProxy = FA3165D5708B90BBCA202C7D /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		0379F475BC8F9312FE600F41 /* Preprod */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = pantomina.heginaholdings.com.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Pantomina.app/Pantomina";
+			};
+			name = Preprod;
+		};
+		15E7CBB5C3EE6F40B0C2FA96 /* Prod */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = pantomina.heginaholdings.com.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Pantomina.app/Pantomina";
+			};
+			name = Prod;
+		};
+		6038251697EEC8650BD68FE9 /* Prod */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Pantomina/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Pantomina;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = pantomina.heginaholdings.com;
+				PRODUCT_NAME = Pantomina;
+				SDKROOT = iphoneos;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Prod;
+		};
+		651B8020392812A1EC7E65D8 /* Prod */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Prod;
+		};
+		8B2D36AA4BE666FC90782F01 /* Preprod */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Pantomina/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Pantomina Beta";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = pantomina.heginaholdings.com.preprod;
+				PRODUCT_NAME = Pantomina;
+				SDKROOT = iphoneos;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "PREPROD DEBUG";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Preprod;
+		};
+		CC54A51B4380C9F6A695FDCF /* Preprod */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Preprod;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		3907343495E3F69BD7442FA1 /* Build configuration list for PBXNativeTarget "Pantomina" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8B2D36AA4BE666FC90782F01 /* Preprod */,
+				6038251697EEC8650BD68FE9 /* Prod */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Preprod;
+		};
+		4D09B142C047DAE7744885E8 /* Build configuration list for PBXProject "Pantomina" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CC54A51B4380C9F6A695FDCF /* Preprod */,
+				651B8020392812A1EC7E65D8 /* Prod */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Preprod;
+		};
+		E50FED541C592AAC9B018A38 /* Build configuration list for PBXNativeTarget "PantominaTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0379F475BC8F9312FE600F41 /* Preprod */,
+				15E7CBB5C3EE6F40B0C2FA96 /* Prod */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Preprod;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 180215CF6A9B920363A75BB1 /* Project object */;
+}

@@ -1,0 +1,68 @@
+import SwiftUI
+import SwiftData
+
+struct RootView: View {
+    @Query private var metaRows: [AppMeta]
+    @Environment(\.modelContext) private var modelContext
+
+    private var onboarded: Bool {
+        metaRows.first(where: { $0.key == "main" })?.onboardingComplete == true
+    }
+
+    var body: some View {
+        Group {
+            if onboarded {
+                MainTabView()
+            } else {
+                OnboardingView()
+            }
+        }
+        .onAppear {
+            _ = Bootstrap.ensureMeta(modelContext)
+        }
+    }
+}
+
+struct MainTabView: View {
+    @State private var tab = 0
+    @State private var previousTab = 0
+    @State private var showAddSheet = false
+
+    var body: some View {
+        TabView(selection: $tab) {
+            HomeView()
+                .tabItem { Label("Home", systemImage: "house") }
+                .tag(0)
+            ReceiptsView()
+                .tabItem { Label("Receipts", systemImage: "doc.text") }
+                .tag(1)
+            Color.clear
+                .tabItem { Label("Add", systemImage: "plus.circle.fill") }
+                .tag(2)
+            Text("Bills")
+                .foregroundStyle(Color.pantomina.muted)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color.pantomina.ground)
+                .tabItem { Label("Bills", systemImage: "creditcard") }
+                .tag(3)
+            MoreView()
+                .tabItem { Label("More", systemImage: "ellipsis") }
+                .tag(4)
+        }
+        .tint(Color.pantomina.sage)
+        .onChange(of: tab) { oldValue, newValue in
+            if newValue == 2 {
+                previousTab = oldValue == 2 ? previousTab : oldValue
+                showAddSheet = true
+                tab = previousTab
+            } else {
+                previousTab = newValue
+            }
+        }
+        .sheet(isPresented: $showAddSheet) {
+            AddEntryView(presentsAsSheet: true)
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
+        }
+    }
+}

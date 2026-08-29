@@ -1,0 +1,33 @@
+---
+description: When shipping Pantomina changes, update impacted docs in the same pass.
+alwaysApply: true
+---
+
+# Pantomina — Update Docs With the Code
+
+When the user asks to implement, fix, ship, or update something, treat documentation as part of the same change. Do not wait to be asked.
+
+## Same pass
+
+1. Change the code (or other impacted files).
+2. Update every log that the change affects.
+
+## Files to check (only what the change touches)
+
+| File | When to update |
+|---|---|
+| `docs/DECISIONS.md` | New lock, supersede, or conscious phase skip — dated row + Why |
+| `APP_SPEC.md` | Product, phase acceptance, or stack change |
+| `docs/app-store-checklist.md` | Builds, review, or submission status |
+| `README.md` | How to run, phase status, privacy/network claims |
+| `docs/SKILLS_REVIEW.md` | Only if revisiting the approved review |
+
+## Style
+
+- Match existing table and bullet format. Include **Why** on decision-log rows.
+- Skip a file if nothing in it changed.
+
+## Do not
+
+- Ship code-only and offer docs later unless the user explicitly says so.
+- Invent new log files beyond the table above without asking.
