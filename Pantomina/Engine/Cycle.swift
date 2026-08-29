@@ -33,11 +33,42 @@ public struct Cycle: Equatable, Sendable {
         // Skip the cycle that contains the purchase; land on the next cutoff-matching anchor.
         for _ in 0..<6 {
             cursor = nextHalfMonth(after: cursor)
-            let day = Int(cursor.anchorISO.split(separator: "-")[2]) ?? 0
-            if cutoff == 15, day == 15 { return cursor }
-            if cutoff == 30, day != 15 { return cursor }
+            if matchesCutoff(cursor, cutoff: cutoff) { return cursor }
         }
         preconditionFailure("could not find next statement cycle")
+    }
+
+    /// Cutoff-matching anchors around `aroundISO` for Statement day “Counts on” picker.
+    public static func statementAnchorCandidates(
+        aroundISO: String,
+        cutoff: Int,
+        before: Int = 2,
+        after: Int = 2
+    ) -> [String] {
+        precondition(cutoff == 15 || cutoff == 30, "cutoff must be 15 or 30")
+        precondition(before >= 0 && after >= 0)
+        var center = cycleFor(isoDate: aroundISO)
+        for _ in 0..<3 {
+            if matchesCutoff(center, cutoff: cutoff) { break }
+            center = nextHalfMonth(after: center)
+        }
+        precondition(matchesCutoff(center, cutoff: cutoff), "no cutoff match near aroundISO")
+
+        var prior: [Cycle] = []
+        var cursor = center
+        for _ in 0..<before {
+            cursor = previousCutoffMatching(before: cursor, cutoff: cutoff)
+            prior.insert(cursor, at: 0)
+        }
+
+        var later: [Cycle] = []
+        cursor = center
+        for _ in 0..<after {
+            cursor = nextCutoffMatching(after: cursor, cutoff: cutoff)
+            later.append(cursor)
+        }
+
+        return (prior + [center] + later).map(\.anchorISO)
     }
 
     public static func nextHalfMonth(after cycle: Cycle) -> Cycle {
@@ -60,6 +91,27 @@ public struct Cycle: Equatable, Sendable {
         return Cycle(anchorISO: String(format: "%04d-%02d-15", nextYear, nextMonth))
     }
 
+    public static func previousHalfMonth(before cycle: Cycle) -> Cycle {
+        let parts = cycle.anchorISO.split(separator: "-").compactMap { Int($0) }
+        precondition(parts.count == 3)
+        let year = parts[0]
+        let month = parts[1]
+        let day = parts[2]
+        if day == 15 {
+            // Previous month's month-end
+            var prevMonth = month - 1
+            var prevYear = year
+            if prevMonth < 1 {
+                prevMonth = 12
+                prevYear -= 1
+            }
+            let last = lastDayOfMonth(year: prevYear, month: prevMonth)
+            return Cycle(anchorISO: String(format: "%04d-%02d-%02d", prevYear, prevMonth, last))
+        }
+        // Month-end → same month's 15th
+        return Cycle(anchorISO: String(format: "%04d-%02d-15", year, month))
+    }
+
     public static func lastDayOfMonth(year: Int, month: Int) -> Int {
         var comps = DateComponents()
         comps.year = year
@@ -72,5 +124,29 @@ public struct Cycle: Equatable, Sendable {
             preconditionFailure("invalid year/month")
         }
         return range.count
+    }
+
+    private static func matchesCutoff(_ cycle: Cycle, cutoff: Int) -> Bool {
+        let day = Int(cycle.anchorISO.split(separator: "-")[2]) ?? 0
+        if cutoff == 15 { return day == 15 }
+        return day != 15
+    }
+
+    private static func nextCutoffMatching(after cycle: Cycle, cutoff: Int) -> Cycle {
+        var cursor = cycle
+        for _ in 0..<4 {
+            cursor = nextHalfMonth(after: cursor)
+            if matchesCutoff(cursor, cutoff: cutoff) { return cursor }
+        }
+        preconditionFailure("could not find next cutoff match")
+    }
+
+    private static func previousCutoffMatching(before cycle: Cycle, cutoff: Int) -> Cycle {
+        var cursor = cycle
+        for _ in 0..<4 {
+            cursor = previousHalfMonth(before: cursor)
+            if matchesCutoff(cursor, cutoff: cutoff) { return cursor }
+        }
+        preconditionFailure("could not find previous cutoff match")
     }
 }

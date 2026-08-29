@@ -76,4 +76,36 @@ struct CycleNextStatementTests {
                 == "2026-08-15"
         )
     }
+
+    @Test("statement candidates around Oct 15 cutoff 15 span prior and next 15ths")
+    func candidatesCutoff15() {
+        let anchors = Cycle.statementAnchorCandidates(
+            aroundISO: "2026-10-15",
+            cutoff: 15,
+            before: 2,
+            after: 2
+        )
+        #expect(anchors == [
+            "2026-08-15",
+            "2026-09-15",
+            "2026-10-15",
+            "2026-11-15",
+            "2026-12-15",
+        ])
+    }
+
+    @Test("statement candidates around Jul 31 cutoff 30 span month-ends")
+    func candidatesCutoff30() {
+        let anchors = Cycle.statementAnchorCandidates(
+            aroundISO: "2026-07-31",
+            cutoff: 30,
+            before: 1,
+            after: 1
+        )
+        #expect(anchors == [
+            "2026-06-30",
+            "2026-07-31",
+            "2026-08-31",
+        ])
+    }
 }

@@ -384,12 +384,13 @@ struct AddEntryView: View {
             error = "Couldn't save. Choose category and payment method."
             return
         }
-        let allocation: Allocation
+        let account = selectedAccount
+        let intended: Allocation
         switch splitMode {
         case 0:
-            allocation = AllocationDefaults.justMine(amountC: amountC, paidBy: paidBy)
+            intended = AllocationDefaults.justMine(amountC: amountC, paidBy: paidBy)
         case 1:
-            allocation = AllocationDefaults.fiftyFifty(amountC: amountC)
+            intended = AllocationDefaults.fiftyFifty(amountC: amountC)
         default:
             guard let f = InputBounds.centavos(fromPesosText: customFern),
                   let s = InputBounds.centavos(fromPesosText: customStark),
@@ -398,15 +399,32 @@ struct AddEntryView: View {
                 error = "Couldn't save. Custom split must add up."
                 return
             }
-            allocation = Allocation(fern: f, stark: s)
+            intended = Allocation(fern: f, stark: s)
         }
+        let scope = account?.scope ?? .household
+        let allocation = AllocationRouting.record(
+            intended: intended,
+            accountScope: scope,
+            paidBy: paidBy
+        )
 
-        let account = selectedAccount
         let decision = Realization.decide(
             purchaseISO: purchaseISO,
             settlement: account?.settlement ?? .instant,
             statementCutoff: account?.statementCutoff
         )
+
+        let category = categories.first { $0.id == categoryId }
+        let settlementRole: SettlementRole? = {
+            guard let category, category.system else { return nil }
+            switch category.item {
+            case "Partner Contribution": return .contribution
+            case "Partner Receivable": return .receivable
+            case "Fund Move": return .fundMove
+            case "Loan Payment": return .loanPayment
+            default: return nil
+            }
+        }()
 
         let tx = TransactionRecord(
             purchaseDate: purchaseISO,
@@ -418,6 +436,7 @@ struct AddEntryView: View {
             categoryId: categoryId,
             paidBy: paidBy,
             allocation: allocation,
+            settlementRole: settlementRole,
             note: {
                 let trimmed = InputBounds.clampNote(note).trimmingCharacters(in: .whitespacesAndNewlines)
                 return trimmed.isEmpty ? nil : trimmed

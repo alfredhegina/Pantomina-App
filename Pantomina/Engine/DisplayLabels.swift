@@ -29,8 +29,11 @@ enum DisplayLabels {
     }
 
     static func accountKindHint(settlement: SettlementKind, scope: Scope, fernName: String, starkName: String) -> String {
-        if settlement == .statement { return "Statement" }
-        return self.scope(scope, fernName: fernName, starkName: starkName)
+        let who = self.scope(scope, fernName: fernName, starkName: starkName)
+        if settlement == .statement {
+            return "\(who) · Statement"
+        }
+        return who
     }
 
     static func displayDate(iso: String) -> String {
@@ -55,5 +58,13 @@ enum DisplayLabels {
             return "Waiting on statement · counts on \(when)"
         }
         return "Counts on \(when)"
+    }
+
+    static func settlementStatus(_ status: SettlementStatus) -> String {
+        switch status {
+        case .settled: return "Settled"
+        case .partial: return "Partial"
+        case .overpaid: return "Overpaid"
+        }
     }
 }

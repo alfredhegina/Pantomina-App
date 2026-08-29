@@ -24,6 +24,7 @@
 		502E098278508D5D20B01FB5 /* PantominaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2615DF508DE79DB10AD3A2DC /* PantominaApp.swift */; };
 		50F8634082A077A4568EB2C2 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B823599C2B79C430C92D7047 /* SettingsView.swift */; };
 		5EAFCDB1B460FB0A44F13981 /* DisplayLabels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22B8023D3CB8E4B30986D2F3 /* DisplayLabels.swift */; };
+		5F13D0A2C33B8EBAF1742986 /* BillsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C002964A17D10C56E3CA2F /* BillsView.swift */; };
 		633ADDCCC050E38BE657AC4B /* AccountLabelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8712B6D306342B28E31BD3D3 /* AccountLabelsTests.swift */; };
 		678AE2B0BC20F179C4F9E02D /* RealizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 696CD15F7EFEAC0E10BE6B3A /* RealizationTests.swift */; };
 		6BC0EABFFBDD2FC20EA77EE7 /* CoAMigration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EFD9E7141F46FA7130E90F8 /* CoAMigration.swift */; };
@@ -34,10 +35,12 @@
 		8C98C5507A11EC8EC389B310 /* CoAMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13494702B3F803138913FE88 /* CoAMigrationTests.swift */; };
 		99111A488DF210754F7ACCCD /* MoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB543846A4324090D51BE2F8 /* MoreView.swift */; };
 		A5ADB0AF24C90E23F113AE14 /* SeedCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F25187A8EBD065FB0589B4 /* SeedCatalog.swift */; };
+		A77581FD06F01FA6180ED957 /* SettlementTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567E6985C02435A4FC2F7323 /* SettlementTests.swift */; };
 		B997C3A666C2A4AEBE062F2E /* MoneyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D52988F0894815DC945A48B0 /* MoneyTests.swift */; };
 		BE588C56B3A912055F87FF0F /* Domain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D4D90A0EE53692CCB069F1C /* Domain.swift */; };
 		C3E95F51368FD5AAA375FDE0 /* AddEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6CC6980CF58C89BB7D7B9FE /* AddEntryView.swift */; };
 		D0CF173B57B48D82ED1A42B1 /* Bootstrap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6325E061F64F2C2AC149C4EC /* Bootstrap.swift */; };
+		D4FF2F58E06191B7E02C2E76 /* Settlement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48FB7376E78D3CE23F7A083B /* Settlement.swift */; };
 		D6E7015F5A609B97D9B8BB33 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9910C65AB0FB2798C53F726A /* Colors.swift */; };
 		E0C377C58755068A82209407 /* Fraunces-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DA78F54A20DB45DBE0FA2FCE /* Fraunces-Italic.ttf */; };
 		ED1981E2EB7ABD01F59A5446 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99353A11AE11E00DBA319353 /* RootView.swift */; };
@@ -60,6 +63,7 @@
 
 /* Begin PBXFileReference section */
 		063875082A5AF605BF68F225 /* Fraunces.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fraunces.ttf; sourceTree = "<group>"; };
+		12C002964A17D10C56E3CA2F /* BillsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillsView.swift; sourceTree = "<group>"; };
 		13494702B3F803138913FE88 /* CoAMigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoAMigrationTests.swift; sourceTree = "<group>"; };
 		1561D7E09988563B27DBCE28 /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
 		1EFCF0FB550B4A59D85E89E4 /* Primitives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Primitives.swift; sourceTree = "<group>"; };
@@ -69,7 +73,9 @@
 		26CD764F81C2AD9EEA664436 /* PantominaTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = PantominaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		29DE9CCC311070037631895C /* LedgerFiltersTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LedgerFiltersTests.swift; sourceTree = "<group>"; };
 		2B14EF3277DB4072ECEC8D04 /* LedgerFilters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LedgerFilters.swift; sourceTree = "<group>"; };
+		48FB7376E78D3CE23F7A083B /* Settlement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settlement.swift; sourceTree = "<group>"; };
 		4C123A96441A24DE527E16E1 /* InputBoundsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputBoundsTests.swift; sourceTree = "<group>"; };
+		567E6985C02435A4FC2F7323 /* SettlementTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettlementTests.swift; sourceTree = "<group>"; };
 		6325E061F64F2C2AC149C4EC /* Bootstrap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bootstrap.swift; sourceTree = "<group>"; };
 		696CD15F7EFEAC0E10BE6B3A /* RealizationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealizationTests.swift; sourceTree = "<group>"; };
 		750E8203BBAB2B9E6AD5BF54 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
@@ -153,6 +159,7 @@
 				29DE9CCC311070037631895C /* LedgerFiltersTests.swift */,
 				D52988F0894815DC945A48B0 /* MoneyTests.swift */,
 				696CD15F7EFEAC0E10BE6B3A /* RealizationTests.swift */,
+				567E6985C02435A4FC2F7323 /* SettlementTests.swift */,
 			);
 			path = PantominaTests;
 			sourceTree = "<group>";
@@ -178,6 +185,7 @@
 			isa = PBXGroup;
 			children = (
 				E6CC6980CF58C89BB7D7B9FE /* AddEntryView.swift */,
+				12C002964A17D10C56E3CA2F /* BillsView.swift */,
 				C4923488F708E4B94BBF1653 /* HomeView.swift */,
 				EB543846A4324090D51BE2F8 /* MoreView.swift */,
 				26660CD12EC0C748508FB5B6 /* OnboardingView.swift */,
@@ -244,6 +252,7 @@
 				2B14EF3277DB4072ECEC8D04 /* LedgerFilters.swift */,
 				B8C5305498BDA3098A03D2A1 /* Money.swift */,
 				B8802F7FAF45C57F3285ECBF /* Realization.swift */,
+				48FB7376E78D3CE23F7A083B /* Settlement.swift */,
 			);
 			path = Engine;
 			sourceTree = "<group>";
@@ -340,6 +349,7 @@
 			files = (
 				C3E95F51368FD5AAA375FDE0 /* AddEntryView.swift in Sources */,
 				8A1F130BBF8F0C613FCC2421 /* AppEnvironment.swift in Sources */,
+				5F13D0A2C33B8EBAF1742986 /* BillsView.swift in Sources */,
 				D0CF173B57B48D82ED1A42B1 /* Bootstrap.swift in Sources */,
 				6BC0EABFFBDD2FC20EA77EE7 /* CoAMigration.swift in Sources */,
 				D6E7015F5A609B97D9B8BB33 /* Colors.swift in Sources */,
@@ -361,6 +371,7 @@
 				ED1981E2EB7ABD01F59A5446 /* RootView.swift in Sources */,
 				A5ADB0AF24C90E23F113AE14 /* SeedCatalog.swift in Sources */,
 				50F8634082A077A4568EB2C2 /* SettingsView.swift in Sources */,
+				D4FF2F58E06191B7E02C2E76 /* Settlement.swift in Sources */,
 				F4983B225917F823224DCD36 /* StatementDayView.swift in Sources */,
 				3DD058C8C0E182D9693F3464 /* Typography.swift in Sources */,
 			);
@@ -379,6 +390,7 @@
 				4AEF6E6E3900DD2A3842865E /* LedgerFiltersTests.swift in Sources */,
 				B997C3A666C2A4AEBE062F2E /* MoneyTests.swift in Sources */,
 				678AE2B0BC20F179C4F9E02D /* RealizationTests.swift in Sources */,
+				A77581FD06F01FA6180ED957 /* SettlementTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

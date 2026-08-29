@@ -32,4 +32,32 @@ struct DisplayLabelsTests {
         #expect(DisplayLabels.settlementHint(isStatement: false, anchorISO: "2026-06-30")
             == "Counts on Jun 30, 2026")
     }
+
+    @Test("account hints keep Shared visible on statement cards")
+    func accountKindHint() {
+        #expect(
+            DisplayLabels.accountKindHint(
+                settlement: .statement,
+                scope: .household,
+                fernName: "Fern",
+                starkName: "Stark"
+            ) == "Shared · Statement"
+        )
+        #expect(
+            DisplayLabels.accountKindHint(
+                settlement: .statement,
+                scope: .fern,
+                fernName: "Fern",
+                starkName: "Stark"
+            ) == "Fern · Statement"
+        )
+        #expect(
+            DisplayLabels.accountKindHint(
+                settlement: .instant,
+                scope: .household,
+                fernName: "Fern",
+                starkName: "Stark"
+            ) == "Shared"
+        )
+    }
 }

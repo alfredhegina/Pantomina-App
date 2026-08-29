@@ -85,3 +85,18 @@ Ran `greenlight preflight .` on current tree (no Xcode app yet):
 ## Explicit non-changes
 
 Product IA, bi-weekly cycle, Love Tab rules, cheese quarantine, two-person non-negotiables, PHP centavos, Phase feature order (1–8) stay. Only delivery stack and Phase 0 tooling change.
+
+---
+
+## Phase 3 polish (2026-08-29, pre–Phase 4)
+
+Skills: Impeccable Operate, Humanizer, Emil / apple-design, UI UX Pro Max (mobile Operate).
+
+| Before | After | Why |
+|---|---|---|
+| Fern card below CTAs; meta “Not a reverse Love Tab” | Settle → Fern covers → actions; shorter human captions | Read money, then act; cheese quarantine |
+| Account picker subtitle `Statement` only | `Shared · Statement` / `Fern · Statement` | Household cards looked non-shared |
+| Cycle menu only if 2+ anchors | Always when any anchors | Sep 15 statement cycle discoverable |
+| Salary-only income seed | + **Income · Side hustle** (backfill) | Matches how people actually earn |
+
+Next product phase: **Phase 4** (Forecast, Checklist, funding plans, Cookie Jar).

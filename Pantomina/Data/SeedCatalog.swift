@@ -43,6 +43,7 @@ enum SeedCatalog {
         .init(group: "Groceries", item: "Household", flow: .expense, needWant: .need, fixedVariable: .variable),
         .init(group: "Travels", item: "Accommodation", flow: .expense, needWant: .want, fixedVariable: .variable),
         .init(group: "Income", item: "Salary", flow: .income, needWant: nil, fixedVariable: .fixed),
+        .init(group: "Income", item: "Side hustle", flow: .income, needWant: nil, fixedVariable: .variable),
         .init(group: "Child Support", item: "Birthday", flow: .expense, needWant: .want, fixedVariable: .variable),
         .init(group: "Siblings", item: "Birthday", flow: .expense, needWant: .need, fixedVariable: .variable),
         .init(group: "Loan", item: "BPI Credit to Cash", flow: .expense, needWant: .want, fixedVariable: .fixed),
@@ -93,6 +94,17 @@ enum SeedCatalog {
                     )
                 )
             }
+        } else if !existingCats.contains(where: { $0.group == "Income" && $0.item == "Side hustle" }) {
+            context.insert(
+                CategoryRecord(
+                    group: "Income",
+                    item: "Side hustle",
+                    flow: .income,
+                    needWant: nil,
+                    fixedVariable: .variable,
+                    system: false
+                )
+            )
         }
         try context.save()
     }

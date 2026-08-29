@@ -113,6 +113,8 @@ final class TransactionRecord {
     var paidByRaw: String
     var allocFernC: Int
     var allocStarkC: Int
+    var settlementRoleRaw: String?
+    var linkedId: String?
     var note: String?
     var merchant: String?
     var createdAt: Date
@@ -129,6 +131,8 @@ final class TransactionRecord {
         categoryId: String,
         paidBy: PersonId,
         allocation: Allocation,
+        settlementRole: SettlementRole? = nil,
+        linkedId: String? = nil,
         note: String? = nil,
         merchant: String? = nil,
         createdAt: Date = .now,
@@ -145,6 +149,8 @@ final class TransactionRecord {
         self.paidByRaw = paidBy.rawValue
         self.allocFernC = allocation.fern
         self.allocStarkC = allocation.stark
+        self.settlementRoleRaw = settlementRole?.rawValue
+        self.linkedId = linkedId
         self.note = note
         self.merchant = merchant
         self.createdAt = createdAt
@@ -157,6 +163,13 @@ final class TransactionRecord {
         set { realizedStatusRaw = newValue.rawValue }
     }
     var allocation: Allocation { Allocation(fern: allocFernC, stark: allocStarkC) }
+    var settlementRole: SettlementRole? {
+        get {
+            guard let settlementRoleRaw else { return nil }
+            return SettlementRole(rawValue: settlementRoleRaw)
+        }
+        set { settlementRoleRaw = newValue?.rawValue }
+    }
 }
 
 @Model
