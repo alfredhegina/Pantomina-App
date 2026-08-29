@@ -55,8 +55,6 @@ struct StatementDayView: View {
                         }
                     }
                 }
-            } header: {
-                Text("Statement day")
             } footer: {
                 Text("Tick swipes on this statement. They become counted on the chosen cycle; the rest stay in the pile.")
             }
@@ -72,10 +70,6 @@ struct StatementDayView: View {
                             ForEach(proposedAnchors, id: \.self) { anchor in
                                 Text(DisplayLabels.displayDate(iso: anchor)).tag(Optional(anchor))
                             }
-                        }
-                        .onChange(of: selectedAccountId) { _, _ in
-                            selectedAnchor = proposedAnchors.first
-                            selectedIds = []
                         }
                     }
                 }
@@ -124,13 +118,17 @@ struct StatementDayView: View {
                 }
             }
         }
-        .onAppear {
+        .task {
             if selectedAccountId == nil {
                 selectedAccountId = statementAccounts.first?.id
             }
             if selectedAnchor == nil {
                 selectedAnchor = proposedAnchors.first
             }
+        }
+        .onChange(of: selectedAccountId) { _, _ in
+            selectedAnchor = proposedAnchors.first
+            selectedIds = []
         }
         .overlay(alignment: .bottom) {
             if let toast {

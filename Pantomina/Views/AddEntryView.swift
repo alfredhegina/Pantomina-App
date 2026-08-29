@@ -426,13 +426,17 @@ struct AddEntryView: View {
         modelContext.insert(tx)
         do {
             try modelContext.save()
-            bumpRecent(id: categoryId, raw: &recentCategoryIdsRaw)
-            bumpRecent(id: accountId, raw: &recentAccountIdsRaw)
-            PantominaMotion.run(reduceMotion) { savedToast = true }
-            amountText = ""
-            note = ""
-            applyAccountDefaults()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+            // Defer AppStorage + UI state so we don't mutate during an in-flight view update cycle.
+            let catId = categoryId
+            let accId = accountId
+            Task { @MainActor in
+                bumpRecent(id: catId, raw: &recentCategoryIdsRaw)
+                bumpRecent(id: accId, raw: &recentAccountIdsRaw)
+                PantominaMotion.run(reduceMotion) { savedToast = true }
+                amountText = ""
+                note = ""
+                applyAccountDefaults()
+                try? await Task.sleep(nanoseconds: 1_200_000_000)
                 PantominaMotion.run(reduceMotion) { savedToast = false }
                 if presentsAsSheet { dismiss() }
             }

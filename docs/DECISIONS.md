@@ -40,6 +40,7 @@ Living log of locked **Baseline** choices and parked **For later** work. The pro
 | 2026-08-29 | **Pre–Phase 2 UI polish:** light-mode lock; Fraunces + DM Sans (OFL variable fonts); no horizontal filter scroll; status/scope display maps (`DisplayLabels`); Home Add CTA + recent 3; Bills/More honest stubs; reduce-motion helper; 44pt filter chips. | Spec §1–2 vibe before realization engine. |
 | 2026-08-29 | Add sheet has **no Close**; dismiss is interactive pull-down. No keyboard Done — Save resigns focus. | Avoid duplicate exits; reduce dismiss/keyboard frame warnings. |
 | 2026-08-29 | **Phase 2** shipped: `Realization` + `Cycle.nextStatementCycle`; Add uses engine; Receipts TBD drawer + group by realized date; Statement day batch-count. Accept fixtures: cash 06/28→06/30; BDO JCB 07/04 proposes 08/15. | Spec §6 Phase 2. |
+| 2026-08-29 | After Save, defer `@AppStorage` / toast / dismiss off the current update; Receipts snapshots `@Query` once per body and opens Statement day via typed `NavigationLink` + `navigationDestination(for:)` (not `isPresented`). | Avoids AttributeGraph “setting value during update” and Form tip/header underlap into the status bar on push. |
 
 ## For later
 

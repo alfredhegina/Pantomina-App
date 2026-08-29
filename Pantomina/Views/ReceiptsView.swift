@@ -12,17 +12,152 @@ struct ReceiptsView: View {
     @State private var flowFilter: FlowType?
     @State private var statusFilter: RealizedStatus?
 
-    private var fernName: String { people.first { $0.id == .fern }?.name ?? "Fern" }
-    private var starkName: String { people.first { $0.id == .stark }?.name ?? "Stark" }
+    private enum Route: Hashable {
+        case statementDay
+    }
 
     private var filtersActive: Bool {
         personFilter != nil || scopeFilter != nil || flowFilter != nil || statusFilter != nil
     }
 
-    private var filtered: [TransactionRecord] {
+    var body: some View {
+        // One snapshot per body pass — never re-enter @Query from nested helpers during the same update.
+        let accountById = Dictionary(uniqueKeysWithValues: accounts.map { ($0.id, $0) })
+        let categoryById = Dictionary(uniqueKeysWithValues: categories.map { ($0.id, $0) })
+        let fern = people.first { $0.id == .fern }?.name ?? "Fern"
+        let stark = people.first { $0.id == .stark }?.name ?? "Stark"
+        let filteredRows = Self.filteredTransactions(
+            transactions: transactions,
+            accountById: accountById,
+            categoryById: categoryById,
+            personFilter: personFilter,
+            scopeFilter: scopeFilter,
+            flowFilter: flowFilter,
+            statusFilter: statusFilter
+        )
+        let pending = filteredRows.filter { $0.realizedStatus == .pending }
+        let ledger = statusFilter == .pending
+            ? filteredRows
+            : filteredRows.filter { $0.realizedStatus != .pending }
+        let tbdSum = Realization.tbdSumCentavos(
+            pending.map { Realization.TBDItem(id: $0.id, amountC: $0.amountC, status: $0.realizedStatus) }
+        )
+        let grouped = Self.groupedByRealizedDate(ledger)
+
+        NavigationStack {
+            VStack(spacing: 0) {
+                filterBar(fernName: fern, starkName: stark)
+                if filteredRows.isEmpty {
+                    empty
+                } else {
+                    List {
+                        if !pending.isEmpty, statusFilter != .pending {
+                            Section {
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("Still in the pile")
+                                            .font(PantominaFont.body.weight(.medium))
+                                        Text("\(pending.count) waiting · \(formatPeso(tbdSum))")
+                                            .font(PantominaFont.caption)
+                                            .foregroundStyle(Color.pantomina.muted)
+                                    }
+                                    Spacer()
+                                    NavigationLink(value: Route.statementDay) {
+                                        Text("Statement day")
+                                            .font(PantominaFont.caption.weight(.semibold))
+                                            .foregroundStyle(Color.pantomina.sage)
+                                    }
+                                }
+                                ForEach(Array(pending.prefix(5)), id: \.id) { tx in
+                                    receiptRow(
+                                        tx,
+                                        dateISO: tx.proposedRealizedDate ?? tx.purchaseDate,
+                                        accountById: accountById,
+                                        categoryById: categoryById,
+                                        fernName: fern,
+                                        starkName: stark
+                                    )
+                                }
+                                if pending.count > 5 {
+                                    Text("+\(pending.count - 5) more")
+                                        .font(PantominaFont.caption)
+                                        .foregroundStyle(Color.pantomina.muted)
+                                }
+                            } header: {
+                                Text("TBD")
+                            }
+                        }
+
+                        if statusFilter == .pending {
+                            ForEach(pending, id: \.id) { tx in
+                                receiptRow(
+                                    tx,
+                                    dateISO: tx.proposedRealizedDate ?? tx.purchaseDate,
+                                    accountById: accountById,
+                                    categoryById: categoryById,
+                                    fernName: fern,
+                                    starkName: stark
+                                )
+                            }
+                        } else {
+                            ForEach(grouped, id: \.key) { group in
+                                Section(DisplayLabels.displayDate(iso: group.key)) {
+                                    ForEach(group.rows, id: \.id) { tx in
+                                        receiptRow(
+                                            tx,
+                                            dateISO: tx.purchaseDate,
+                                            accountById: accountById,
+                                            categoryById: categoryById,
+                                            fernName: fern,
+                                            starkName: stark
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .listStyle(.insetGrouped)
+                }
+            }
+            .background(Color.pantomina.ground)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    VStack(spacing: 2) {
+                        PetTitle("The Receipts")
+                        Text("Ledger")
+                            .font(PantominaFont.caption)
+                            .foregroundStyle(Color.pantomina.muted)
+                    }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink(value: Route.statementDay) {
+                        Image(systemName: "creditcard")
+                    }
+                    .accessibilityLabel("Statement day")
+                }
+            }
+            .navigationDestination(for: Route.self) { route in
+                switch route {
+                case .statementDay:
+                    StatementDayView()
+                }
+            }
+        }
+    }
+
+    private static func filteredTransactions(
+        transactions: [TransactionRecord],
+        accountById: [String: AccountRecord],
+        categoryById: [String: CategoryRecord],
+        personFilter: PersonId?,
+        scopeFilter: Scope?,
+        flowFilter: FlowType?,
+        statusFilter: RealizedStatus?
+    ) -> [TransactionRecord] {
         let rows = transactions.map { tx -> (TransactionRecord, LedgerFilterRow) in
-            let account = accounts.first { $0.id == tx.accountId }
-            let category = categories.first { $0.id == tx.categoryId }
+            let account = accountById[tx.accountId]
+            let category = categoryById[tx.categoryId]
             let row = LedgerFilterRow(
                 id: tx.id,
                 paidBy: tx.paidBy,
@@ -44,24 +179,10 @@ struct ReceiptsView: View {
         return rows.compactMap { kept.contains($0.0.id) ? $0.0 : nil }
     }
 
-    /// Realized (and projected) rows for the main list — pending live in the TBD drawer.
-    private var ledgerRows: [TransactionRecord] {
-        if statusFilter == .pending { return filtered }
-        return filtered.filter { $0.realizedStatus != .pending }
-    }
-
-    private var pendingRows: [TransactionRecord] {
-        filtered.filter { $0.realizedStatus == .pending }
-    }
-
-    private var tbdSum: Int {
-        Realization.tbdSumCentavos(
-            pendingRows.map { Realization.TBDItem(id: $0.id, amountC: $0.amountC, status: $0.realizedStatus) }
-        )
-    }
-
-    private var groupedByRealized: [(key: String, rows: [TransactionRecord])] {
-        let groups = Dictionary(grouping: ledgerRows) { tx in
+    private static func groupedByRealizedDate(
+        _ rows: [TransactionRecord]
+    ) -> [(key: String, rows: [TransactionRecord])] {
+        let groups = Dictionary(grouping: rows) { tx in
             tx.realizedDate ?? tx.purchaseDate
         }
         return groups.keys.sorted(by: >).map { key in
@@ -69,87 +190,7 @@ struct ReceiptsView: View {
         }
     }
 
-    var body: some View {
-        NavigationStack {
-            VStack(spacing: 0) {
-                filterBar
-                if filtered.isEmpty {
-                    empty
-                } else {
-                    List {
-                        if !pendingRows.isEmpty, statusFilter != .pending {
-                            Section {
-                                HStack {
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text("Still in the pile")
-                                            .font(PantominaFont.body.weight(.medium))
-                                        Text("\(pendingRows.count) waiting · \(formatPeso(tbdSum))")
-                                            .font(PantominaFont.caption)
-                                            .foregroundStyle(Color.pantomina.muted)
-                                    }
-                                    Spacer()
-                                    NavigationLink {
-                                        StatementDayView()
-                                    } label: {
-                                        Text("Statement day")
-                                            .font(PantominaFont.caption.weight(.semibold))
-                                            .foregroundStyle(Color.pantomina.sage)
-                                    }
-                                }
-                                ForEach(pendingRows.prefix(5), id: \.id) { tx in
-                                    receiptRow(tx, dateISO: tx.proposedRealizedDate ?? tx.purchaseDate)
-                                }
-                                if pendingRows.count > 5 {
-                                    Text("+\(pendingRows.count - 5) more")
-                                        .font(PantominaFont.caption)
-                                        .foregroundStyle(Color.pantomina.muted)
-                                }
-                            } header: {
-                                Text("TBD")
-                            }
-                        }
-
-                        if statusFilter == .pending {
-                            ForEach(pendingRows, id: \.id) { tx in
-                                receiptRow(tx, dateISO: tx.proposedRealizedDate ?? tx.purchaseDate)
-                            }
-                        } else {
-                            ForEach(groupedByRealized, id: \.key) { group in
-                                Section(DisplayLabels.displayDate(iso: group.key)) {
-                                    ForEach(group.rows, id: \.id) { tx in
-                                        receiptRow(tx, dateISO: tx.purchaseDate)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    .listStyle(.insetGrouped)
-                }
-            }
-            .background(Color.pantomina.ground.ignoresSafeArea())
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    VStack(spacing: 2) {
-                        PetTitle("The Receipts")
-                        Text("Ledger")
-                            .font(PantominaFont.caption)
-                            .foregroundStyle(Color.pantomina.muted)
-                    }
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    NavigationLink {
-                        StatementDayView()
-                    } label: {
-                        Image(systemName: "creditcard")
-                    }
-                    .accessibilityLabel("Statement day")
-                }
-            }
-        }
-    }
-
-    private var filterBar: some View {
+    private func filterBar(fernName: String, starkName: String) -> some View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
             FlowLayout(spacing: Spacing.sm) {
                 filterChip("All people", selected: personFilter == nil) { personFilter = nil }
@@ -222,9 +263,16 @@ struct ReceiptsView: View {
         .frame(maxWidth: .infinity)
     }
 
-    private func receiptRow(_ tx: TransactionRecord, dateISO: String) -> some View {
-        let account = accounts.first { $0.id == tx.accountId }
-        let category = categories.first { $0.id == tx.categoryId }
+    private func receiptRow(
+        _ tx: TransactionRecord,
+        dateISO: String,
+        accountById: [String: AccountRecord],
+        categoryById: [String: CategoryRecord],
+        fernName: String,
+        starkName: String
+    ) -> some View {
+        let account = accountById[tx.accountId]
+        let category = categoryById[tx.categoryId]
         let label = account?.displayLabel(fernName: fernName, starkName: starkName) ?? "Account"
         let amountColor: Color = {
             switch category?.flow {
