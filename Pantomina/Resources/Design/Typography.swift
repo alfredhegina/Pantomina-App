@@ -10,15 +10,25 @@ enum Spacing {
 }
 
 enum PantominaFont {
-    static let eyebrow = Font.system(size: 12, weight: .semibold)
-    static let petTitle = Font.system(.title2, design: .serif).italic()
-    static let body = Font.system(size: 16, weight: .regular)
-    static let amount = Font.system(size: 28, weight: .semibold).monospacedDigit()
-    static let caption = Font.system(size: 13, weight: .regular)
+    /// Fraunces italic for pet-titles (falls back to system serif if unregistered).
+    static let petTitle = Font.custom("Fraunces", size: 22, relativeTo: .title2).italic()
+    static let eyebrow = Font.custom("DM Sans", size: 12, relativeTo: .caption).weight(.semibold)
+    static let body = Font.custom("DM Sans", size: 16, relativeTo: .body)
+    static let amount = Font.custom("DM Sans", size: 28, relativeTo: .title).weight(.semibold).monospacedDigit()
+    static let caption = Font.custom("DM Sans", size: 13, relativeTo: .caption)
 }
 
 enum PantominaMotion {
     static let feedback = Animation.timingCurve(0.23, 1, 0.32, 1, duration: 0.28)
     static let sheet = Animation.timingCurve(0.32, 0.72, 0, 1, duration: 0.4)
     static let spring = Animation.spring(duration: 0.5, bounce: 0.2)
+
+    @MainActor
+    static func run(_ reduceMotion: Bool, _ body: () -> Void) {
+        if reduceMotion {
+            body()
+        } else {
+            withAnimation(feedback, body)
+        }
+    }
 }

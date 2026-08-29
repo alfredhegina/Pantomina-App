@@ -24,6 +24,8 @@ xcodebuild -scheme Pantomina-Preprod -destination 'platform=iOS Simulator,name=i
 
 - Add date field is labeled **When it happened** (salary/transfers too — not “purchase”).
 - Input bounds: display name ≤40, pet ≤24, note ≤200; amounts **₱1…₱100,000,000**.
+- Status chips say **Not counted yet** (never `pending`/`realized` raw values); scopes say **Shared** / person names.
+- Fonts: **Fraunces** + **DM Sans** (bundled under `Pantomina/Resources/Fonts/`).
 - Delete the app from the Simulator to re-run onboarding (no Settings replay yet).
 
 ## Prototype (reference only)

@@ -37,6 +37,8 @@ Living log of locked **Baseline** choices and parked **For later** work. The pro
 | 2026-08-29 | **Phase 1** shipped: SwiftData ledger, onboarding, seed CoA/accounts, Receipts filters, Add form, Settings rename → computed labels. | Spec §6 Phase 1 acceptance. |
 | 2026-08-29 | **Input bounds:** display name ≤40 graphemes, pet ≤24, note ≤200; money **₱1…₱100,000,000** (1…10_000_000_000 centavos). Engine helpers + UI clamp/reject. | Harden free-text and amount entry; salary/transfers need a sane ceiling. |
 | 2026-08-29 | UI date label is **When it happened**; schema/engine field stays `purchaseDate`. | Salary and transfers are not purchases; avoid leaking engine nouns. |
+| 2026-08-29 | **Pre–Phase 2 UI polish:** light-mode lock; Fraunces + DM Sans (OFL variable fonts); no horizontal filter scroll; status/scope display maps (`DisplayLabels`); Home Add CTA + recent 3; Bills/More honest stubs; reduce-motion helper; 44pt filter chips. | Spec §1–2 vibe before realization engine. |
+| 2026-08-29 | Add sheet has **no Close**; dismiss is interactive pull-down. No keyboard Done — Save resigns focus. | Avoid duplicate exits; reduce dismiss/keyboard frame warnings. |
 
 ## For later
 

@@ -73,6 +73,10 @@ targets:
         ITSAppUsesNonExemptEncryption: false
         UIDeviceFamily:
           - 1
+        UIAppFonts:
+          - Fraunces.ttf
+          - Fraunces-Italic.ttf
+          - DMSans.ttf
   PantominaTests:
     type: bundle.unit-test
     platform: iOS

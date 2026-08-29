@@ -13,6 +13,7 @@ struct Card<Content: View>: View {
                 RoundedRectangle(cornerRadius: Spacing.radius, style: .continuous)
                     .stroke(Color.pantomina.hairline, lineWidth: 1)
             )
+            .shadow(color: Color.black.opacity(0.04), radius: 8, y: 2)
     }
 }
 
@@ -54,12 +55,13 @@ struct Amount: View {
 
 struct PersonDot: View {
     let person: PersonId
+    var displayName: String?
 
     var body: some View {
         Circle()
             .fill(person == .fern ? Color.pantomina.sage : Color.pantomina.terra)
             .frame(width: 10, height: 10)
-            .accessibilityLabel(person.rawValue)
+            .accessibilityLabel(displayName ?? (person == .fern ? "Payer" : "Contributor"))
     }
 }
 
@@ -74,11 +76,13 @@ struct Chip: View {
     var body: some View {
         Text(label)
             .font(PantominaFont.caption)
-            .padding(.horizontal, Spacing.sm)
+            .padding(.horizontal, Spacing.md)
+            .frame(minHeight: 32)
             .padding(.vertical, Spacing.xs)
             .background(background)
             .foregroundStyle(foreground)
             .clipShape(Capsule())
+            .accessibilityAddTraits(.isStaticText)
     }
 
     private var background: Color {
@@ -103,19 +107,20 @@ struct Chip: View {
 struct Seg: View {
     let options: [String]
     @Binding var selection: Int
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         HStack(spacing: 0) {
             ForEach(options.indices, id: \.self) { index in
                 Button {
-                    withAnimation(PantominaMotion.feedback) {
+                    PantominaMotion.run(reduceMotion) {
                         selection = index
                     }
                 } label: {
                     Text(options[index])
                         .font(PantominaFont.caption)
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, Spacing.sm)
+                        .frame(minHeight: 44)
                         .background(selection == index ? Color.pantomina.sage : Color.clear)
                         .foregroundStyle(selection == index ? Color.white : Color.pantomina.muted)
                 }

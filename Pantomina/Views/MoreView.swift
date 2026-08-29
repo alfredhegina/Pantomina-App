@@ -9,7 +9,7 @@ struct MoreView: View {
                     SettingsView()
                 } label: {
                     Label {
-                        VStack(alignment: .leading) {
+                        VStack(alignment: .leading, spacing: 2) {
                             Text("The Fine Print")
                             Text("Settings")
                                 .font(PantominaFont.caption)
@@ -18,6 +18,13 @@ struct MoreView: View {
                     } icon: {
                         Image(systemName: "gearshape")
                     }
+                }
+
+                Section {
+                    EmptyView()
+                } footer: {
+                    Text("Settings for now — more rooms later.")
+                        .font(PantominaFont.caption)
                 }
             }
             .scrollContentBackground(.hidden)

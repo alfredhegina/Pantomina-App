@@ -15,6 +15,10 @@ struct ReceiptsView: View {
     private var fernName: String { people.first { $0.id == .fern }?.name ?? "Fern" }
     private var starkName: String { people.first { $0.id == .stark }?.name ?? "Stark" }
 
+    private var filtersActive: Bool {
+        personFilter != nil || scopeFilter != nil || flowFilter != nil || statusFilter != nil
+    }
+
     private var filtered: [TransactionRecord] {
         let rows = transactions.map { tx -> (TransactionRecord, LedgerFilterRow) in
             let account = accounts.first { $0.id == tx.accountId }
@@ -69,12 +73,12 @@ struct ReceiptsView: View {
     }
 
     private var filterBar: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: Spacing.sm) {
+        VStack(alignment: .leading, spacing: Spacing.sm) {
+            FlowLayout(spacing: Spacing.sm) {
                 filterChip("All people", selected: personFilter == nil) { personFilter = nil }
                 filterChip(fernName, selected: personFilter == .fern) { personFilter = .fern }
                 filterChip(starkName, selected: personFilter == .stark) { personFilter = .stark }
-                filterChip("Household", selected: scopeFilter == .household) {
+                filterChip("Shared", selected: scopeFilter == .household) {
                     scopeFilter = scopeFilter == .household ? nil : .household
                 }
                 filterChip("Expense", selected: flowFilter == .expense) {
@@ -83,8 +87,16 @@ struct ReceiptsView: View {
                 filterChip("Income", selected: flowFilter == .income) {
                     flowFilter = flowFilter == .income ? nil : .income
                 }
-                filterChip("Pending", selected: statusFilter == .pending) {
+                filterChip(DisplayLabels.statusFilter(.pending), selected: statusFilter == .pending) {
                     statusFilter = statusFilter == .pending ? nil : .pending
+                }
+                if filtersActive {
+                    filterChip("Clear", selected: false) {
+                        personFilter = nil
+                        scopeFilter = nil
+                        flowFilter = nil
+                        statusFilter = nil
+                    }
                 }
             }
             .padding(.horizontal, Spacing.lg)
@@ -96,23 +108,40 @@ struct ReceiptsView: View {
         Button(action: action) {
             Text(title)
                 .font(PantominaFont.caption)
-                .padding(.horizontal, Spacing.sm)
-                .padding(.vertical, Spacing.xs)
+                .padding(.horizontal, Spacing.md)
+                .frame(minHeight: 44)
                 .background(selected ? Color.pantomina.sage : Color.pantomina.hairline)
                 .foregroundStyle(selected ? Color.white : Color.pantomina.ink)
                 .clipShape(Capsule())
+                .contentShape(Capsule())
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(title)
+        .accessibilityAddTraits(selected ? [.isSelected, .isButton] : .isButton)
     }
 
     private var empty: some View {
         VStack(spacing: Spacing.md) {
             Spacer()
-            Text("Nothing here yet. Rare quiet moment.")
+            Text(transactions.isEmpty
+                 ? "Nothing here yet. Rare quiet moment."
+                 : "Nothing matches these filters.")
                 .font(PantominaFont.body)
                 .foregroundStyle(Color.pantomina.muted)
+                .multilineTextAlignment(.center)
+            if filtersActive {
+                Button("Clear filters") {
+                    personFilter = nil
+                    scopeFilter = nil
+                    flowFilter = nil
+                    statusFilter = nil
+                }
+                .font(PantominaFont.body.weight(.semibold))
+                .foregroundStyle(Color.pantomina.sage)
+            }
             Spacer()
         }
+        .padding(Spacing.lg)
         .frame(maxWidth: .infinity)
     }
 
@@ -120,6 +149,13 @@ struct ReceiptsView: View {
         let account = accounts.first { $0.id == tx.accountId }
         let category = categories.first { $0.id == tx.categoryId }
         let label = account?.displayLabel(fernName: fernName, starkName: starkName) ?? "Account"
+        let amountColor: Color = {
+            switch category?.flow {
+            case .income: return Color.pantomina.sageDeep
+            case .expense: return Color.pantomina.terraDeep
+            default: return Color.pantomina.ink
+            }
+        }()
         return VStack(alignment: .leading, spacing: 4) {
             HStack {
                 Text(category?.displayName ?? "Category")
@@ -127,13 +163,16 @@ struct ReceiptsView: View {
                 Spacer()
                 Text(formatPeso(tx.amountC))
                     .font(PantominaFont.body.monospacedDigit())
+                    .foregroundStyle(amountColor)
             }
             HStack {
-                Text(tx.purchaseDate)
+                Text(DisplayLabels.displayDate(iso: tx.purchaseDate))
                 Text("·")
                 Text(label)
                 Spacer()
-                Chip(label: tx.realizedStatus.rawValue, tone: tx.realizedStatus == .pending ? .terra : .neutral)
+                if let status = DisplayLabels.status(tx.realizedStatus) {
+                    Chip(label: status, tone: tx.realizedStatus == .pending ? .terra : .neutral)
+                }
             }
             .font(PantominaFont.caption)
             .foregroundStyle(Color.pantomina.muted)

@@ -3,6 +3,7 @@ import SwiftData
 
 struct OnboardingView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var step = 0
     @State private var nameA = ""
     @State private var nameB = ""
@@ -10,48 +11,75 @@ struct OnboardingView: View {
     @State private var seedStarters = true
     @State private var error: String?
 
+    private let stepCount = 4
+
     var body: some View {
         NavigationStack {
-            VStack(alignment: .leading, spacing: Spacing.md) {
-                Eyebrow("Pantomina")
-                PetTitle("Shall we dance?")
+            ScrollView {
+                VStack(alignment: .leading, spacing: Spacing.md) {
+                    Eyebrow("Pantomina")
+                    PetTitle("Shall we dance?")
+                    stepIndicator
 
-                Group {
-                    switch step {
-                    case 0: namesStep
-                    case 1: rolesStep
-                    case 2: currencyStep
-                    default: startersStep
+                    Group {
+                        switch step {
+                        case 0: namesStep
+                        case 1: rolesStep
+                        case 2: currencyStep
+                        default: startersStep
+                        }
+                    }
+
+                    if let error {
+                        Text(error)
+                            .font(PantominaFont.caption)
+                            .foregroundStyle(Color.pantomina.rose)
                     }
                 }
-
-                if let error {
-                    Text(error)
-                        .font(PantominaFont.caption)
-                        .foregroundStyle(Color.pantomina.rose)
-                }
-
-                Spacer(minLength: Spacing.lg)
+                .padding(Spacing.lg)
+                .padding(.bottom, 88)
             }
-            .padding(Spacing.lg)
             .background(Color.pantomina.ground.ignoresSafeArea())
             .safeAreaInset(edge: .bottom) {
-                Button(action: advance) {
-                    Text(step < 3 ? "Continue" : "Start our ledger")
+                HStack(spacing: Spacing.sm) {
+                    if step > 0 {
+                        Button("Back") {
+                            PantominaMotion.run(reduceMotion) { step -= 1 }
+                        }
                         .font(PantominaFont.body.weight(.semibold))
-                        .frame(maxWidth: .infinity)
                         .frame(minHeight: 48)
-                        .background(Color.pantomina.sage)
-                        .foregroundStyle(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: Spacing.radius, style: .continuous))
+                        .padding(.horizontal, Spacing.lg)
+                        .foregroundStyle(Color.pantomina.sage)
+                    }
+                    Button(action: advance) {
+                        Text(step < 3 ? "Continue" : "Start our ledger")
+                            .font(PantominaFont.body.weight(.semibold))
+                            .frame(maxWidth: .infinity)
+                            .frame(minHeight: 48)
+                            .background(Color.pantomina.sage)
+                            .foregroundStyle(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: Spacing.radius, style: .continuous))
+                    }
+                    .buttonStyle(SageButtonStyle())
                 }
-                .buttonStyle(.plain)
                 .padding(.horizontal, Spacing.lg)
                 .padding(.top, Spacing.sm)
                 .padding(.bottom, Spacing.sm)
                 .background(Color.pantomina.ground)
             }
         }
+    }
+
+    private var stepIndicator: some View {
+        HStack(spacing: Spacing.xs) {
+            ForEach(0..<stepCount, id: \.self) { index in
+                Capsule()
+                    .fill(index <= step ? Color.pantomina.sage : Color.pantomina.hairline)
+                    .frame(height: 4)
+            }
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Step \(step + 1) of \(stepCount)")
     }
 
     private var namesStep: some View {
@@ -79,8 +107,16 @@ struct OnboardingView: View {
             Text("Who fronts the household bills? That person is the payer; the other contributes each cycle. This sets settlement direction and is not swapped later.")
                 .font(PantominaFont.body)
                 .foregroundStyle(Color.pantomina.muted)
-            roleButton(title: nameA.isEmpty ? "First person" : nameA, selected: payerIsA) { payerIsA = true }
-            roleButton(title: nameB.isEmpty ? "Second person" : nameB, selected: !payerIsA) { payerIsA = false }
+            roleButton(
+                title: nameA.isEmpty ? "First person" : nameA,
+                selected: payerIsA,
+                badge: payerIsA ? "Payer" : "Contributes each cycle"
+            ) { payerIsA = true }
+            roleButton(
+                title: nameB.isEmpty ? "Second person" : nameB,
+                selected: !payerIsA,
+                badge: !payerIsA ? "Payer" : "Contributes each cycle"
+            ) { payerIsA = false }
         }
     }
 
@@ -102,18 +138,17 @@ struct OnboardingView: View {
         }
     }
 
-    private func roleButton(title: String, selected: Bool, action: @escaping () -> Void) -> some View {
+    private func roleButton(title: String, selected: Bool, badge: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             HStack {
                 Text(title)
                 Spacer()
-                if selected {
-                    Text("Payer")
-                        .font(PantominaFont.caption)
-                        .foregroundStyle(Color.pantomina.sageDeep)
-                }
+                Text(badge)
+                    .font(PantominaFont.caption)
+                    .foregroundStyle(selected ? Color.pantomina.sageDeep : Color.pantomina.muted)
             }
             .padding(Spacing.md)
+            .frame(minHeight: 44)
             .background(selected ? Color.pantomina.sage.opacity(0.12) : Color.pantomina.card)
             .overlay(
                 RoundedRectangle(cornerRadius: Spacing.radius, style: .continuous)
@@ -136,11 +171,11 @@ struct OnboardingView: View {
                 error = "Couldn't continue. Enter both names."
                 return
             }
-            step = 1
+            PantominaMotion.run(reduceMotion) { step = 1 }
             return
         }
         if step < 3 {
-            step += 1
+            PantominaMotion.run(reduceMotion) { step += 1 }
             return
         }
 

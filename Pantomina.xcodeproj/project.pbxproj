@@ -7,17 +7,23 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		012AB156F8A5D3527E607D82 /* Layout.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB19BB64CC3C1ABB1DF02C4E /* Layout.swift */; };
 		058DF10F5B2262209C6F1C74 /* Primitives.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EFCF0FB550B4A59D85E89E4 /* Primitives.swift */; };
 		0CC4AD15DA2DEF6DC46FF174 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 750E8203BBAB2B9E6AD5BF54 /* PrivacyInfo.xcprivacy */; };
 		1591FD697D08466A15478DD6 /* Cycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5CAA1BF8684554DB59D6838 /* Cycle.swift */; };
+		2B207117194F37A902FCA24C /* DisplayLabelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7231909121283955C536ADB /* DisplayLabelsTests.swift */; };
+		3338FEE2DB5DC0473208D7BD /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = AA9A5EAB4E3DF3A48F3096ED /* README.md */; };
+		374718304F98D29263895F88 /* Fraunces.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 063875082A5AF605BF68F225 /* Fraunces.ttf */; };
 		3936D37B22728DD086E09C63 /* AllocationDefaultsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3E691C1BF781061756C3D47 /* AllocationDefaultsTests.swift */; };
 		3DD058C8C0E182D9693F3464 /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1561D7E09988563B27DBCE28 /* Typography.swift */; };
 		4143427B70772B07CA6A2F81 /* CycleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBD750FCC71323491E6FB04E /* CycleTests.swift */; };
 		46781C0E4CEE8ECCC6570F71 /* LedgerFilters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B14EF3277DB4072ECEC8D04 /* LedgerFilters.swift */; };
+		473F854C7B282C181AAA5E22 /* DMSans.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AFCD3AA59B74EC9A72E208BF /* DMSans.ttf */; };
 		4AEF6E6E3900DD2A3842865E /* LedgerFiltersTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29DE9CCC311070037631895C /* LedgerFiltersTests.swift */; };
 		4F8DA4BE26855679929703AC /* Money.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C5305498BDA3098A03D2A1 /* Money.swift */; };
 		502E098278508D5D20B01FB5 /* PantominaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2615DF508DE79DB10AD3A2DC /* PantominaApp.swift */; };
 		50F8634082A077A4568EB2C2 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B823599C2B79C430C92D7047 /* SettingsView.swift */; };
+		5EAFCDB1B460FB0A44F13981 /* DisplayLabels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22B8023D3CB8E4B30986D2F3 /* DisplayLabels.swift */; };
 		633ADDCCC050E38BE657AC4B /* AccountLabelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8712B6D306342B28E31BD3D3 /* AccountLabelsTests.swift */; };
 		6BC0EABFFBDD2FC20EA77EE7 /* CoAMigration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EFD9E7141F46FA7130E90F8 /* CoAMigration.swift */; };
 		6E30F6E19D6251AEE068D3AB /* ReceiptsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9249B8779319C89636800F82 /* ReceiptsView.swift */; };
@@ -31,6 +37,7 @@
 		C3E95F51368FD5AAA375FDE0 /* AddEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6CC6980CF58C89BB7D7B9FE /* AddEntryView.swift */; };
 		D0CF173B57B48D82ED1A42B1 /* Bootstrap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6325E061F64F2C2AC149C4EC /* Bootstrap.swift */; };
 		D6E7015F5A609B97D9B8BB33 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9910C65AB0FB2798C53F726A /* Colors.swift */; };
+		E0C377C58755068A82209407 /* Fraunces-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DA78F54A20DB45DBE0FA2FCE /* Fraunces-Italic.ttf */; };
 		ED1981E2EB7ABD01F59A5446 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99353A11AE11E00DBA319353 /* RootView.swift */; };
 		F987A6153F784EEFDEB25060 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26660CD12EC0C748508FB5B6 /* OnboardingView.swift */; };
 		FD3D73171D3C2B1E21A7E40A /* InputBounds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83F045E3D61777046C8B88BD /* InputBounds.swift */; };
@@ -49,9 +56,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		063875082A5AF605BF68F225 /* Fraunces.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fraunces.ttf; sourceTree = "<group>"; };
 		13494702B3F803138913FE88 /* CoAMigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoAMigrationTests.swift; sourceTree = "<group>"; };
 		1561D7E09988563B27DBCE28 /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
 		1EFCF0FB550B4A59D85E89E4 /* Primitives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Primitives.swift; sourceTree = "<group>"; };
+		22B8023D3CB8E4B30986D2F3 /* DisplayLabels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayLabels.swift; sourceTree = "<group>"; };
 		2615DF508DE79DB10AD3A2DC /* PantominaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PantominaApp.swift; sourceTree = "<group>"; };
 		26660CD12EC0C748508FB5B6 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		26CD764F81C2AD9EEA664436 /* PantominaTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = PantominaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -68,6 +77,9 @@
 		9249B8779319C89636800F82 /* ReceiptsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptsView.swift; sourceTree = "<group>"; };
 		9910C65AB0FB2798C53F726A /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		99353A11AE11E00DBA319353 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		AA9A5EAB4E3DF3A48F3096ED /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		AFCD3AA59B74EC9A72E208BF /* DMSans.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = DMSans.ttf; sourceTree = "<group>"; };
+		B7231909121283955C536ADB /* DisplayLabelsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayLabelsTests.swift; sourceTree = "<group>"; };
 		B823599C2B79C430C92D7047 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		B8C5305498BDA3098A03D2A1 /* Money.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Money.swift; sourceTree = "<group>"; };
 		C3E691C1BF781061756C3D47 /* AllocationDefaultsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllocationDefaultsTests.swift; sourceTree = "<group>"; };
@@ -76,14 +88,27 @@
 		C9175B58105513FE21762F11 /* Pantomina.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Pantomina.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D52988F0894815DC945A48B0 /* MoneyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneyTests.swift; sourceTree = "<group>"; };
 		D9505F4A33598A4C2021201C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		DA78F54A20DB45DBE0FA2FCE /* Fraunces-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fraunces-Italic.ttf"; sourceTree = "<group>"; };
 		E071C8B79EE8A5BEB39FEDFA /* AppEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEnvironment.swift; sourceTree = "<group>"; };
 		E6CC6980CF58C89BB7D7B9FE /* AddEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEntryView.swift; sourceTree = "<group>"; };
 		EB543846A4324090D51BE2F8 /* MoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreView.swift; sourceTree = "<group>"; };
 		EBD750FCC71323491E6FB04E /* CycleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CycleTests.swift; sourceTree = "<group>"; };
 		F5CAA1BF8684554DB59D6838 /* Cycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cycle.swift; sourceTree = "<group>"; };
+		FB19BB64CC3C1ABB1DF02C4E /* Layout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Layout.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		2B9A9491CB90A348E393A0BE /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				AFCD3AA59B74EC9A72E208BF /* DMSans.ttf */,
+				DA78F54A20DB45DBE0FA2FCE /* Fraunces-Italic.ttf */,
+				063875082A5AF605BF68F225 /* Fraunces.ttf */,
+				AA9A5EAB4E3DF3A48F3096ED /* README.md */,
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
 		30559B81A6E6760A8580F7FB /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -117,6 +142,7 @@
 				C3E691C1BF781061756C3D47 /* AllocationDefaultsTests.swift */,
 				13494702B3F803138913FE88 /* CoAMigrationTests.swift */,
 				EBD750FCC71323491E6FB04E /* CycleTests.swift */,
+				B7231909121283955C536ADB /* DisplayLabelsTests.swift */,
 				4C123A96441A24DE527E16E1 /* InputBoundsTests.swift */,
 				29DE9CCC311070037631895C /* LedgerFiltersTests.swift */,
 				D52988F0894815DC945A48B0 /* MoneyTests.swift */,
@@ -159,6 +185,7 @@
 			isa = PBXGroup;
 			children = (
 				D62CA4642A626FC1B186D3E3 /* Design */,
+				2B9A9491CB90A348E393A0BE /* Fonts */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -192,6 +219,7 @@
 		E5682135CD916A0C692EACA7 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				FB19BB64CC3C1ABB1DF02C4E /* Layout.swift */,
 				1EFCF0FB550B4A59D85E89E4 /* Primitives.swift */,
 			);
 			path = Components;
@@ -202,6 +230,7 @@
 			children = (
 				7EFD9E7141F46FA7130E90F8 /* CoAMigration.swift */,
 				F5CAA1BF8684554DB59D6838 /* Cycle.swift */,
+				22B8023D3CB8E4B30986D2F3 /* DisplayLabels.swift */,
 				8D4D90A0EE53692CCB069F1C /* Domain.swift */,
 				83F045E3D61777046C8B88BD /* InputBounds.swift */,
 				2B14EF3277DB4072ECEC8D04 /* LedgerFilters.swift */,
@@ -285,7 +314,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				473F854C7B282C181AAA5E22 /* DMSans.ttf in Resources */,
+				E0C377C58755068A82209407 /* Fraunces-Italic.ttf in Resources */,
+				374718304F98D29263895F88 /* Fraunces.ttf in Resources */,
 				0CC4AD15DA2DEF6DC46FF174 /* PrivacyInfo.xcprivacy in Resources */,
+				3338FEE2DB5DC0473208D7BD /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -302,9 +335,11 @@
 				6BC0EABFFBDD2FC20EA77EE7 /* CoAMigration.swift in Sources */,
 				D6E7015F5A609B97D9B8BB33 /* Colors.swift in Sources */,
 				1591FD697D08466A15478DD6 /* Cycle.swift in Sources */,
+				5EAFCDB1B460FB0A44F13981 /* DisplayLabels.swift in Sources */,
 				BE588C56B3A912055F87FF0F /* Domain.swift in Sources */,
 				7915D32C0B7A596E1FD4BCA3 /* HomeView.swift in Sources */,
 				FD3D73171D3C2B1E21A7E40A /* InputBounds.swift in Sources */,
+				012AB156F8A5D3527E607D82 /* Layout.swift in Sources */,
 				46781C0E4CEE8ECCC6570F71 /* LedgerFilters.swift in Sources */,
 				FFC9A6E9019200880611406C /* Models.swift in Sources */,
 				4F8DA4BE26855679929703AC /* Money.swift in Sources */,
@@ -328,6 +363,7 @@
 				3936D37B22728DD086E09C63 /* AllocationDefaultsTests.swift in Sources */,
 				8C98C5507A11EC8EC389B310 /* CoAMigrationTests.swift in Sources */,
 				4143427B70772B07CA6A2F81 /* CycleTests.swift in Sources */,
+				2B207117194F37A902FCA24C /* DisplayLabelsTests.swift in Sources */,
 				FF47120EA49A691C5B2BC666 /* InputBoundsTests.swift in Sources */,
 				4AEF6E6E3900DD2A3842865E /* LedgerFiltersTests.swift in Sources */,
 				B997C3A666C2A4AEBE062F2E /* MoneyTests.swift in Sources */,

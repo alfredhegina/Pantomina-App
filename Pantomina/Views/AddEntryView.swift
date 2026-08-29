@@ -4,6 +4,7 @@ import SwiftData
 struct AddEntryView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Query private var accounts: [AccountRecord]
     @Query private var categories: [CategoryRecord]
     @Query private var people: [PersonRecord]
@@ -27,7 +28,11 @@ struct AddEntryView: View {
     @State private var savedToast = false
     @State private var showCategoryPicker = false
     @State private var showAccountPicker = false
-    @FocusState private var amountFocused: Bool
+    @FocusState private var focusedField: Field?
+
+    private enum Field {
+        case amount, customFern, customStark, note
+    }
 
     private var pickerCategories: [CategoryRecord] {
         categories.filter { !$0.system }.sorted { $0.displayName < $1.displayName }
@@ -55,34 +60,37 @@ struct AddEntryView: View {
     private var realizationHint: String {
         guard let account = selectedAccount else { return "" }
         let anchor = Cycle.cycleFor(isoDate: purchaseISO).anchorISO
-        if account.settlement == .statement {
-            return "Pending until statement · proposed \(anchor)"
-        }
-        return "Counts on \(anchor)"
+        return DisplayLabels.settlementHint(
+            isStatement: account.settlement == .statement,
+            anchorISO: anchor
+        )
+    }
+
+    private var customSplitSumOK: Bool? {
+        guard splitMode == 2, let total = amountCentavos() else { return nil }
+        guard let f = InputBounds.centavos(fromPesosText: customFern),
+              let s = InputBounds.centavos(fromPesosText: customStark)
+        else { return false }
+        return f + s == total
     }
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: Spacing.lg) {
-                        heroAmount
-                        detailsCard
-                        splitCard
-                        dateCard
-                        if let error {
-                            Text(error)
-                                .font(PantominaFont.caption)
-                                .foregroundStyle(Color.pantomina.rose)
-                        }
+            ScrollView {
+                VStack(alignment: .leading, spacing: Spacing.lg) {
+                    heroAmount
+                    detailsCard
+                    splitCard
+                    dateCard
+                    if let error {
+                        Text(error)
+                            .font(PantominaFont.caption)
+                            .foregroundStyle(Color.pantomina.rose)
                     }
-                    .padding(Spacing.lg)
-                    .padding(.bottom, 88)
                 }
-                .scrollDismissesKeyboard(.interactively)
-
-                stickySave
+                .padding(Spacing.lg)
             }
+            .scrollDismissesKeyboard(.interactively)
             .background(Color.pantomina.ground.ignoresSafeArea())
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -94,15 +102,9 @@ struct AddEntryView: View {
                             .foregroundStyle(Color.pantomina.muted)
                     }
                 }
-                if presentsAsSheet {
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button("Close") { dismiss() }
-                    }
-                }
-                ToolbarItemGroup(placement: .keyboard) {
-                    Spacer()
-                    Button("Done") { amountFocused = false }
-                }
+            }
+            .safeAreaInset(edge: .bottom) {
+                stickySave
             }
             .overlay(alignment: .bottom) {
                 if savedToast {
@@ -112,7 +114,7 @@ struct AddEntryView: View {
                         .background(Color.pantomina.ink)
                         .foregroundStyle(.white)
                         .clipShape(Capsule())
-                        .padding(.bottom, 96)
+                        .padding(.bottom, 72)
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
             }
@@ -138,7 +140,9 @@ struct AddEntryView: View {
                     selectedCategoryId = orderedCategories().first?.id
                 }
                 applyAccountDefaults()
-                amountFocused = true
+            }
+            .onDisappear {
+                focusedField = nil
             }
             .onChange(of: selectedAccountId) { _, _ in
                 applyAccountDefaults()
@@ -157,9 +161,10 @@ struct AddEntryView: View {
                     TextField("0.00", text: $amountText)
                         .font(PantominaFont.amount)
                         .keyboardType(.decimalPad)
-                        .focused($amountFocused)
+                        .focused($focusedField, equals: .amount)
                         .monospacedDigit()
                         .foregroundStyle(Color.pantomina.ink)
+                        .accessibilityLabel("Amount")
                 }
             }
         }
@@ -210,10 +215,17 @@ struct AddEntryView: View {
                 if splitMode == 2 {
                     TextField("\(fernName) ₱", text: $customFern)
                         .keyboardType(.decimalPad)
+                        .focused($focusedField, equals: .customFern)
                         .onChange(of: customFern) { _, new in autofill(fromFern: true, text: new) }
                     TextField("\(starkName) ₱", text: $customStark)
                         .keyboardType(.decimalPad)
+                        .focused($focusedField, equals: .customStark)
                         .onChange(of: customStark) { _, new in autofill(fromFern: false, text: new) }
+                    if let ok = customSplitSumOK {
+                        Text(ok ? "Splits add up." : "Splits must add up to the amount.")
+                            .font(PantominaFont.caption)
+                            .foregroundStyle(ok ? Color.pantomina.sageDeep : Color.pantomina.rose)
+                    }
                 }
             }
         }
@@ -229,6 +241,7 @@ struct AddEntryView: View {
                 )
                 .datePickerStyle(.compact)
                 TextField("Note", text: $note)
+                    .focused($focusedField, equals: .note)
                     .onChange(of: note) { _, new in
                         let clamped = InputBounds.clampNote(new)
                         if clamped != new { note = clamped }
@@ -249,7 +262,7 @@ struct AddEntryView: View {
                     .foregroundStyle(.white)
                     .clipShape(RoundedRectangle(cornerRadius: Spacing.radius, style: .continuous))
             }
-            .buttonStyle(.plain)
+            .buttonStyle(SageButtonStyle())
             .padding(.horizontal, Spacing.lg)
             .padding(.top, Spacing.sm)
             .padding(.bottom, Spacing.sm)
@@ -270,7 +283,7 @@ struct AddEntryView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 Image(systemName: "chevron.up.chevron.down")
-                    .font(.caption)
+                    .font(PantominaFont.caption)
                     .foregroundStyle(Color.pantomina.sage)
             }
             .contentShape(Rectangle())
@@ -287,7 +300,12 @@ struct AddEntryView: View {
             SearchablePickItem(
                 id: $0.id,
                 title: $0.displayLabel(fernName: fernName, starkName: starkName),
-                subtitle: $0.settlement == .statement ? "statement" : $0.scope.rawValue
+                subtitle: DisplayLabels.accountKindHint(
+                    settlement: $0.settlement,
+                    scope: $0.scope,
+                    fernName: fernName,
+                    starkName: starkName
+                )
             )
         }
     }
@@ -348,7 +366,7 @@ struct AddEntryView: View {
 
     private func save() {
         error = nil
-        amountFocused = false
+        focusedField = nil
         let cleanedAmount = amountText.replacingOccurrences(of: ",", with: "")
             .trimmingCharacters(in: .whitespacesAndNewlines)
         if let pesos = Double(cleanedAmount), pesos.isFinite {
@@ -417,12 +435,12 @@ struct AddEntryView: View {
             try modelContext.save()
             bumpRecent(id: categoryId, raw: &recentCategoryIdsRaw)
             bumpRecent(id: accountId, raw: &recentAccountIdsRaw)
-            withAnimation(PantominaMotion.feedback) { savedToast = true }
+            PantominaMotion.run(reduceMotion) { savedToast = true }
             amountText = ""
             note = ""
             applyAccountDefaults()
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
-                savedToast = false
+                PantominaMotion.run(reduceMotion) { savedToast = false }
                 if presentsAsSheet { dismiss() }
             }
         } catch {

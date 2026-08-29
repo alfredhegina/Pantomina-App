@@ -30,7 +30,7 @@ struct MainTabView: View {
 
     var body: some View {
         TabView(selection: $tab) {
-            HomeView()
+            HomeView(onAdd: { showAddSheet = true })
                 .tabItem { Label("Home", systemImage: "house") }
                 .tag(0)
             ReceiptsView()
@@ -39,10 +39,7 @@ struct MainTabView: View {
             Color.clear
                 .tabItem { Label("Add", systemImage: "plus.circle.fill") }
                 .tag(2)
-            Text("Bills")
-                .foregroundStyle(Color.pantomina.muted)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color.pantomina.ground)
+            billsPlaceholder
                 .tabItem { Label("Bills", systemImage: "creditcard") }
                 .tag(3)
             MoreView()
@@ -63,6 +60,25 @@ struct MainTabView: View {
             AddEntryView(presentsAsSheet: true)
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
+                .presentationBackground(Color.pantomina.ground)
         }
+    }
+
+    private var billsPlaceholder: some View {
+        VStack(spacing: Spacing.md) {
+            PetTitle("Whose Turn Is It")
+            Text("Bills")
+                .font(PantominaFont.caption)
+                .foregroundStyle(Color.pantomina.muted)
+            Text("Bills land in a later build.")
+                .font(PantominaFont.body)
+                .foregroundStyle(Color.pantomina.muted)
+                .multilineTextAlignment(.center)
+        }
+        .padding(Spacing.lg)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.pantomina.ground.ignoresSafeArea())
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Bills. Lands in a later build.")
     }
 }
