@@ -39,6 +39,8 @@ enum Checklist {
         var linkedId: String?
         var paymentsRequired: Int
         var paymentsDone: Int
+        /// This cycle's tranche is complete (reserved), even if k < n overall.
+        var done: Bool
     }
 
     static func tasks(
@@ -105,8 +107,8 @@ enum Checklist {
                     paymentsRequired: tranche.paymentsRequired,
                     paymentsDone: tranche.paymentsDone,
                     linkedId: tranche.linkedId,
-                    done: tranche.paymentsDone >= tranche.paymentsRequired,
-                    pastCutoff: past && tranche.paymentsDone < tranche.paymentsRequired
+                    done: tranche.done || doneIds.contains(tranche.id),
+                    pastCutoff: past && !(tranche.done || doneIds.contains(tranche.id))
                 )
             )
         }

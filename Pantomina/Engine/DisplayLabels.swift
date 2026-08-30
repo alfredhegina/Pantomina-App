@@ -97,4 +97,13 @@ enum DisplayLabels {
             return "Right on the line"
         }
     }
+
+    static func fundingStatus(_ status: Funding.Status) -> String {
+        switch status {
+        case .funded(let done, let total):
+            return "Funded \(done)/\(total)"
+        case .paid:
+            return "Paid"
+        }
+    }
 }

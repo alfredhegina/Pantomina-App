@@ -132,6 +132,15 @@ struct BillsChecklistPane: View {
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text(task.title)
                                             .font(PantominaFont.body)
+                                        if task.kind == .fundTranche {
+                                            Text(
+                                                DisplayLabels.fundingStatus(
+                                                    .funded(done: task.paymentsDone, total: max(1, task.paymentsRequired))
+                                                )
+                                            )
+                                            .font(PantominaFont.caption)
+                                            .foregroundStyle(Color.pantomina.sageDeep)
+                                        }
                                         Text(formatPeso(task.amountC))
                                             .font(PantominaFont.caption.monospacedDigit())
                                             .foregroundStyle(Color.pantomina.muted)

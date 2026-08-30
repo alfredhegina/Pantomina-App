@@ -252,6 +252,58 @@ final class RecurringRuleRecord {
 }
 
 @Model
+final class FundingPlanRecord {
+    @Attribute(.unique) var id: String
+    var billRecurringRuleId: String
+    var billTitle: String
+    var sourceAccountId: String
+    var payoutCycleISO: String
+    /// JSON array of `{cycleISO, amountC, reserved}`.
+    var tranchesJSON: Data
+    var paid: Bool
+
+    init(
+        id: String = UUID().uuidString,
+        billRecurringRuleId: String,
+        billTitle: String,
+        sourceAccountId: String,
+        payoutCycleISO: String,
+        tranches: [Funding.Tranche],
+        paid: Bool = false
+    ) {
+        self.id = id
+        self.billRecurringRuleId = billRecurringRuleId
+        self.billTitle = billTitle
+        self.sourceAccountId = sourceAccountId
+        self.payoutCycleISO = payoutCycleISO
+        self.tranchesJSON = (try? JSONEncoder().encode(tranches)) ?? Data("[]".utf8)
+        self.paid = paid
+    }
+
+    var enginePlan: Funding.Plan {
+        let tranches = (try? JSONDecoder().decode([Funding.Tranche].self, from: tranchesJSON)) ?? []
+        return Funding.Plan(
+            id: id,
+            billRecurringRuleId: billRecurringRuleId,
+            billTitle: billTitle,
+            sourceAccountId: sourceAccountId,
+            payoutCycleISO: payoutCycleISO,
+            tranches: tranches,
+            paid: paid
+        )
+    }
+
+    func apply(_ plan: Funding.Plan) {
+        billRecurringRuleId = plan.billRecurringRuleId
+        billTitle = plan.billTitle
+        sourceAccountId = plan.sourceAccountId
+        payoutCycleISO = plan.payoutCycleISO
+        tranchesJSON = (try? JSONEncoder().encode(plan.tranches)) ?? tranchesJSON
+        paid = plan.paid
+    }
+}
+
+@Model
 final class AppMeta {
     @Attribute(.unique) var key: String
     var onboardingComplete: Bool

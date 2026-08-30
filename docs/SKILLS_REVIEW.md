@@ -168,3 +168,33 @@ Skills: Operate, Emil, Apple HIG. Before Slice B.
 | Other settlementRole | Delete only; confirm “This was posted from Bills. Remove it?” |
 
 **Paused here.** Next product when resumed: Phase 4 Slice B (funding).
+
+## Phase 4 Slice B — funding (2026-08-30)
+
+Skills: Operate, write-swift TDD. Spec §4.9.
+
+| Piece | Behavior |
+| --- | --- |
+| Engine | `Funding` status funded k/n → paid; forecast charges tranche per cycle; exclude bill rule from committed |
+| Checklist | **Set aside** tranche → ledger expense; last half auto-Paid; no Pay row |
+| Things We Keep Doing | Pause; Add/Edit/Delete; **Category** required; validation error under title; Funding plans status |
+| Seed | Twin personal PruLife (Fern 2×₱1,500, Stark 1×₱3,000); bare PruLife retired |
+
+### Tranche ledger mini-pass (2026-08-30)
+
+Skills: Operate, Humanizer. Tick = Counted expense + Funded k/n toast. Footer: each set-aside hits Receipts.
+
+### Checklist pay method + add recurring (2026-08-30)
+
+Skills: Operate, Humanizer, Emil.
+
+| Piece | Lock |
+| --- | --- |
+| Count it | Prefills default account; **Change** for one-cycle override; Shared shows Just mine / 50·50 |
+| Add rule | Whose Just Fern / Stark / Shared; **Category** required; optional 2-cycle set-aside |
+| Edit / Delete | Swipe Edit (same sheet) / Delete+confirm; pause temporary; funding locked once a set-aside is counted |
+| Validation | Error in first Form section (visible at medium detent) |
+| Seed | PruLife · Fern (2×₱1,500) + PruLife · Stark (1×₱3,000); retire bare PruLife |
+| Anti-double | Funded bills never post full amount; personal = just mine |
+
+**Slice B complete** (funding + mini-slices). Next: Phase 4 Slice C (Cookie Jar).

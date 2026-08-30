@@ -31,6 +31,7 @@
 		678AE2B0BC20F179C4F9E02D /* RealizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 696CD15F7EFEAC0E10BE6B3A /* RealizationTests.swift */; };
 		6BC0EABFFBDD2FC20EA77EE7 /* CoAMigration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EFD9E7141F46FA7130E90F8 /* CoAMigration.swift */; };
 		6E30F6E19D6251AEE068D3AB /* ReceiptsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9249B8779319C89636800F82 /* ReceiptsView.swift */; };
+		73A3213BD6F12A181614A4C2 /* Funding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309AA4037C7D1B357F4EB7E4 /* Funding.swift */; };
 		7915D32C0B7A596E1FD4BCA3 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4923488F708E4B94BBF1653 /* HomeView.swift */; };
 		796C437D019E6506CE9F1671 /* Realization.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8802F7FAF45C57F3285ECBF /* Realization.swift */; };
 		84399DE14D44303C7217D9E7 /* ProjectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE4A7B2968307E483CC3586C /* ProjectionTests.swift */; };
@@ -40,6 +41,7 @@
 		8FA015CBE95D1F061D14E57C /* ChecklistTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A34EF3046046EC6B4BAC16A /* ChecklistTests.swift */; };
 		94E92060A1A523026721D102 /* BillsForecastChecklistPanes.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3681453990B457C84DAD77E /* BillsForecastChecklistPanes.swift */; };
 		99111A488DF210754F7ACCCD /* MoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB543846A4324090D51BE2F8 /* MoreView.swift */; };
+		9D95DA2FBA609CE89B20740A /* FundingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AA2E360ABC5333C5039DEE0 /* FundingTests.swift */; };
 		A5ADB0AF24C90E23F113AE14 /* SeedCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F25187A8EBD065FB0589B4 /* SeedCatalog.swift */; };
 		A77581FD06F01FA6180ED957 /* SettlementTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567E6985C02435A4FC2F7323 /* SettlementTests.swift */; };
 		B997C3A666C2A4AEBE062F2E /* MoneyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D52988F0894815DC945A48B0 /* MoneyTests.swift */; };
@@ -83,6 +85,7 @@
 		26CD764F81C2AD9EEA664436 /* PantominaTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = PantominaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		29DE9CCC311070037631895C /* LedgerFiltersTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LedgerFiltersTests.swift; sourceTree = "<group>"; };
 		2B14EF3277DB4072ECEC8D04 /* LedgerFilters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LedgerFilters.swift; sourceTree = "<group>"; };
+		309AA4037C7D1B357F4EB7E4 /* Funding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Funding.swift; sourceTree = "<group>"; };
 		4489E4A000D2A16C43EA9D1F /* Checklist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Checklist.swift; sourceTree = "<group>"; };
 		48FB7376E78D3CE23F7A083B /* Settlement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settlement.swift; sourceTree = "<group>"; };
 		4C123A96441A24DE527E16E1 /* InputBoundsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputBoundsTests.swift; sourceTree = "<group>"; };
@@ -100,6 +103,7 @@
 		9249B8779319C89636800F82 /* ReceiptsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptsView.swift; sourceTree = "<group>"; };
 		9910C65AB0FB2798C53F726A /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		99353A11AE11E00DBA319353 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		9AA2E360ABC5333C5039DEE0 /* FundingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FundingTests.swift; sourceTree = "<group>"; };
 		AA9A5EAB4E3DF3A48F3096ED /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		AB1D312E74CC27D7FAE618E5 /* ThingsWeKeepDoingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThingsWeKeepDoingView.swift; sourceTree = "<group>"; };
 		AFCD3AA59B74EC9A72E208BF /* DMSans.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = DMSans.ttf; sourceTree = "<group>"; };
@@ -173,6 +177,7 @@
 				EBD750FCC71323491E6FB04E /* CycleTests.swift */,
 				B7231909121283955C536ADB /* DisplayLabelsTests.swift */,
 				190A974AB699BA812D8F02DE /* ForecastTests.swift */,
+				9AA2E360ABC5333C5039DEE0 /* FundingTests.swift */,
 				4C123A96441A24DE527E16E1 /* InputBoundsTests.swift */,
 				29DE9CCC311070037631895C /* LedgerFiltersTests.swift */,
 				D52988F0894815DC945A48B0 /* MoneyTests.swift */,
@@ -271,6 +276,7 @@
 				22B8023D3CB8E4B30986D2F3 /* DisplayLabels.swift */,
 				8D4D90A0EE53692CCB069F1C /* Domain.swift */,
 				8F2D8D580EDD694073DBB29F /* Forecast.swift */,
+				309AA4037C7D1B357F4EB7E4 /* Funding.swift */,
 				83F045E3D61777046C8B88BD /* InputBounds.swift */,
 				2B14EF3277DB4072ECEC8D04 /* LedgerFilters.swift */,
 				B8C5305498BDA3098A03D2A1 /* Money.swift */,
@@ -383,6 +389,7 @@
 				5EAFCDB1B460FB0A44F13981 /* DisplayLabels.swift in Sources */,
 				BE588C56B3A912055F87FF0F /* Domain.swift in Sources */,
 				0C97F452621DB44225788B57 /* Forecast.swift in Sources */,
+				73A3213BD6F12A181614A4C2 /* Funding.swift in Sources */,
 				7915D32C0B7A596E1FD4BCA3 /* HomeView.swift in Sources */,
 				FD3D73171D3C2B1E21A7E40A /* InputBounds.swift in Sources */,
 				012AB156F8A5D3527E607D82 /* Layout.swift in Sources */,
@@ -417,6 +424,7 @@
 				4143427B70772B07CA6A2F81 /* CycleTests.swift in Sources */,
 				2B207117194F37A902FCA24C /* DisplayLabelsTests.swift in Sources */,
 				209CE2119FCD9EFDA1CC15A3 /* ForecastTests.swift in Sources */,
+				9D95DA2FBA609CE89B20740A /* FundingTests.swift in Sources */,
 				FF47120EA49A691C5B2BC666 /* InputBoundsTests.swift in Sources */,
 				4AEF6E6E3900DD2A3842865E /* LedgerFiltersTests.swift in Sources */,
 				B997C3A666C2A4AEBE062F2E /* MoneyTests.swift in Sources */,

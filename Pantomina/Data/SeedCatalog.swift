@@ -108,6 +108,7 @@ enum SeedCatalog {
         }
 
         try seedDemoRulesIfNeeded(into: context)
+        try seedDemoFundingIfNeeded(into: context)
         try context.save()
     }
 
@@ -166,5 +167,103 @@ enum SeedCatalog {
                 fixedVariable: .fixed
             )
         )
+    }
+
+    /// Twin personal PruLife plans (additive). Retires bare single PruLife seed.
+    @MainActor
+    static func seedDemoFundingIfNeeded(into context: ModelContext) throws {
+        let accounts = try context.fetch(FetchDescriptor<AccountRecord>())
+        let categories = try context.fetch(FetchDescriptor<CategoryRecord>())
+        guard
+            let fernCash = accounts.first(where: { $0.baseName == "Cash" && $0.scope == .fern }),
+            let starkCash = accounts.first(where: { $0.baseName == "Cash" && $0.scope == .stark }),
+            let insurance = categories.first(where: {
+                $0.group.localizedCaseInsensitiveContains("Insurance")
+                    || ($0.group == "Needs" && $0.item.localizedCaseInsensitiveContains("Pru"))
+            }) ?? categories.first(where: { !$0.system && $0.flow == .expense })
+        else { return }
+
+        let today: String = {
+            let f = DateFormatter()
+            f.calendar = Calendar(identifier: .gregorian)
+            f.locale = Locale(identifier: "en_US_POSIX")
+            f.timeZone = TimeZone.current
+            f.dateFormat = "yyyy-MM-dd"
+            return f.string(from: Date())
+        }()
+        let first = Cycle.cycleFor(isoDate: today)
+        let second = Cycle.nextHalfMonth(after: first)
+
+        var rules = try context.fetch(FetchDescriptor<RecurringRuleRecord>())
+        var plans = try context.fetch(FetchDescriptor<FundingPlanRecord>())
+
+        // Retire old single PruLife demo (not person-suffixed).
+        for rule in rules where rule.title == "PruLife" {
+            for plan in plans where plan.billRecurringRuleId == rule.id {
+                context.delete(plan)
+            }
+            context.delete(rule)
+        }
+        rules = try context.fetch(FetchDescriptor<RecurringRuleRecord>())
+        plans = try context.fetch(FetchDescriptor<FundingPlanRecord>())
+
+        if !rules.contains(where: { $0.title == "PruLife · Fern" }) {
+            let fernRule = RecurringRuleRecord(
+                title: "PruLife · Fern",
+                amountC: 3_000_00,
+                accountId: fernCash.id,
+                categoryId: insurance.id,
+                paidBy: .fern,
+                allocation: Allocation(fern: 3_000_00, stark: 0),
+                cadence: .biweekly,
+                anchorDay: .both,
+                amountBehavior: .exact,
+                startCycleISO: first.anchorISO,
+                flow: .expense,
+                fixedVariable: .fixed
+            )
+            context.insert(fernRule)
+            context.insert(
+                FundingPlanRecord(
+                    billRecurringRuleId: fernRule.id,
+                    billTitle: fernRule.title,
+                    sourceAccountId: fernCash.id,
+                    payoutCycleISO: second.anchorISO,
+                    tranches: [
+                        Funding.Tranche(cycleISO: first.anchorISO, amountC: 1_500_00, reserved: false),
+                        Funding.Tranche(cycleISO: second.anchorISO, amountC: 1_500_00, reserved: false),
+                    ]
+                )
+            )
+        }
+
+        if !rules.contains(where: { $0.title == "PruLife · Stark" }) {
+            let starkRule = RecurringRuleRecord(
+                title: "PruLife · Stark",
+                amountC: 3_000_00,
+                accountId: starkCash.id,
+                categoryId: insurance.id,
+                paidBy: .stark,
+                allocation: Allocation(fern: 0, stark: 3_000_00),
+                cadence: .biweekly,
+                anchorDay: .both,
+                amountBehavior: .exact,
+                startCycleISO: first.anchorISO,
+                flow: .expense,
+                fixedVariable: .fixed
+            )
+            context.insert(starkRule)
+            context.insert(
+                FundingPlanRecord(
+                    billRecurringRuleId: starkRule.id,
+                    billTitle: starkRule.title,
+                    sourceAccountId: starkCash.id,
+                    payoutCycleISO: first.anchorISO,
+                    tranches: [
+                        Funding.Tranche(cycleISO: first.anchorISO, amountC: 3_000_00, reserved: false),
+                    ]
+                )
+            )
+        }
     }
 }

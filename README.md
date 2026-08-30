@@ -7,8 +7,8 @@ Shared finance for exactly two people — **Fern** (payer) and **Stark** (contri
 
 ## Status
 
-**Paused after Phase 4 Slice A** (+ Bills/Receipts polish + Receipts swipe Edit/Delete, contribution amount edit). **Next:** Slice B (funding) then C (Cookie Jar).  
-**Phase 4 Slice A** — Projection / Forecast / Checklist on Bills; recurring rules seed; Things We Keep Doing (read-only).  
+**Phase 4 Slice B** — funding + Count it (default + Change); Keep Doing Add/Edit/Delete + Category; twin PruLife. **Next:** Slice C (Cookie Jar).  
+**Phase 4 Slice A** — Projection / Forecast / Checklist on Bills; recurring rules; Things We Keep Doing.  
 **Receipts hygiene** — swipe Edit / Delete; contributions amount-only Edit.  
 Phase 3 — allocations & settlement, Love Tab, Bills split + Fern share; Statement day cycle pick.  
 Phase 2 — realization engine, TBD drawer, Statement day.  

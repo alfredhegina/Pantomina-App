@@ -52,6 +52,14 @@ Living log of locked **Baseline** choices and parked **For later** work. The pro
 | 2026-08-29 | **Receipts hygiene:** List swipe leading = Edit (Add form edit mode), trailing = Delete + confirm; hard delete; settlementRole rows Delete-only. Soft delete stays Phase 8. | Smoke without reinstall; Operate/Emil/HIG. |
 | 2026-08-29 | Receipts contribution rows: leading Edit opens amount-only sheet (keeps `settlementRole`); receivable / fundMove / loanPayment stay Delete-only. | Fix mistyped contributions without full Add form. |
 | 2026-08-29 | **Pause after Phase 4 Slice A** (+ polish + Receipts hygiene). Slice B funding / Slice C Cookie Jar not started. | Explicit stop; resume at B when ready. |
+| 2026-08-30 | **Phase 4 Slice B** shipped: `Funding` engine + `FundingPlanRecord`; Forecast tranche lines (bill excluded); Checklist reserve/payout; Things We Keep Doing pause + plan status; PruLife demo `funded k/n → paid`. | Spec §4.9 accept walkthrough. |
+| 2026-08-30 | Bills cycle picker unions funding tranche/payout anchors + next half-month (not ledger-only). | Forecast/Checklist can open second tranche cycle. |
+| 2026-08-30 | Funding tranche Checklist tick posts realized half-expense; last reserve auto-**Paid**; no separate Pay task. Spec reserve bucket deferred to Funds. | Matches spreadsheet habit; avoids double-count of full bill. |
+| 2026-08-30 | Checklist **Count it** sheet (How did you pay? + split when Shared); Things We Keep Doing **Add** (Just Fern/Stark/Shared, optional 2-cycle set-aside); twin personal PruLife seed. | Payment method per tick; anti-double personal vs shared. |
+| 2026-08-30 | **Supersedes** “payment method per tick”: Count it **prefills** rule/task default account; **Change** only if this payday differs. Keep doing this footer matches. Split/Paid by still when Shared. | Setup owns default; Checklist is confirm+post (Operate). |
+| 2026-08-30 | Things We Keep Doing: swipe **Edit** / **Delete** (+ confirm). Pause = temporary; hard delete rule + linked funding plan; Receipts untouched. Funding rewrite only when no tranche reserved. | Mistyped setup; match Receipts hygiene. |
+| 2026-08-30 | Keep Doing Add/Edit: required **Category** picker (expense CoA; same SearchablePickList as Add). No global default category. | Per-rule category; Count posts correct CoA. |
+| 2026-08-30 | Keep Doing validation error sits in **first Form section** (under title), not below set-aside. | Visible at medium detent without expand. |
 
 ## For later
 
