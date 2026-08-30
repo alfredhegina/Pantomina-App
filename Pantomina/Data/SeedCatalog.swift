@@ -109,7 +109,67 @@ enum SeedCatalog {
 
         try seedDemoRulesIfNeeded(into: context)
         try seedDemoFundingIfNeeded(into: context)
+        try seedDemoJarIfNeeded(into: context)
         try context.save()
+    }
+
+    /// Boarder units + demo jar rows (additive). Matches CookieJarTests fixture shape.
+    @MainActor
+    static func seedDemoJarIfNeeded(into context: ModelContext) throws {
+        var sources = try context.fetch(FetchDescriptor<JarSourceRecord>())
+        let expected = [CookieJar.Expected(amountC: 700_00, cadence: .monthly)]
+        let unitLabels = ["404", "406", "408", "305"]
+        for label in unitLabels where !sources.contains(where: { $0.label == label }) {
+            context.insert(
+                JarSourceRecord(id: "jar-unit-\(label)", label: label, kind: .unit, expected: expected)
+            )
+        }
+        if !sources.contains(where: { $0.id == "jar-person-fern" }) {
+            context.insert(
+                JarSourceRecord(id: "jar-person-fern", label: "Fern", kind: .person, expected: [])
+            )
+        }
+        sources = try context.fetch(FetchDescriptor<JarSourceRecord>())
+
+        let jarTx = try context.fetch(FetchDescriptor<TransactionRecord>()).filter(\.isJarEntry)
+        guard jarTx.isEmpty else { return }
+
+        let accounts = try context.fetch(FetchDescriptor<AccountRecord>())
+        let categories = try context.fetch(FetchDescriptor<CategoryRecord>())
+        guard
+            let cash = accounts.first(where: { $0.baseName == "House cash box" && $0.scope == .household }),
+            let petty = categories.first(where: { $0.system && $0.item == "Petty Cash" })
+                ?? categories.first(where: { !$0.system && $0.flow == .expense })
+        else { return }
+
+        let src404 = sources.first { $0.label == "404" }?.id
+        let src406 = sources.first { $0.label == "406" }?.id
+        let srcFern = sources.first { $0.id == "jar-person-fern" }?.id
+
+        let demo: [(String, Int, CookieJar.Kind, String?, Bool?, String)] = [
+            ("2026-08-01", 700_00, .income, src404, nil, "Internet"),
+            ("2026-08-02", 700_00, .income, src406, nil, "Internet"),
+            ("2026-08-05", 200_00, .spend, nil, nil, "Pocket"),
+            ("2026-08-10", 500_00, .borrow, srcFern, false, "Fern No Cash"),
+        ]
+        for row in demo {
+            context.insert(
+                TransactionRecord(
+                    purchaseDate: row.0,
+                    realizedDate: row.0,
+                    realizedStatus: .realized,
+                    amountC: row.1,
+                    accountId: cash.id,
+                    categoryId: petty.id,
+                    paidBy: .fern,
+                    allocation: Allocation(fern: row.1, stark: 0),
+                    note: row.5,
+                    jarKind: row.2,
+                    jarSourceId: row.3,
+                    jarReturned: row.4
+                )
+            )
+        }
     }
 
     /// Demo recurring rules for Forecast/Checklist (additive backfill).

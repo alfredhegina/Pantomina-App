@@ -36,6 +36,21 @@ struct MoreView: View {
                 }
 
                 NavigationLink {
+                    CookieJarView()
+                } label: {
+                    Label {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("The Cookie Jar")
+                            Text("Petty cash")
+                                .font(PantominaFont.caption)
+                                .foregroundStyle(Color.pantomina.muted)
+                        }
+                    } icon: {
+                        Image(systemName: "archivebox")
+                    }
+                }
+
+                NavigationLink {
                     ThingsWeKeepDoingView()
                 } label: {
                     Label {
@@ -53,7 +68,7 @@ struct MoreView: View {
                 Section {
                     EmptyView()
                 } footer: {
-                    Text("Settings, Statement day, and recurring for now — more rooms later.")
+                    Text("Cookie Jar, recurring, Statement day, and settings — more rooms later.")
                         .font(PantominaFont.caption)
                 }
             }

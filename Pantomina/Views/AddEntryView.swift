@@ -8,6 +8,7 @@ struct AddEntryView: View {
     @Query private var accounts: [AccountRecord]
     @Query private var categories: [CategoryRecord]
     @Query private var people: [PersonRecord]
+    @Query private var jarSources: [JarSourceRecord]
 
     /// When false, view is presented as a sheet and dismisses after save.
     var presentsAsSheet: Bool = true
@@ -30,6 +31,10 @@ struct AddEntryView: View {
     @State private var savedToast = false
     @State private var showCategoryPicker = false
     @State private var showAccountPicker = false
+    @State private var showJarSourcePicker = false
+    @State private var cookieJarOn = false
+    @State private var jarKind: CookieJar.Kind = .spend
+    @State private var jarSourceId: String?
     @State private var didPrefillEdit = false
     @State private var skipAccountDefaults = false
     @FocusState private var focusedField: Field?
@@ -56,7 +61,12 @@ struct AddEntryView: View {
     }
 
     private var selectedCategory: CategoryRecord? {
-        pickerCategories.first { $0.id == selectedCategoryId }
+        if cookieJarOn, let petty = pettyCashCategory { return petty }
+        return pickerCategories.first { $0.id == selectedCategoryId }
+    }
+
+    private var pettyCashCategory: CategoryRecord? {
+        categories.first { $0.system && $0.item == "Petty Cash" }
     }
 
     private var purchaseISO: String {
@@ -88,6 +98,7 @@ struct AddEntryView: View {
                     detailsCard
                     splitCard
                     dateCard
+                    jarCard
                     if let error {
                         Text(error)
                             .font(PantominaFont.caption)
@@ -138,7 +149,22 @@ struct AddEntryView: View {
                     selection: $selectedAccountId
                 )
             }
+            .sheet(isPresented: $showJarSourcePicker) {
+                SearchablePickList(
+                    title: "Jar source",
+                    items: jarSources.sorted { $0.label < $1.label }.map {
+                        SearchablePickItem(
+                            id: $0.id,
+                            title: $0.label,
+                            subtitle: $0.kind == .unit ? "Unit" : "Person"
+                        )
+                    },
+                    selection: $jarSourceId
+                )
+            }
             .onAppear {
+                try? SeedCatalog.seedDemoJarIfNeeded(into: modelContext)
+                try? modelContext.save()
                 if let tx = editingTransaction, !didPrefillEdit {
                     prefill(from: tx)
                     didPrefillEdit = true
@@ -188,8 +214,25 @@ struct AddEntryView: View {
     private var detailsCard: some View {
         Card {
             VStack(alignment: .leading, spacing: Spacing.md) {
-                pickRow(title: "Category", value: selectedCategory?.displayName ?? "Choose") {
-                    showCategoryPicker = true
+                if cookieJarOn {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Category")
+                                .font(PantominaFont.caption)
+                                .foregroundStyle(Color.pantomina.muted)
+                            Text(pettyCashCategory?.displayName ?? "Petty Cash")
+                                .font(PantominaFont.body)
+                                .foregroundStyle(Color.pantomina.ink)
+                        }
+                        Spacer()
+                    }
+                    Text("Jar rows stay on Petty Cash — a system tag, not a second utility bill.")
+                        .font(PantominaFont.caption)
+                        .foregroundStyle(Color.pantomina.muted)
+                } else {
+                    pickRow(title: "Category", value: selectedCategory?.displayName ?? "Choose") {
+                        showCategoryPicker = true
+                    }
                 }
                 Divider().overlay(Color.pantomina.hairline)
                 pickRow(title: "Payment method", value: selectedAccount.map {
@@ -211,6 +254,7 @@ struct AddEntryView: View {
                     Text(starkName).tag(PersonId.stark)
                 }
                 .pickerStyle(.segmented)
+                .disabled(cookieJarOn)
             }
         }
     }
@@ -221,25 +265,34 @@ struct AddEntryView: View {
                 Text("Split")
                     .font(PantominaFont.caption)
                     .foregroundStyle(Color.pantomina.muted)
-                Picker("Split", selection: $splitMode) {
-                    Text("Just mine").tag(0)
-                    Text("50·50").tag(1)
-                    Text("Custom").tag(2)
-                }
-                .pickerStyle(.segmented)
-                if splitMode == 2 {
-                    TextField("\(fernName) ₱", text: $customFern)
-                        .keyboardType(.decimalPad)
-                        .focused($focusedField, equals: .customFern)
-                        .onChange(of: customFern) { _, new in autofill(fromFern: true, text: new) }
-                    TextField("\(starkName) ₱", text: $customStark)
-                        .keyboardType(.decimalPad)
-                        .focused($focusedField, equals: .customStark)
-                        .onChange(of: customStark) { _, new in autofill(fromFern: false, text: new) }
-                    if let ok = customSplitSumOK {
-                        Text(ok ? "Splits add up." : "Splits must add up to the amount.")
-                            .font(PantominaFont.caption)
-                            .foregroundStyle(ok ? Color.pantomina.sageDeep : Color.pantomina.rose)
+                if cookieJarOn {
+                    Text("Just mine")
+                        .font(PantominaFont.body)
+                        .foregroundStyle(Color.pantomina.ink)
+                    Text("Jar cash doesn’t add to Stark’s bill due. Keep unit shares off The split.")
+                        .font(PantominaFont.caption)
+                        .foregroundStyle(Color.pantomina.muted)
+                } else {
+                    Picker("Split", selection: $splitMode) {
+                        Text("Just mine").tag(0)
+                        Text("50·50").tag(1)
+                        Text("Custom").tag(2)
+                    }
+                    .pickerStyle(.segmented)
+                    if splitMode == 2 {
+                        TextField("\(fernName) ₱", text: $customFern)
+                            .keyboardType(.decimalPad)
+                            .focused($focusedField, equals: .customFern)
+                            .onChange(of: customFern) { _, new in autofill(fromFern: true, text: new) }
+                        TextField("\(starkName) ₱", text: $customStark)
+                            .keyboardType(.decimalPad)
+                            .focused($focusedField, equals: .customStark)
+                            .onChange(of: customStark) { _, new in autofill(fromFern: false, text: new) }
+                        if let ok = customSplitSumOK {
+                            Text(ok ? "Splits add up." : "Splits must add up to the amount.")
+                                .font(PantominaFont.caption)
+                                .foregroundStyle(ok ? Color.pantomina.sageDeep : Color.pantomina.rose)
+                        }
                     }
                 }
             }
@@ -262,6 +315,46 @@ struct AddEntryView: View {
                         if clamped != new { note = clamped }
                     }
             }
+        }
+    }
+
+    private var jarCard: some View {
+        Card {
+            VStack(alignment: .leading, spacing: Spacing.md) {
+                Toggle("Cookie Jar", isOn: $cookieJarOn)
+                    .onChange(of: cookieJarOn) { _, on in
+                        if on { applyJarDefaults() }
+                    }
+                if cookieJarOn {
+                    Picker("Jar kind", selection: $jarKind) {
+                        Text("In").tag(CookieJar.Kind.income)
+                        Text("Spend").tag(CookieJar.Kind.spend)
+                        Text("Borrow").tag(CookieJar.Kind.borrow)
+                    }
+                    .pickerStyle(.segmented)
+                    pickRow(
+                        title: "Source",
+                        value: jarSources.first { $0.id == jarSourceId }?.label
+                            ?? (jarKind == .income ? "Choose" : "Optional")
+                    ) {
+                        showJarSourcePicker = true
+                    }
+                    Text(jarKindFooter)
+                        .font(PantominaFont.caption)
+                        .foregroundStyle(Color.pantomina.muted)
+                }
+            }
+        }
+    }
+
+    private var jarKindFooter: String {
+        switch jarKind {
+        case .income:
+            return "Unit shares come In here. Full internet/water stays on Receipts."
+        case .spend:
+            return "Spend dips the jar."
+        case .borrow:
+            return "Borrow is expected back."
         }
     }
 
@@ -353,6 +446,10 @@ struct AddEntryView: View {
 
     private func applyAccountDefaults() {
         guard let account = selectedAccount else { return }
+        if cookieJarOn {
+            applyJarDefaults()
+            return
+        }
         switch account.scope {
         case .fern:
             paidBy = .fern
@@ -363,6 +460,14 @@ struct AddEntryView: View {
         case .household, .business:
             splitMode = 1
         }
+    }
+
+    private func applyJarDefaults() {
+        if let petty = pettyCashCategory {
+            selectedCategoryId = petty.id
+        }
+        splitMode = 0
+        paidBy = .fern
     }
 
     private func prefill(from tx: TransactionRecord) {
@@ -385,6 +490,17 @@ struct AddEntryView: View {
             splitMode = 2
             customFern = String(format: "%.2f", Double(tx.allocFernC) / 100)
             customStark = String(format: "%.2f", Double(tx.allocStarkC) / 100)
+        }
+
+        if let kind = tx.jarKind {
+            cookieJarOn = true
+            jarKind = kind
+            jarSourceId = tx.jarSourceId
+            applyJarDefaults()
+        } else {
+            cookieJarOn = false
+            jarKind = .spend
+            jarSourceId = nil
         }
     }
 
@@ -418,15 +534,29 @@ struct AddEntryView: View {
             error = "Couldn't save. Enter an amount."
             return
         }
-        guard let accountId = selectedAccountId, let categoryId = selectedCategoryId else {
+        guard let accountId = selectedAccountId else {
+            error = "Couldn't save. Choose category and payment method."
+            return
+        }
+        let categoryId: String
+        if cookieJarOn {
+            guard let pettyId = pettyCashCategory?.id else {
+                error = "Couldn't save. Petty Cash category missing."
+                return
+            }
+            categoryId = pettyId
+        } else if let selectedCategoryId {
+            categoryId = selectedCategoryId
+        } else {
             error = "Couldn't save. Choose category and payment method."
             return
         }
         let account = selectedAccount
+        let effectiveSplit = cookieJarOn ? 0 : splitMode
         let intended: Allocation
-        switch splitMode {
+        switch effectiveSplit {
         case 0:
-            intended = AllocationDefaults.justMine(amountC: amountC, paidBy: paidBy)
+            intended = AllocationDefaults.justMine(amountC: amountC, paidBy: cookieJarOn ? .fern : paidBy)
         case 1:
             intended = AllocationDefaults.fiftyFifty(amountC: amountC)
         default:
@@ -443,7 +573,7 @@ struct AddEntryView: View {
         let allocation = AllocationRouting.record(
             intended: intended,
             accountScope: scope,
-            paidBy: paidBy
+            paidBy: cookieJarOn ? .fern : paidBy
         )
 
         let decision = Realization.decide(
@@ -469,6 +599,15 @@ struct AddEntryView: View {
             return trimmed.isEmpty ? nil : trimmed
         }()
 
+        if cookieJarOn, jarKind == .income, jarSourceId == nil {
+            error = "Couldn't save. Choose which unit or person paid In."
+            return
+        }
+
+        let resolvedJarKind: CookieJar.Kind? = cookieJarOn ? jarKind : nil
+        let resolvedJarReturned: Bool? = resolvedJarKind == .borrow ? false : nil
+        let savePaidBy: PersonId = cookieJarOn ? .fern : paidBy
+
         if let existing = editingTransaction {
             existing.purchaseDate = purchaseISO
             existing.realizedDate = decision.realizedDate
@@ -477,11 +616,14 @@ struct AddEntryView: View {
             existing.amountC = amountC
             existing.accountId = accountId
             existing.categoryId = categoryId
-            existing.paidByRaw = paidBy.rawValue
+            existing.paidByRaw = savePaidBy.rawValue
             existing.allocFernC = allocation.fern
             existing.allocStarkC = allocation.stark
             existing.settlementRole = settlementRole
             existing.note = noteValue
+            existing.jarKind = resolvedJarKind
+            existing.jarSourceId = cookieJarOn ? jarSourceId : nil
+            existing.jarReturned = resolvedJarReturned
             existing.updatedAt = .now
         } else {
             let tx = TransactionRecord(
@@ -492,10 +634,13 @@ struct AddEntryView: View {
                 amountC: amountC,
                 accountId: accountId,
                 categoryId: categoryId,
-                paidBy: paidBy,
+                paidBy: savePaidBy,
                 allocation: allocation,
                 settlementRole: settlementRole,
-                note: noteValue
+                note: noteValue,
+                jarKind: resolvedJarKind,
+                jarSourceId: cookieJarOn ? jarSourceId : nil,
+                jarReturned: resolvedJarReturned
             )
             modelContext.insert(tx)
         }
@@ -512,6 +657,9 @@ struct AddEntryView: View {
                 if !editing {
                     amountText = ""
                     note = ""
+                    cookieJarOn = false
+                    jarKind = .spend
+                    jarSourceId = nil
                     applyAccountDefaults()
                 }
                 try? await Task.sleep(nanoseconds: 1_200_000_000)

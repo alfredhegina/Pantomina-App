@@ -11,6 +11,7 @@ enum PantominaSchema {
             TransactionRecord.self,
             RecurringRuleRecord.self,
             FundingPlanRecord.self,
+            JarSourceRecord.self,
             AppMeta.self,
         ])
         let config = ModelConfiguration(isStoredInMemoryOnly: false)

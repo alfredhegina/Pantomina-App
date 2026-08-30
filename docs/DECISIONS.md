@@ -60,6 +60,9 @@ Living log of locked **Baseline** choices and parked **For later** work. The pro
 | 2026-08-30 | Things We Keep Doing: swipe **Edit** / **Delete** (+ confirm). Pause = temporary; hard delete rule + linked funding plan; Receipts untouched. Funding rewrite only when no tranche reserved. | Mistyped setup; match Receipts hygiene. |
 | 2026-08-30 | Keep Doing Add/Edit: required **Category** picker (expense CoA; same SearchablePickList as Add). No global default category. | Per-rule category; Count posts correct CoA. |
 | 2026-08-30 | Keep Doing validation error sits in **first Form section** (under title), not below set-aside. | Visible at medium detent without expand. |
+| 2026-08-30 | **Phase 4 Slice C** shipped: `CookieJar` engine + `JarSourceRecord` + jar fields on transactions; More → Cookie Jar (running balance, who’s-paid, Still out / Returned); Add Cookie Jar toggle; demo units 404/406/408/305 + fixture rows. | Spec §4.13 accept: balance + IOU. |
+| 2026-08-30 | Cookie Jar UX: no Clear chip (re-tap filter); confirm before Returned; **Add to the jar** sheet from `+`. Full utility bills on Receipts; unit reimbursements = jar **In** only (anti-double-dip). | Household internet/water + unit shares use case; Operate. |
+| 2026-08-30 | Cookie Jar on Add/Edit: force **Petty Cash** (system) + **Just mine** (Fern). Not 50·50. YTD/charts later key off `jar.kind`, not category flow. | Avoid Stark due on unit In; Petty Cash isn’t CoA income/asset. |
 
 ## For later
 

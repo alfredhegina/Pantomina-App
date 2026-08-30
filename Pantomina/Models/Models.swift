@@ -118,6 +118,11 @@ final class TransactionRecord {
     var recurringRuleId: String?
     var note: String?
     var merchant: String?
+    /// When non-nil, transaction is a Cookie Jar entry (`income` / `spend` / `borrow`).
+    var jarKindRaw: String?
+    var jarSourceId: String?
+    /// Borrows only: repaid yet?
+    var jarReturned: Bool?
     var createdAt: Date
     var updatedAt: Date
 
@@ -137,6 +142,9 @@ final class TransactionRecord {
         recurringRuleId: String? = nil,
         note: String? = nil,
         merchant: String? = nil,
+        jarKind: CookieJar.Kind? = nil,
+        jarSourceId: String? = nil,
+        jarReturned: Bool? = nil,
         createdAt: Date = .now,
         updatedAt: Date = .now
     ) {
@@ -156,6 +164,9 @@ final class TransactionRecord {
         self.recurringRuleId = recurringRuleId
         self.note = note
         self.merchant = merchant
+        self.jarKindRaw = jarKind?.rawValue
+        self.jarSourceId = jarSourceId
+        self.jarReturned = jarReturned
         self.createdAt = createdAt
         self.updatedAt = updatedAt
     }
@@ -172,6 +183,25 @@ final class TransactionRecord {
             return SettlementRole(rawValue: settlementRoleRaw)
         }
         set { settlementRoleRaw = newValue?.rawValue }
+    }
+    var jarKind: CookieJar.Kind? {
+        get { jarKindRaw.flatMap(CookieJar.Kind.init(rawValue:)) }
+        set { jarKindRaw = newValue?.rawValue }
+    }
+    var isJarEntry: Bool { jarKind != nil }
+
+    func asJarEntry() -> CookieJar.Entry? {
+        guard let kind = jarKind else { return nil }
+        let date = realizedDate ?? purchaseDate
+        return CookieJar.Entry(
+            id: id,
+            dateISO: date,
+            amountC: amountC,
+            kind: kind,
+            sourceId: jarSourceId,
+            returned: jarReturned,
+            note: note
+        )
     }
 }
 
@@ -300,6 +330,39 @@ final class FundingPlanRecord {
         payoutCycleISO = plan.payoutCycleISO
         tranchesJSON = (try? JSONEncoder().encode(plan.tranches)) ?? tranchesJSON
         paid = plan.paid
+    }
+}
+
+@Model
+final class JarSourceRecord {
+    @Attribute(.unique) var id: String
+    var label: String
+    var kindRaw: String
+    /// JSON array of `{amountC, cadence}`.
+    var expectedJSON: Data
+
+    init(
+        id: String = UUID().uuidString,
+        label: String,
+        kind: CookieJar.SourceKind,
+        expected: [CookieJar.Expected] = []
+    ) {
+        self.id = id
+        self.label = label
+        self.kindRaw = kind.rawValue
+        self.expectedJSON = (try? JSONEncoder().encode(expected)) ?? Data("[]".utf8)
+    }
+
+    var kind: CookieJar.SourceKind {
+        CookieJar.SourceKind(rawValue: kindRaw) ?? .unit
+    }
+
+    var expected: [CookieJar.Expected] {
+        (try? JSONDecoder().decode([CookieJar.Expected].self, from: expectedJSON)) ?? []
+    }
+
+    var engineSource: CookieJar.Source {
+        CookieJar.Source(id: id, label: label, kind: kind, expected: expected)
     }
 }
 

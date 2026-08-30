@@ -198,3 +198,20 @@ Skills: Operate, Humanizer, Emil.
 | Anti-double | Funded bills never post full amount; personal = just mine |
 
 **Slice B complete** (funding + mini-slices). Next: Phase 4 Slice C (Cookie Jar).
+
+## Phase 4 Slice C — Cookie Jar (2026-08-30)
+
+Skills: Operate, Humanizer, write-swift TDD. Spec §4.13.
+
+| Piece | Behavior |
+| --- | --- |
+| Engine | Running balance; unreturned borrow parenthesized / dips; returned nets out; who’s-paid; filter by source |
+| More | **The Cookie Jar** — In the jar, Who’s paid chips, Still out + Returned, Statement |
+| Add | Cookie Jar toggle → income / Spend·Borrow + optional source |
+| Seed | Units 404/406/408/305 (₱700/mo expected) + demo statement rows |
+| UX polish | Re-tap clears filter (no Clear ×); Returned confirm; jar-native **Add to the jar**; full bills on Receipts, unit shares = In |
+| Add/Edit jar | Category locked **Petty Cash**; split locked **Just mine**; kind In/Spend/Borrow |
+
+**Mental model:** Pay full internet/water on Receipts (Shared). Unit reimbursements → jar In with unit source. Spend/Borrow only for physical jar cash. Do **not** 50·50 jar In (would inflate Stark due).
+
+**Phase 4 complete** (A+B+C). Next: Phase 5 (loans & funds).
