@@ -10,6 +10,7 @@ struct BillsView: View {
     @Query private var people: [PersonRecord]
     @Query private var recurringRules: [RecurringRuleRecord]
     @Query private var fundingPlans: [FundingPlanRecord]
+    @Query private var loans: [LoanRecord]
 
     @State private var pane = 0
     @State private var selectedAnchor: String?
@@ -155,6 +156,7 @@ struct BillsView: View {
             rules: rules,
             statementAccountsWithPending: Array(statementPending).sorted(),
             trancheTasks: trancheTasks,
+            loanSnapshots: loans.map(\.engineLoan),
             doneIds: checklistDoneIds
         )
     }
@@ -190,6 +192,7 @@ struct BillsView: View {
                         accountLabels: Dictionary(uniqueKeysWithValues: accounts.map {
                             ($0.id, $0.displayLabel(fernName: fern, starkName: stark))
                         }),
+                        pendingTaskId: countIt?.task.id,
                         onPickCycle: { AnyView(cycleMenu) },
                         onToggle: handleChecklistToggle,
                         onOpenStatement: { statementRoute = $0 }
@@ -218,8 +221,15 @@ struct BillsView: View {
             )) {
                 StatementDayView()
             }
-            .sheet(item: $countIt) { _ in
-                countItSheet(fernName: fern, starkName: stark)
+            .sheet(item: $countIt) { item in
+                countItSheet(
+                    draft: Binding(
+                        get: { countIt ?? item },
+                        set: { countIt = $0 }
+                    ),
+                    fernName: fern,
+                    starkName: stark
+                )
             }
             .sheet(isPresented: $showLogContribution) {
                 contributionSheet(starkName: stark)
@@ -240,6 +250,7 @@ struct BillsView: View {
                 }
                 try? SeedCatalog.seedDemoRulesIfNeeded(into: modelContext)
                 try? SeedCatalog.seedDemoFundingIfNeeded(into: modelContext)
+                try? SeedCatalog.seedDemoLoansIfNeeded(into: modelContext)
                 try? modelContext.save()
             }
         }
@@ -273,6 +284,25 @@ struct BillsView: View {
 
     private func openCountIt(for task: Checklist.Task) {
         countItError = nil
+        if task.kind == .loanPayment {
+            guard let loanId = task.linkedId,
+                  let loan = loans.first(where: { $0.id == loanId })
+            else { return }
+            let accountId = "" // User picks Paid from; do not preselect loan.paymentAccountId
+            countIt = CountItDraft(
+                task: task,
+                amountText: String(format: "%.2f", Double(task.amountC) / 100),
+                selectedAccountId: accountId,
+                paidBy: .fern,
+                splitMode: 0,
+                fundingPlanId: nil,
+                ruleId: nil,
+                loanId: loanId,
+                billTitle: loan.loanDescription,
+                amountEditable: false
+            )
+            return
+        }
         if task.kind == .fundTranche {
             guard let planId = task.linkedId,
                   let record = fundingPlans.first(where: { $0.id == planId })
@@ -294,6 +324,7 @@ struct BillsView: View {
                 splitMode: splitMode,
                 fundingPlanId: planId,
                 ruleId: rule.id,
+                loanId: nil,
                 billTitle: plan.billTitle,
                 amountEditable: false
             )
@@ -314,6 +345,7 @@ struct BillsView: View {
             splitMode: splitMode,
             fundingPlanId: nil,
             ruleId: rule.id,
+            loanId: nil,
             billTitle: rule.title,
             amountEditable: task.amountBehavior == .estimate
         )
@@ -326,29 +358,30 @@ struct BillsView: View {
         return preferred.isEmpty ? ruleAccountId : preferred
     }
 
-    private func updateCountIt(_ mutate: (inout CountItDraft) -> Void) {
-        guard var draft = countIt else { return }
-        mutate(&draft)
-        countIt = draft
-    }
-
-    private func countItSheet(fernName: String, starkName: String) -> some View {
+    private func countItSheet(
+        draft: Binding<CountItDraft>,
+        fernName: String,
+        starkName: String
+    ) -> some View {
         NavigationStack {
             Form {
                 Section {
-                    if countIt?.amountEditable == true {
+                    if draft.wrappedValue.amountEditable {
                         TextField("Amount", text: Binding(
-                            get: { countIt?.amountText ?? "" },
-                            set: { newValue in updateCountIt { $0.amountText = newValue } }
+                            get: { draft.wrappedValue.amountText },
+                            set: { newValue in
+                                var next = draft.wrappedValue
+                                next.amountText = newValue
+                                draft.wrappedValue = next
+                            }
                         ))
                         .keyboardType(.decimalPad)
-                    } else if let text = countIt?.amountText,
-                              let cents = InputBounds.centavos(fromPesosText: text) {
+                    } else if let cents = InputBounds.centavos(fromPesosText: draft.wrappedValue.amountText) {
                         Text(formatPeso(cents))
                             .font(PantominaFont.body.monospacedDigit())
                     }
                 } header: {
-                    Text(countIt?.billTitle ?? "")
+                    Text(draft.wrappedValue.billTitle)
                 }
                 Section {
                     Button {
@@ -358,25 +391,37 @@ struct BillsView: View {
                             Text("Paid from")
                                 .foregroundStyle(Color.pantomina.ink)
                             Spacer()
-                            Text(paidFromLabel(fernName: fernName, starkName: starkName))
-                                .foregroundStyle(Color.pantomina.muted)
+                            Text(paidFromLabel(
+                                for: draft.wrappedValue.selectedAccountId,
+                                fernName: fernName,
+                                starkName: starkName
+                            ))
+                            .foregroundStyle(Color.pantomina.muted)
                             Text("Change")
                                 .font(PantominaFont.caption)
                                 .foregroundStyle(Color.pantomina.sage)
                         }
                     }
-                    if let accountId = countIt?.selectedAccountId, isHouseholdAccount(accountId) {
+                    if isHouseholdAccount(draft.wrappedValue.selectedAccountId) {
                         Picker("Split", selection: Binding(
-                            get: { countIt?.splitMode ?? 0 },
-                            set: { newValue in updateCountIt { $0.splitMode = newValue } }
+                            get: { draft.wrappedValue.splitMode },
+                            set: { newValue in
+                                var next = draft.wrappedValue
+                                next.splitMode = newValue
+                                draft.wrappedValue = next
+                            }
                         )) {
                             Text("Just mine").tag(0)
                             Text("50·50").tag(1)
                         }
                         .pickerStyle(.segmented)
                         Picker("Paid by", selection: Binding(
-                            get: { countIt?.paidBy ?? .fern },
-                            set: { newValue in updateCountIt { $0.paidBy = newValue } }
+                            get: { draft.wrappedValue.paidBy },
+                            set: { newValue in
+                                var next = draft.wrappedValue
+                                next.paidBy = newValue
+                                draft.wrappedValue = next
+                            }
                         )) {
                             Text(fernName).tag(PersonId.fern)
                             Text(starkName).tag(PersonId.stark)
@@ -421,13 +466,27 @@ struct BillsView: View {
                         )
                     },
                     selection: Binding(
-                        get: { countIt?.selectedAccountId },
+                        get: {
+                            let id = draft.wrappedValue.selectedAccountId
+                            return id.isEmpty ? nil : id
+                        },
                         set: { newId in
                             guard let newId else { return }
-                            updateCountIt { draft in
-                                draft.selectedAccountId = newId
+                            var next = draft.wrappedValue
+                            next.selectedAccountId = newId
+                            if let account = accountById[newId] {
+                                switch account.scope {
+                                case .fern:
+                                    next.paidBy = .fern
+                                    next.splitMode = 0
+                                case .stark:
+                                    next.paidBy = .stark
+                                    next.splitMode = 0
+                                case .household, .business:
+                                    next.splitMode = 1
+                                }
                             }
-                            applyAccountDefaultsToCountIt(accountId: newId)
+                            draft.wrappedValue = next
                         }
                     )
                 )
@@ -436,31 +495,13 @@ struct BillsView: View {
         .presentationDetents([.medium, .large])
     }
 
-    private func paidFromLabel(fernName: String, starkName: String) -> String {
-        guard let id = countIt?.selectedAccountId,
-              let account = accountById[id]
-        else { return "Choose" }
+    private func paidFromLabel(for accountId: String, fernName: String, starkName: String) -> String {
+        guard let account = accountById[accountId] else { return "Choose" }
         return account.displayLabel(fernName: fernName, starkName: starkName)
     }
 
     private func isHouseholdAccount(_ id: String) -> Bool {
         accountById[id]?.scope == .household
-    }
-
-    private func applyAccountDefaultsToCountIt(accountId: String) {
-        guard let account = accountById[accountId] else { return }
-        updateCountIt { draft in
-            switch account.scope {
-            case .fern:
-                draft.paidBy = .fern
-                draft.splitMode = 0
-            case .stark:
-                draft.paidBy = .stark
-                draft.splitMode = 0
-            case .household, .business:
-                draft.splitMode = 1
-            }
-        }
     }
 
     private func submitCountIt() {
@@ -474,7 +515,61 @@ struct BillsView: View {
             countItError = "Choose where you paid from."
             return
         }
-        guard let rule = recurringRules.first(where: { $0.id == draft.ruleId }) else {
+
+        if let loanId = draft.loanId {
+            guard let loan = loans.first(where: { $0.id == loanId }) else {
+                countItError = "Couldn't find that loan."
+                return
+            }
+            guard let loanCat = categories.first(where: { $0.system && $0.item == "Loan Payment" }) else {
+                countItError = "Loan Payment category missing."
+                return
+            }
+            let intended = AllocationDefaults.justMine(amountC: amountC, paidBy: draft.paidBy)
+            let account = accountById[draft.selectedAccountId]
+            let routed = AllocationRouting.record(
+                intended: intended,
+                accountScope: account?.scope ?? .fern,
+                paidBy: draft.paidBy
+            )
+            let decision = Realization.decide(
+                purchaseISO: activeAnchor,
+                settlement: account?.settlement ?? .instant,
+                statementCutoff: account?.statementCutoff
+            )
+            let tx = TransactionRecord(
+                purchaseDate: activeAnchor,
+                realizedDate: decision.realizedDate,
+                realizedStatus: decision.status,
+                proposedRealizedDate: decision.proposedRealizedDate,
+                amountC: amountC,
+                accountId: draft.selectedAccountId,
+                categoryId: loanCat.id,
+                paidBy: draft.paidBy,
+                allocation: routed,
+                settlementRole: .loanPayment,
+                linkedId: loanId,
+                note: draft.billTitle
+            )
+            modelContext.insert(tx)
+            loan.applyPayment()
+            try? modelContext.save()
+            markChecklistDone(draft.task.id)
+            let months = "\(loan.paidMonths)/\(loan.termMonths)"
+            countIt = nil
+            Task { @MainActor in
+                PantominaMotion.run(reduceMotion) {
+                    toast = "Counted · \(months) · \(formatPeso(loan.derivedBalanceC)) left"
+                }
+                try? await Task.sleep(nanoseconds: 1_400_000_000)
+                PantominaMotion.run(reduceMotion) { toast = nil }
+            }
+            return
+        }
+
+        guard let ruleId = draft.ruleId,
+              let rule = recurringRules.first(where: { $0.id == ruleId })
+        else {
             countItError = "Couldn't find that bill."
             return
         }
@@ -936,7 +1031,8 @@ private struct CountItDraft: Identifiable {
     var paidBy: PersonId
     var splitMode: Int
     var fundingPlanId: String?
-    var ruleId: String
+    var ruleId: String?
+    var loanId: String?
     var billTitle: String
     var amountEditable: Bool
 }

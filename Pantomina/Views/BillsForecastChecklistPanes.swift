@@ -81,9 +81,14 @@ struct BillsChecklistPane: View {
     let tasks: [Checklist.Task]
     let summary: Checklist.Summary
     let accountLabels: [String: String]
+    /// Task id while Count it sheet is open — keeps toggle visually on until cancel/count.
+    var pendingTaskId: String? = nil
     let onPickCycle: () -> AnyView
     let onToggle: (Checklist.Task) -> Void
     let onOpenStatement: (String) -> Void
+
+    /// Armed in the same frame as the Toggle gesture so get stays true before parent sets pendingTaskId.
+    @State private var armedTaskId: String?
 
     var body: some View {
         ScrollView {
@@ -126,8 +131,14 @@ struct BillsChecklistPane: View {
                                 .buttonStyle(.plain)
                             } else {
                                 Toggle(isOn: Binding(
-                                    get: { task.done },
-                                    set: { _ in onToggle(task) }
+                                    get: {
+                                        task.done || pendingTaskId == task.id || armedTaskId == task.id
+                                    },
+                                    set: { isOn in
+                                        guard isOn, !task.done else { return }
+                                        armedTaskId = task.id
+                                        onToggle(task)
+                                    }
                                 )) {
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text(task.title)
@@ -157,12 +168,18 @@ struct BillsChecklistPane: View {
                                     }
                                 }
                                 .disabled(task.done)
+                                .transaction { $0.animation = nil }
                             }
                         }
                     }
                 }
             }
             .padding(Spacing.lg)
+        }
+        .onChange(of: pendingTaskId) { _, newValue in
+            if newValue == nil {
+                armedTaskId = nil
+            }
         }
     }
 }

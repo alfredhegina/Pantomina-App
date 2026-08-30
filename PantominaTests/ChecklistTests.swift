@@ -58,4 +58,42 @@ struct ChecklistTests {
         #expect(summary.doneCount == 1)
         #expect(summary.stillToSendC == 0)
     }
+
+    @Test("includes loan_payment tasks from Loan snapshots")
+    func includesLoanPayments() {
+        let loan = Loan.Snapshot(
+            id: "loan-ub",
+            lender: "UB",
+            description: "UB Personal",
+            purpose: "Consolidate",
+            owner: .fern,
+            principalC: 850_000_00,
+            totalLoanC: 104_819_460,
+            termMonths: 60,
+            paidMonths: 24,
+            monthlyC: 17_469_91,
+            cutoff: 15,
+            startDateISO: "2024-08-15",
+            endDateISO: "2029-08-15",
+            aprPercent: 18.5,
+            snowballOrder: 1,
+            snowballBatch: 1,
+            strategy: nil,
+            linkedReceivableAccountId: nil,
+            journal: [],
+            status: .active,
+            paymentAccountId: "acct-bpi"
+        )
+        let tasks = Checklist.tasks(
+            cycleISO: "2026-08-15",
+            todayISO: "2026-08-10",
+            rules: [],
+            statementAccountsWithPending: [],
+            trancheTasks: [],
+            loanSnapshots: [loan],
+            doneIds: []
+        )
+        #expect(tasks.contains { $0.kind == .loanPayment && $0.linkedId == "loan-ub" })
+        #expect(tasks.first { $0.kind == .loanPayment }?.amountC == 17_469_91)
+    }
 }

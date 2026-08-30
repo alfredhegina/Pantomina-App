@@ -367,6 +367,125 @@ final class JarSourceRecord {
 }
 
 @Model
+final class LoanRecord {
+    @Attribute(.unique) var id: String
+    var lender: String
+    var loanDescription: String
+    var purpose: String
+    var ownerRaw: String
+    var principalC: Int
+    var totalLoanC: Int
+    var termMonths: Int
+    var paidMonths: Int
+    var monthlyC: Int
+    var cutoff: Int
+    var startDateISO: String
+    var endDateISO: String
+    var aprPercent: Double
+    var snowballOrder: Int?
+    var snowballBatch: Int?
+    var strategyRaw: String?
+    var linkedReceivableAccountId: String?
+    var journalJSON: Data
+    var statusRaw: String
+    var paymentAccountId: String
+
+    init(
+        id: String = UUID().uuidString,
+        lender: String,
+        description: String,
+        purpose: String,
+        owner: PersonId,
+        principalC: Int,
+        totalLoanC: Int,
+        termMonths: Int,
+        paidMonths: Int,
+        monthlyC: Int,
+        cutoff: Int,
+        startDateISO: String,
+        endDateISO: String,
+        aprPercent: Double,
+        snowballOrder: Int? = nil,
+        snowballBatch: Int? = nil,
+        strategy: Loan.Strategy? = nil,
+        linkedReceivableAccountId: String? = nil,
+        journal: [Loan.JournalEntry] = [],
+        status: Loan.Status = .active,
+        paymentAccountId: String
+    ) {
+        self.id = id
+        self.lender = lender
+        self.loanDescription = description
+        self.purpose = purpose
+        self.ownerRaw = owner.rawValue
+        self.principalC = principalC
+        self.totalLoanC = totalLoanC
+        self.termMonths = termMonths
+        self.paidMonths = paidMonths
+        self.monthlyC = monthlyC
+        self.cutoff = cutoff
+        self.startDateISO = startDateISO
+        self.endDateISO = endDateISO
+        self.aprPercent = aprPercent
+        self.snowballOrder = snowballOrder
+        self.snowballBatch = snowballBatch
+        self.strategyRaw = strategy?.rawValue
+        self.linkedReceivableAccountId = linkedReceivableAccountId
+        self.journalJSON = (try? JSONEncoder().encode(journal)) ?? Data("[]".utf8)
+        self.statusRaw = status.rawValue
+        self.paymentAccountId = paymentAccountId
+    }
+
+    var engineLoan: Loan.Snapshot {
+        let journal = (try? JSONDecoder().decode([Loan.JournalEntry].self, from: journalJSON)) ?? []
+        return Loan.Snapshot(
+            id: id,
+            lender: lender,
+            description: loanDescription,
+            purpose: purpose,
+            owner: PersonId(rawValue: ownerRaw) ?? .fern,
+            principalC: principalC,
+            totalLoanC: totalLoanC,
+            termMonths: termMonths,
+            paidMonths: paidMonths,
+            monthlyC: monthlyC,
+            cutoff: cutoff,
+            startDateISO: startDateISO,
+            endDateISO: endDateISO,
+            aprPercent: aprPercent,
+            snowballOrder: snowballOrder,
+            snowballBatch: snowballBatch,
+            strategy: strategyRaw.flatMap(Loan.Strategy.init(rawValue:)),
+            linkedReceivableAccountId: linkedReceivableAccountId,
+            journal: journal,
+            status: Loan.Status(rawValue: statusRaw) ?? .active,
+            paymentAccountId: paymentAccountId
+        )
+    }
+
+    var derivedBalanceC: Int {
+        Loan.derivedBalanceC(totalLoanC: totalLoanC, paidMonths: paidMonths, monthlyC: monthlyC)
+    }
+
+    func applyPayment() {
+        let result = Loan.afterPayment(
+            paidMonths: paidMonths,
+            termMonths: termMonths,
+            totalLoanC: totalLoanC,
+            monthlyC: monthlyC
+        )
+        paidMonths = result.paidMonths
+        statusRaw = result.status.rawValue
+    }
+
+    func appendJournal(dateISO: String, note: String) {
+        let current = (try? JSONDecoder().decode([Loan.JournalEntry].self, from: journalJSON)) ?? []
+        guard let next = Loan.appendJournal(dateISO: dateISO, note: note, to: current) else { return }
+        journalJSON = (try? JSONEncoder().encode(next)) ?? journalJSON
+    }
+}
+
+@Model
 final class AppMeta {
     @Attribute(.unique) var key: String
     var onboardingComplete: Bool

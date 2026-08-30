@@ -110,7 +110,47 @@ enum SeedCatalog {
         try seedDemoRulesIfNeeded(into: context)
         try seedDemoFundingIfNeeded(into: context)
         try seedDemoJarIfNeeded(into: context)
+        try seedDemoLoansIfNeeded(into: context)
         try context.save()
+    }
+
+    /// UB Personal accept fixture (24/60 → ₱628,916.76). Additive.
+    @MainActor
+    static func seedDemoLoansIfNeeded(into context: ModelContext) throws {
+        let existing = try context.fetch(FetchDescriptor<LoanRecord>())
+        guard !existing.contains(where: { $0.id == "loan-ub-personal" }) else { return }
+
+        let accounts = try context.fetch(FetchDescriptor<AccountRecord>())
+        let paymentId = accounts.first { $0.baseName == "BPI Debit" && $0.scope == .fern }?.id
+            ?? accounts.first { $0.scope == .fern }?.id
+            ?? accounts.first?.id
+        guard let paymentId else { return }
+
+        context.insert(
+            LoanRecord(
+                id: "loan-ub-personal",
+                lender: "UnionBank",
+                description: "UB Personal Loan",
+                purpose: "Debt consolidation",
+                owner: .fern,
+                principalC: 850_000_00,
+                totalLoanC: 104_819_460,
+                termMonths: 60,
+                paidMonths: 24,
+                monthlyC: 17_469_91,
+                cutoff: 15,
+                startDateISO: "2024-08-15",
+                endDateISO: "2029-08-15",
+                aprPercent: 18.5,
+                snowballOrder: 1,
+                snowballBatch: 1,
+                journal: [
+                    Loan.JournalEntry(dateISO: "2024-08-01", note: "Took the loan to clear high-APR cards.")
+                ],
+                status: .active,
+                paymentAccountId: paymentId
+            )
+        )
     }
 
     /// Boarder units + demo jar rows (additive). Matches CookieJarTests fixture shape.

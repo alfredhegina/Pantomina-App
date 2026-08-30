@@ -215,3 +215,40 @@ Skills: Operate, Humanizer, write-swift TDD. Spec §4.13.
 **Mental model:** Pay full internet/water on Receipts (Shared). Unit reimbursements → jar In with unit source. Spend/Borrow only for physical jar cash. Do **not** 50·50 jar In (would inflate Stark due).
 
 **Phase 4 complete** (A+B+C). Next: Phase 5 (loans & funds).
+
+---
+
+## Phase 5 skills critique (2026-08-30, pre-build)
+
+Skills: Impeccable Operate, Humanizer, Emil / apple-design, UI UX Pro Max (mobile Operate), write-swift. **Docs lock — Slice A may start after this row.**
+
+| Surface | Recommendation | Why / Push back |
+|---|---|---|
+| More IA | **Baggage We're Carrying** + **The War Chest** as first-class links (not under Fine Print). Footer: more rooms later. | Don’t invent a third “debts” room; Love Tab stays partner receivable |
+| Baggage | Active list + archive (“Baggage we put down”); derived balance prominent; purpose + APR (0% distinct); journal dated notes; **no hand-typed balance** | Balance Day confirm = Phase 6 |
+| War Chest | Fund cards: In the bank · owed-back · whole-again-at · target + IOU sliver; summary when owed | No household-scoped fund toggle (For later) |
+| Raid | Sheet from Forecast over + War Chest; raid order; amount ≤ balance; absorb (default) vs add-to-due | No auto-raid on open |
+| Checklist loan | Emit `loan_payment`; Count it → ledger + `loanPayment` role + `paidMonths++` | No separate loan-pay screen |
+| Snowball | War Chest queue; custom order; IOU repay **before** sweep; confirm card | No silent auto-sweep |
+| Method | Engines + UB / raid / repay fixtures before chrome | No empty War Chest shell without engine |
+| Funding spoken-for | Keep Phase 4 tranche-as-expense; Fund `iousC` is Phase 5 spoken-for | Don’t rewrite PruLife into fund earmarks in Slice B |
+
+### Explicit non-changes (Phase 5 skills)
+
+Phase order; personal-scope funds only; Love Tab floor-0; centavos; light mode. Empire/YTD/Balance Day = Phase 6; chat/backup = Phase 7.
+
+---
+
+## Phase 5 Slice A — Loans + Baggage + Checklist tick (2026-08-30)
+
+Skills: Operate, Humanizer, write-swift TDD. Spec §4.11.
+
+| Piece | Behavior |
+|---|---|
+| Engine | `Loan.derivedBalanceC`; `afterPayment` → paidMonths/balance/status; due on cutoff-matching cycle |
+| More | **Baggage We're Carrying** — active + archive; journal |
+| Checklist | `loan_payment` tasks; Count it posts Loan Payment + bumps loan |
+| Seed | UB Personal 24/60 → ₱628,916.76 |
+| Count it UX | Loan Paid from starts **Choose** (no prefill); sheet `countIt ?? item` keeps pick; toggle armed while sheet open |
+
+**Next:** Slice B (funds / raids / War Chest).

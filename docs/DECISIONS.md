@@ -63,6 +63,9 @@ Living log of locked **Baseline** choices and parked **For later** work. The pro
 | 2026-08-30 | **Phase 4 Slice C** shipped: `CookieJar` engine + `JarSourceRecord` + jar fields on transactions; More → Cookie Jar (running balance, who’s-paid, Still out / Returned); Add Cookie Jar toggle; demo units 404/406/408/305 + fixture rows. | Spec §4.13 accept: balance + IOU. |
 | 2026-08-30 | Cookie Jar UX: no Clear chip (re-tap filter); confirm before Returned; **Add to the jar** sheet from `+`. Full utility bills on Receipts; unit reimbursements = jar **In** only (anti-double-dip). | Household internet/water + unit shares use case; Operate. |
 | 2026-08-30 | Cookie Jar on Add/Edit: force **Petty Cash** (system) + **Just mine** (Fern). Not 50·50. YTD/charts later key off `jar.kind`, not category flow. | Avoid Stark due on unit In; Petty Cash isn’t CoA income/asset. |
+| 2026-08-30 | **Phase 5 UX locks (pre-build):** More → Baggage + War Chest first-class; Baggage derived balance only (no hand-type); Checklist loan via Count it; raid sheet intentional (absorb default); snowball confirm + IOU repay before sweep; engines/fixtures before chrome. Funding tranche posts unchanged. | Skills Operate/Humanizer/Emil; `docs/SKILLS_REVIEW.md`. |
+| 2026-08-30 | **Phase 5 Slice A** shipped: `Loan` engine + `LoanRecord`; More → Baggage We're Carrying (active/archive/journal); Checklist `loan_payment` + Count it bumps `paidMonths`; UB Personal seed 24/60 → ₱628,916.76. | Spec §4.11 / §6 accept. |
+| 2026-08-30 | Loan Count it: **Paid from starts empty** (Choose) — no prefill from `paymentAccountId`. Count it sheet binds `countIt ?? item` so account pick updates on first return. Checklist toggle stays on while Count it is open (`pendingTaskId` + same-frame `armedTaskId`). | Operate; avoid false “retention” from seed default; sheet(item) nil flash. |
 
 ## For later
 

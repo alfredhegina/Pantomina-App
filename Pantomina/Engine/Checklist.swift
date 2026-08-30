@@ -49,6 +49,7 @@ enum Checklist {
         rules: [Projection.Rule],
         statementAccountsWithPending: [String],
         trancheTasks: [TrancheTask],
+        loanSnapshots: [Loan.Snapshot] = [],
         doneIds: Set<String>
     ) -> [Task] {
         let past = todayISO > cycleISO
@@ -111,6 +112,11 @@ enum Checklist {
                     pastCutoff: past && !(tranche.done || doneIds.contains(tranche.id))
                 )
             )
+        }
+
+        for var loanTask in Loan.checklistTasks(cycleISO: cycleISO, loans: loanSnapshots, doneIds: doneIds) {
+            loanTask.pastCutoff = past && !loanTask.done
+            out.append(loanTask)
         }
 
         return out

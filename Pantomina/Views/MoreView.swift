@@ -51,6 +51,21 @@ struct MoreView: View {
                 }
 
                 NavigationLink {
+                    BaggageView()
+                } label: {
+                    Label {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Baggage We're Carrying")
+                            Text("Loans")
+                                .font(PantominaFont.caption)
+                                .foregroundStyle(Color.pantomina.muted)
+                        }
+                    } icon: {
+                        Image(systemName: "suitcase")
+                    }
+                }
+
+                NavigationLink {
                     ThingsWeKeepDoingView()
                 } label: {
                     Label {
@@ -68,7 +83,7 @@ struct MoreView: View {
                 Section {
                     EmptyView()
                 } footer: {
-                    Text("Cookie Jar, recurring, Statement day, and settings — more rooms later.")
+                    Text("Cookie Jar, loans, recurring, Statement day, and settings — War Chest next.")
                         .font(PantominaFont.caption)
                 }
             }
