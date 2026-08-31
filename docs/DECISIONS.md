@@ -82,6 +82,7 @@ Living log of locked **Baseline** choices and parked **For later** work. The pro
 | 2026-08-31 | Loan strategy **display**: Stash extras / On schedule only (`DisplayLabels`); raw `prepay` / `park_to_maturity` unchanged. | Humanizer; Prepay/Park-to-maturity jargon. |
 | 2026-08-31 | Snowball **Batch** UI hidden until a later wave exists (`Snowball.showsBatchChrome`); edit offers “Pay in a later wave…”. | Operate; one-wave demos. |
 | 2026-08-31 | Park/Sweep sheets dismiss only after successful commit (Forecast leftover keeps War Chest open on failure). | Review before merge PR #3. |
+| 2026-08-31 | **Input bounds hygiene:** fund + Keep Doing titles use display-name clamp (≤40); borrow/journal notes use note clamp (≤200); snowball order/batch via `clampQueueIndex` **1…99** (empty order → nil). Rule `.cursor/rules/input-bounds.mdc` + skill `input-bounds-hygiene`. | Close unbound TextFields; shared engine only. |
 
 ## For later
 

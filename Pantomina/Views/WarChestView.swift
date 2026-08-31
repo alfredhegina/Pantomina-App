@@ -850,6 +850,10 @@ private struct AddFundSheet: View {
                 }
                 Section {
                     TextField("Name", text: $name)
+                        .onChange(of: name) { _, new in
+                            let limited = InputBounds.limiting(new, max: InputBounds.maxDisplayNameLength)
+                            if limited != new { name = limited }
+                        }
                     Picker("Purpose", selection: $purpose) {
                         Text("Emergency").tag(Fund.Purpose.emergency)
                         Text("Sinking").tag(Fund.Purpose.sinking)
@@ -898,7 +902,7 @@ private struct AddFundSheet: View {
 
     private func submit() {
         error = nil
-        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmed = InputBounds.clampDisplayName(name)
         guard !trimmed.isEmpty else {
             error = "Give the fund a name."
             return
@@ -1071,6 +1075,10 @@ private struct RaidSheet: View {
                 Section {
                     TextField("What for", text: $note, axis: .vertical)
                         .lineLimit(2...4)
+                        .onChange(of: note) { _, new in
+                            let clamped = InputBounds.clampNote(new)
+                            if clamped != new { note = clamped }
+                        }
                 } footer: {
                     Text("Usually settling bills — say so if it’s something else.")
                         .font(PantominaFont.caption)
@@ -1127,7 +1135,7 @@ private struct RaidSheet: View {
             fund.id,
             amountC,
             destinationId,
-            note,
+            InputBounds.clampNote(note),
             WarChestView.isoString(from: happenedOn)
         )
     }
@@ -1339,12 +1347,16 @@ private struct EditSnowballSheet: View {
     @State private var batchText = ""
     @State private var strategy: Loan.Strategy = .prepay
     @State private var revealBatch = false
+    @State private var error: String?
 
     private var batchVisible: Bool { showBatchChrome || revealBatch }
 
     var body: some View {
         NavigationStack {
             Form {
+                if let error {
+                    Text(error).foregroundStyle(Color.pantomina.terraDeep)
+                }
                 Section {
                     Text(loan.loanDescription)
                         .foregroundStyle(Color.pantomina.muted)
@@ -1406,16 +1418,7 @@ private struct EditSnowballSheet: View {
                     Button("Cancel", action: onCancel)
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
-                        let order = Int(orderText.trimmingCharacters(in: .whitespaces))
-                        let batch: Int?
-                        if batchVisible {
-                            batch = Int(batchText.trimmingCharacters(in: .whitespaces))
-                        } else {
-                            batch = loan.snowballBatch ?? 1
-                        }
-                        onSave(order, batch, strategy)
-                    }
+                    Button("Save") { submit() }
                     .fontWeight(.semibold)
                 }
             }
@@ -1424,8 +1427,34 @@ private struct EditSnowballSheet: View {
                 batchText = loan.snowballBatch.map(String.init) ?? "1"
                 strategy = loan.engineLoan.strategy ?? .prepay
                 revealBatch = false
+                error = nil
             }
         }
         .presentationDetents([.large])
+    }
+
+    private func submit() {
+        error = nil
+        let trimmedOrder = orderText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let order: Int?
+        if trimmedOrder.isEmpty {
+            order = nil
+        } else if let parsed = InputBounds.clampQueueIndex(orderText) {
+            order = parsed
+        } else {
+            error = "Pay next needs a number from 1 to \(InputBounds.maxQueueIndex)."
+            return
+        }
+        let batch: Int?
+        if batchVisible {
+            guard let parsed = InputBounds.clampQueueIndex(batchText) else {
+                error = "Batch needs a number from 1 to \(InputBounds.maxQueueIndex)."
+                return
+            }
+            batch = parsed
+        } else {
+            batch = loan.snowballBatch ?? 1
+        }
+        onSave(order, batch, strategy)
     }
 }

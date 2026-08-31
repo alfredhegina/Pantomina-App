@@ -156,6 +156,10 @@ struct BaggageView: View {
                 Section {
                     TextField("What did you decide?", text: $journalNote, axis: .vertical)
                         .lineLimit(3...6)
+                        .onChange(of: journalNote) { _, new in
+                            let clamped = InputBounds.clampNote(new)
+                            if clamped != new { journalNote = clamped }
+                        }
                 } footer: {
                     Text("Notes stay on this loan — no balance edits here.")
                         .font(PantominaFont.caption)
@@ -170,7 +174,7 @@ struct BaggageView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
                         let iso = Cycle.cycleFor(isoDate: Self.todayISO()).anchorISO
-                        loan.appendJournal(dateISO: iso, note: journalNote)
+                        loan.appendJournal(dateISO: iso, note: InputBounds.clampNote(journalNote))
                         try? modelContext.save()
                         journalLoanId = nil
                     }

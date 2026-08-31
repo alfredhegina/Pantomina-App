@@ -379,6 +379,10 @@ private struct AddToJarSheet: View {
                         }
                     }
                     TextField("Note", text: $note)
+                        .onChange(of: note) { _, new in
+                            let clamped = InputBounds.clampNote(new)
+                            if clamped != new { note = clamped }
+                        }
                     DatePicker(
                         "When it happened",
                         selection: $happenedOn,
