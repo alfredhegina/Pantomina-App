@@ -199,7 +199,8 @@ struct BalanceDayView: View {
                     realizedStatus: tx.realizedStatus,
                     purchaseDate: tx.purchaseDate,
                     realizedDate: tx.realizedDate,
-                    note: tx.note ?? tx.merchant
+                    note: tx.note ?? tx.merchant,
+                    settlementRole: tx.settlementRole
                 )
             }
     }
@@ -299,9 +300,11 @@ struct BalanceDayView: View {
             )
         }
 
-        let prior = snapshots.first {
-            $0.personId == personId.rawValue && !$0.lines.isEmpty
-        }?.metrics
+        if personId == .fern, let love = loveTabLine(asOf: cycleISO) {
+            lines.append(love)
+        }
+
+        let prior = priorMetrics()
         let metrics = Snapshot.metrics(lines: lines, prior: prior, lens: .personal)
         let record = SnapshotRecord(
             cycleAnchorISO: cycleISO,
@@ -312,5 +315,52 @@ struct BalanceDayView: View {
         modelContext.insert(record)
         try? modelContext.save()
         onDone()
+    }
+
+    private func priorMetrics() -> Snapshot.Metrics? {
+        let prev = Cycle.previousHalfMonth(before: Cycle(anchorISO: cycleISO)).anchorISO
+        if let snap = snapshots.first(where: {
+            $0.personId == personId.rawValue && $0.cycleAnchorISO == prev && !$0.lines.isEmpty
+        }) {
+            return snap.metrics
+        }
+        return snapshots
+            .filter {
+                $0.personId == personId.rawValue
+                    && !$0.lines.isEmpty
+                    && $0.cycleAnchorISO < cycleISO
+            }
+            .sorted { $0.cycleAnchorISO > $1.cycleAnchorISO }
+            .first?
+            .metrics
+    }
+
+    private func loveTabLine(asOf cycleISO: String) -> Snapshot.Line? {
+        let rows: [Settlement.LedgerRow] = transactions.map { tx in
+            let account = accounts.first { $0.id == tx.accountId }
+            return Settlement.LedgerRow(
+                realizedDate: tx.realizedDate,
+                realizedStatus: tx.realizedStatus,
+                accountScope: account?.scope ?? .household,
+                allocationStarkC: tx.allocStarkC,
+                allocationFernC: tx.allocFernC,
+                amountC: tx.amountC,
+                settlementRole: tx.settlementRole,
+                isStatement: account?.settlement == .statement,
+                proposedRealizedDate: tx.proposedRealizedDate
+            )
+        }
+        let anchors = Settlement.cycleAnchors(in: rows).filter { $0 <= cycleISO }
+        guard let snap = Settlement.history(rows: rows, anchors: anchors).last,
+              snap.result.tabAfterC > 0
+        else { return nil }
+        return Snapshot.Line(
+            accountId: "love-tab",
+            balanceC: snap.result.tabAfterC,
+            source: .derived,
+            isLiability: false,
+            countsTowardSavingsAssets: false,
+            isInternalDebt: true
+        )
     }
 }

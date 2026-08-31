@@ -29,7 +29,8 @@ struct PocketMiniReportView: View {
                     realizedStatus: tx.realizedStatus,
                     purchaseDate: tx.purchaseDate,
                     realizedDate: tx.realizedDate,
-                    note: tx.note ?? tx.merchant ?? cat.displayName
+                    note: tx.note ?? tx.merchant ?? cat.displayName,
+                    settlementRole: tx.settlementRole
                 )
             }
     }

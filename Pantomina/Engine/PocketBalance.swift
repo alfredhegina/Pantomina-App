@@ -15,9 +15,21 @@ enum PocketBalance {
         var purchaseDate: String
         var realizedDate: String? = nil
         var note: String?
+        /// Settlement theater on a pocket (contribution / receivable / fund_move) — not cash truth.
+        var settlementRole: SettlementRole? = nil
 
         /// Prefer realized date when present (statement-landed), else when it happened.
         var effectiveDate: String { realizedDate ?? purchaseDate }
+
+        /// Loan payments move real pesos; contribution / receivable / fund_move do not for pocket NW.
+        var countsTowardPocket: Bool {
+            switch settlementRole {
+            case .contribution, .receivable, .fundMove:
+                return false
+            case .loanPayment, nil:
+                return true
+            }
+        }
     }
 
     struct Result: Equatable, Sendable {
@@ -131,7 +143,7 @@ enum PocketBalance {
         openingBalanceC: Int
     ) -> [StatementRow] {
         let realized = legs
-            .filter { $0.realizedStatus == .realized }
+            .filter { $0.realizedStatus == .realized && $0.countsTowardPocket }
             .sorted {
                 if $0.effectiveDate != $1.effectiveDate { return $0.effectiveDate < $1.effectiveDate }
                 return $0.purchaseDate < $1.purchaseDate
@@ -157,7 +169,7 @@ enum PocketBalance {
     static func ledgerSum(kind: AccountKind, legs: [Leg]) -> Int {
         let liability = isLiabilityKind(kind)
         return legs
-            .filter { $0.realizedStatus == .realized }
+            .filter { $0.realizedStatus == .realized && $0.countsTowardPocket }
             .reduce(0) { $0 + signedDelta(amountC: $1.amountC, flow: $1.flow, isLiability: liability) }
     }
 

@@ -260,4 +260,40 @@ struct PocketBalanceTests {
         )
         #expect(r.source == .unknown)
     }
+
+    @Test("settlement contribution and receivable do not inflate cash")
+    func settlementTheaterExcluded() {
+        let legs = [
+            leg(amountC: 10_000_00, flow: .income, date: "2026-08-01"),
+            PocketBalance.Leg(
+                amountC: 5_000_00,
+                flow: .transfer,
+                realizedStatus: .realized,
+                purchaseDate: "2026-08-15",
+                settlementRole: .contribution
+            ),
+            PocketBalance.Leg(
+                amountC: 7_000_00,
+                flow: .transfer,
+                realizedStatus: .realized,
+                purchaseDate: "2026-08-15",
+                settlementRole: .receivable
+            ),
+            PocketBalance.Leg(
+                amountC: 1_000_00,
+                flow: .transfer,
+                realizedStatus: .realized,
+                purchaseDate: "2026-08-20",
+                settlementRole: .fundMove
+            ),
+        ]
+        let r = PocketBalance.compute(
+            kind: .cash,
+            legs: legs,
+            loanBalanceC: nil,
+            lastConfirmedC: nil,
+            spokenForC: 0
+        )
+        #expect(r.balanceC == 10_000_00)
+    }
 }

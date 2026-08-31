@@ -75,9 +75,9 @@ struct EmpireView: View {
     private var displayMetrics: Snapshot.Metrics? {
         switch scope {
         case .fern:
-            let lines = fernPockets.map(\.line)
+            let lines = fernMetricLines
             guard !lines.isEmpty || metricsOnlySnapshot(personId: PersonId.fern.rawValue) != nil else { return nil }
-            if lines.isEmpty, let snap = metricsOnlySnapshot(personId: PersonId.fern.rawValue) {
+            if fernPockets.isEmpty, let snap = metricsOnlySnapshot(personId: PersonId.fern.rawValue) {
                 return snap.metrics
             }
             return Snapshot.metrics(
@@ -94,10 +94,19 @@ struct EmpireView: View {
                 lens: .personal
             )
         case .household:
-            let lines = fernPockets.map(\.line) + starkPockets.map(\.line)
+            let lines = fernMetricLines + starkPockets.map(\.line)
             guard !lines.isEmpty else { return nil }
             return Snapshot.metrics(lines: lines, prior: nil, lens: .household)
         }
+    }
+
+    /// Fern pockets plus Love Tab receivable (Settlement) for NW / household netting.
+    private var fernMetricLines: [Snapshot.Line] {
+        var lines = fernPockets.map(\.line)
+        if let love = loveTabLine(asOf: activeAnchor) {
+            lines.append(love)
+        }
+        return lines
     }
 
     private var canLoadFernDemo: Bool {
@@ -382,7 +391,8 @@ struct EmpireView: View {
                     realizedStatus: tx.realizedStatus,
                     purchaseDate: tx.purchaseDate,
                     realizedDate: tx.realizedDate,
-                    note: tx.note ?? tx.merchant
+                    note: tx.note ?? tx.merchant,
+                    settlementRole: tx.settlementRole
                 )
             }
         let spoken = funds.filter { $0.homeAccountId == account.id }.map(\.balanceC).reduce(0, +)
@@ -435,6 +445,36 @@ struct EmpireView: View {
             .sorted { $0.cycleAnchorISO > $1.cycleAnchorISO }
             .first?
             .metrics
+    }
+
+    /// Love Tab running balance as of cycle — asset + internal debt for household netting.
+    private func loveTabLine(asOf cycleISO: String) -> Snapshot.Line? {
+        let rows: [Settlement.LedgerRow] = transactions.map { tx in
+            let account = accounts.first { $0.id == tx.accountId }
+            return Settlement.LedgerRow(
+                realizedDate: tx.realizedDate,
+                realizedStatus: tx.realizedStatus,
+                accountScope: account?.scope ?? .household,
+                allocationStarkC: tx.allocStarkC,
+                allocationFernC: tx.allocFernC,
+                amountC: tx.amountC,
+                settlementRole: tx.settlementRole,
+                isStatement: account?.settlement == .statement,
+                proposedRealizedDate: tx.proposedRealizedDate
+            )
+        }
+        let anchors = Settlement.cycleAnchors(in: rows).filter { $0 <= cycleISO }
+        guard let snap = Settlement.history(rows: rows, anchors: anchors).last,
+              snap.result.tabAfterC > 0
+        else { return nil }
+        return Snapshot.Line(
+            accountId: "love-tab",
+            balanceC: snap.result.tabAfterC,
+            source: .derived,
+            isLiability: false,
+            countsTowardSavingsAssets: false,
+            isInternalDebt: true
+        )
     }
 
     /// Metrics-only demo (no pocket lines) for Spec smoke.
