@@ -179,7 +179,7 @@ struct ReceiptsView: View {
                 titleVisibility: .visible
             ) {
                 if pendingOpeningFund != nil {
-                    Button("Remove fund and this move", role: .destructive) {
+                    Button("Remove fund and all Fund Moves", role: .destructive) {
                         let tx = pendingDelete
                         let fund = pendingOpeningFund
                         pendingDelete = nil
@@ -222,14 +222,14 @@ struct ReceiptsView: View {
         guard let tx = pendingDelete,
               tx.settlementRole == .fundMove,
               let linkedId = tx.linkedId,
-              (tx.note ?? "").contains("· opening")
+              (tx.note ?? "").contains(Fund.openingNoteMarker)
         else { return nil }
         return funds.first { $0.id == linkedId }
     }
 
     private var deleteDialogTitle: String {
         if let fund = pendingOpeningFund {
-            return "This opened \(fund.name). Remove that fund from the War Chest and this Fund Move?"
+            return "This opened \(fund.name). Remove that fund and all its Fund Moves from the War Chest?"
         }
         if pendingDelete?.settlementRole != nil {
             return "This was posted from Bills. Remove it?"
@@ -572,12 +572,21 @@ struct ReceiptsView: View {
     }
 
     private func deleteOpeningFundMove(_ tx: TransactionRecord, fund: FundRecord) {
-        modelContext.delete(tx)
+        let linkedId = fund.id
+        let linkedMoves = transactions.filter {
+            $0.settlementRole == .fundMove && $0.linkedId == linkedId
+        }
+        for move in linkedMoves {
+            modelContext.delete(move)
+        }
+        if !linkedMoves.contains(where: { $0.id == tx.id }) {
+            modelContext.delete(tx)
+        }
         modelContext.delete(fund)
         do {
             try modelContext.save()
             Task { @MainActor in
-                PantominaMotion.run(reduceMotion) { toast = "Removed fund and move." }
+                PantominaMotion.run(reduceMotion) { toast = "Removed fund and moves." }
                 try? await Task.sleep(nanoseconds: 1_200_000_000)
                 PantominaMotion.run(reduceMotion) { toast = nil }
             }

@@ -45,10 +45,13 @@ enum Fund {
         max(0, fund.iousC)
     }
 
-    /// Real cash left for raids after household IOUs.
+    /// Cash still in the envelope for further raids. Raid already dips `balanceC`; do not subtract IOUs again.
     static func effectiveBalanceC(_ fund: Snapshot) -> Int {
-        fund.balanceC - fund.iousC
+        max(0, fund.balanceC)
     }
+
+    /// Note marker for opening Fund Moves (Receipts cascade delete).
+    static let openingNoteMarker = "· opening"
 
     static func raidCandidates(from funds: [Snapshot]) -> [Snapshot] {
         funds

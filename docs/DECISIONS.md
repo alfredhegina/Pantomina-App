@@ -71,7 +71,8 @@ Living log of locked **Baseline** choices and parked **For later** work. The pro
 | 2026-08-31 | War Chest Add UX: **Start a fund** list footer (no leading `+` beside Back); Home picker = Fern asset pockets only (cash/bank/e-wallet/digital bank — no CC/loan); owner stays payer. Contributor funds and Baggage→fund link deferred. | Operate/Emil; §4.10 / §7.7. |
 | 2026-08-31 | War Chest: **When it happened** = Add-style **compact** DatePicker; Start a fund / Top-up / Borrow sheets use **`.large`** detent so the calendar popover dismisses (wheel was a temporary anti-stick hack). | Match Add entry; Operate. |
 | 2026-08-31 | MVP Borrow / raid UI is **absorb only** (payer). Hide Add to contributor’s due; `Fund.Attribution.addToDue` + `commitRaid` branch retained unused. No Stark wallet picker. | Raids = Fern covers bills; add-to-due needs settlement design later. |
-| 2026-08-31 | Receipts: deleting an opening `fund_move` (note `· opening`) confirms **Remove fund and this move** — deletes `FundRecord` + row. No ledger-only path (would leave In the bank wrong). Other fund_moves stay Delete-only without reversing balance. | Operate; TEST GOAL delete left orphan fund. |
+| 2026-08-31 | Receipts: deleting an opening `fund_move` (`Fund.openingNoteMarker`) confirms remove **fund + all linked Fund Moves**. Demo seed fund balances stay ledger-free fixtures until Balance Day. | Operate; avoid orphan moves. |
+| 2026-08-31 | `Fund.effectiveBalanceC` = cash left (`balanceC`); raid already dips balance — do not subtract IOUs again. UI shows In the bank + owed back (no double-count “Feels like”). | Review before merge PR #1. |
 
 ## For later
 
@@ -91,6 +92,7 @@ Do not implement until a human moves the row to Baseline.
 | 2026-08-23 | Web / desktop companion | App Store is the product. |
 | 2026-08-29 | Capacitor + React / Vite rewrite | Only if SwiftUI path is abandoned; inverse of prior For-later SwiftUI row. |
 | 2026-08-31 | Raid **add-to-due** UI (and House cash box posting fix) | Engine `Fund.Attribution.addToDue` retained; re-show after settlement design. Not a Stark wallet picker. |
+| 2026-08-23 | Household-scoped funds | Spec: personal-scope in MVP. |
 | 2026-08-23 | Swappable payer / contributor roles | Spec §7.9. |
 | 2026-08-23 | Third person / family seat | Spec §7.1. |
 | 2026-08-23 | Currency other than PHP | Spec §2. |

@@ -48,9 +48,9 @@ struct FundTests {
         )
     }
 
-    @Test("effective balance is real minus IOUs")
+    @Test("effective balance is cash left in the envelope (raid already dipped balance)")
     func effectiveBalance() {
-        let fund = emergency(balanceC: 50_000_00, iousC: 6_500_00)
+        let fund = emergency(balanceC: 43_500_00, iousC: 6_500_00)
         #expect(Fund.effectiveBalanceC(fund) == 43_500_00)
         #expect(Fund.owedBackC(fund) == 6_500_00)
     }
@@ -79,7 +79,7 @@ struct FundTests {
         #expect(after.iouLog[0].amountC == 6_500_00)
         #expect(after.iouLog[0].repaidC == 0)
         #expect(after.iouLog[0].attribution == .absorb)
-        #expect(Fund.effectiveBalanceC(after) == 37_000_00)
+        #expect(Fund.effectiveBalanceC(after) == 43_500_00)
     }
 
     @Test("raid rejects amount above balance")

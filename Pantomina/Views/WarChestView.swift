@@ -117,6 +117,7 @@ struct WarChestView: View {
             AddFundSheet(
                 fernAccounts: fernAssetPockets,
                 fernName: fernName,
+                starkName: starkName,
                 onCancel: { showAddFund = false },
                 onSave: { name, purpose, homeId, openingC, targetC, dateISO in
                     commitAddFund(
@@ -162,7 +163,7 @@ struct WarChestView: View {
                 TopUpSheet(
                     fundName: fund.name,
                     homeAccountId: fund.homeAccountId,
-                    fernAccounts: fernPersonalAccounts,
+                    fernAccounts: fernAssetPockets,
                     fernName: fernName,
                     starkName: starkName,
                     onCancel: { topUpFundId = nil },
@@ -201,7 +202,6 @@ struct WarChestView: View {
     private func fundCard(_ record: FundRecord) -> some View {
         let snap = record.engineFund
         let owed = Fund.owedBackC(snap)
-        let effective = Fund.effectiveBalanceC(snap)
         let homeLabel = accountById[snap.homeAccountId]?
             .displayLabel(fernName: fernName, starkName: starkName) ?? "Account"
         return VStack(alignment: .leading, spacing: Spacing.sm) {
@@ -229,9 +229,6 @@ struct WarChestView: View {
                         .font(PantominaFont.caption.monospacedDigit())
                         .foregroundStyle(Color.pantomina.terraDeep)
                 }
-                Text("Feels like \(formatPeso(effective))")
-                    .font(PantominaFont.caption)
-                    .foregroundStyle(Color.pantomina.muted)
                 if let whole = Fund.wholeAgainAtISO(
                     fund: snap,
                     monthlyRepayC: max(1, owed / 2),
@@ -308,7 +305,10 @@ struct WarChestView: View {
         targetC: Int?,
         dateISO: String
     ) {
-        guard let catId = fundMoveCategoryId() else { return }
+        guard let catId = fundMoveCategoryId() else {
+            flashToast("Couldn't post — Fund Move category missing.")
+            return
+        }
         let record = FundRecord(
             name: name,
             purpose: purpose,
@@ -324,7 +324,7 @@ struct WarChestView: View {
                 amountC: openingC,
                 categoryId: catId,
                 linkedId: record.id,
-                note: "\(name) · opening",
+                note: "\(name) \(Fund.openingNoteMarker)",
                 dateISO: dateISO
             )
         }
@@ -335,7 +335,10 @@ struct WarChestView: View {
     private func commitTopUp(fund: FundRecord, amountC: Int, fromAccountId: String, dateISO: String) {
         guard let catId = fundMoveCategoryId(),
               let updated = Fund.topUp(to: fund.engineFund, amountC: amountC)
-        else { return }
+        else {
+            flashToast("Couldn't top up — try again.")
+            return
+        }
         fund.apply(updated)
         if fromAccountId != fund.homeAccountId {
             insertFundMove(
@@ -379,7 +382,10 @@ struct WarChestView: View {
                 attribution: attribution
               ),
               let catId = fundMoveCategoryId()
-        else { return }
+        else {
+            flashToast("Couldn't borrow — try again.")
+            return
+        }
 
         record.apply(updated)
 
@@ -481,7 +487,10 @@ struct WarChestView: View {
     private func commitRepay(_ record: FundRecord) {
         guard let amountC = InputBounds.centavos(fromPesosText: repayAmountText), amountC > 0,
               let updated = Fund.repayOldest(in: record.engineFund, amountC: amountC, restoreBalance: true)
-        else { return }
+        else {
+            flashToast("Couldn't repay — try again.")
+            return
+        }
         record.apply(updated)
         try? modelContext.save()
         repayFundId = nil
@@ -515,6 +524,7 @@ struct WarChestView: View {
 private struct AddFundSheet: View {
     let fernAccounts: [AccountRecord]
     let fernName: String
+    let starkName: String
     let onCancel: () -> Void
     let onSave: (String, Fund.Purpose, String, Int, Int?, String) -> Void
 
@@ -542,7 +552,7 @@ private struct AddFundSheet: View {
                     }
                     Picker("Home account", selection: $homeAccountId) {
                         ForEach(fernAccounts, id: \.id) { acct in
-                            Text(acct.displayLabel(fernName: fernName, starkName: "Stark")).tag(acct.id)
+                            Text(acct.displayLabel(fernName: fernName, starkName: starkName)).tag(acct.id)
                         }
                     }
                     TextField("Opening amount", text: $openingText)
