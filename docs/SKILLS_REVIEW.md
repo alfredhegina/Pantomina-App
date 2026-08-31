@@ -261,10 +261,10 @@ Skills: Operate, Humanizer, write-swift TDD. Spec §4.10. Phase locks reused (no
 
 | Piece | Behavior |
 |---|---|
-| Engine | Raid order loan_payoff → sinking → emergency; IOU absorb / add_to_due; repay oldest-first; effective = balance − ious |
+| Engine | Raid order loan_payoff → sinking → emergency; IOU absorb / add_to_due; repay oldest-first; `effectiveBalanceC` = cash left (`balanceC`). add-to-due UI hidden; engine path kept |
 | More | **The War Chest** — fund cards, owed summary, Borrow / Repay sheets |
 | Forecast | Over → “Borrow from a fund” opens War Chest raid (suggested shortfall) |
-| Ledger | `fund_move` home→dest; MVP absorb only (IOU on fund) | add-to-due UI hidden; engine path kept |
+| Ledger | `fund_move` home→dest; MVP absorb only (IOU on fund); add-to-due UI hidden |
 | Seed | Loan payoff · Sinking · Emergency (Fern / BPI Debit) |
 
 **Next:** Slice C (snowball — repay IOUs before sweep).
@@ -289,3 +289,29 @@ Skills: Operate, Humanizer, Emil. Spec §4.10 transfer home → spend pocket.
 | Loan → fund | Deferred (Baggage “Park payoff…”) | Not this polish |
 
 **Next:** Phase 5 Slice C (snowball — IOU repay before sweep). Then Phase 6 Empire / Balance Day.
+
+---
+
+## Phase 5 Slice C — Snowball (2026-08-31)
+
+Skills: Operate, Humanizer, Emil, write-swift TDD. Spec §4.10–4.11.
+
+| Piece | Lock | Push back |
+|---|---|---|
+| Queue home | War Chest **Snowball** section (batch groups; order · batch · strategy) | No third More room; Baggage = register only |
+| Baggage | Read-only order/batch/strategy chips | Edit only on War Chest |
+| Reorder | Row → sheet (order, batch, strategy); **no drag** | Few loans; custom never auto smallest-first |
+| Batches | Lowest batch with actives; then `snowballOrder` | Nil batch = 1; nil order last |
+| Strategy | `prepay` (+ nil) = Park another month OK; `park_to_maturity` = accumulate only | No separate 2× schema field |
+| Sweep | Confirm card: IOUs oldest-first, remainder → loan-payoff; From + date | No silent auto-sweep; Love Tab credit ≠ surplus |
+| Forecast | Breathing room → “Park leftover…” opens Sweep with suggested amount | Mirrors over → Borrow |
+| Ready to pay | Chip when loan-payoff ≥ next monthly → Checklist / Count it | **Not** Statement day (CC realization) |
+| Target bar | Cash progress + terra owed sliver | Slice B polish gap |
+| Engine | `Snowball` + tests before chrome | Phase 5 accept: repay before park |
+| Seed | UB #1 + BPI CC remnant #2 batch 1 | Queue demo |
+
+### Explicit non-changes (Slice C)
+
+Empire / Balance Day; household funds; add-to-due UI; drag-reorder; Statement-day loan payout; funding-tranche rewrite.
+
+**Phase 5 complete** (A+B+C). **Next:** Phase 6 Snapshots & Empire.

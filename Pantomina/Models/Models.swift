@@ -478,6 +478,12 @@ final class LoanRecord {
         statusRaw = result.status.rawValue
     }
 
+    func applySnowball(order: Int?, batch: Int?, strategy: Loan.Strategy?) {
+        snowballOrder = order
+        snowballBatch = batch
+        strategyRaw = strategy?.rawValue
+    }
+
     func appendJournal(dateISO: String, note: String) {
         let current = (try? JSONDecoder().decode([Loan.JournalEntry].self, from: journalJSON)) ?? []
         guard let next = Loan.appendJournal(dateISO: dateISO, note: note, to: current) else { return }

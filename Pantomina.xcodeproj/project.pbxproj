@@ -11,6 +11,8 @@
 		012AB156F8A5D3527E607D82 /* Layout.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB19BB64CC3C1ABB1DF02C4E /* Layout.swift */; };
 		058DF10F5B2262209C6F1C74 /* Primitives.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EFCF0FB550B4A59D85E89E4 /* Primitives.swift */; };
 		06BA394BDDB3D1B2307B9538 /* Fund.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBC592E0853CACC208B9AEB7 /* Fund.swift */; };
+		B2C3D4E5F60718293A4B5C6D /* Snowball.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B5C /* Snowball.swift */; };
+		D4E5F60718293A4B5C6D7E8F /* SnowballTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D4E5F60718293A4B5C6D7E /* SnowballTests.swift */; };
 		0A34303C7A5DC9E6792AB706 /* LoanTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E431724D5AED12D3CAB0985 /* LoanTests.swift */; };
 		0C97F452621DB44225788B57 /* Forecast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F2D8D580EDD694073DBB29F /* Forecast.swift */; };
 		0CC4AD15DA2DEF6DC46FF174 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 750E8203BBAB2B9E6AD5BF54 /* PrivacyInfo.xcprivacy */; };
@@ -137,6 +139,8 @@
 		D9505F4A33598A4C2021201C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		DA78F54A20DB45DBE0FA2FCE /* Fraunces-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fraunces-Italic.ttf"; sourceTree = "<group>"; };
 		DBC592E0853CACC208B9AEB7 /* Fund.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fund.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718293A4B5C /* Snowball.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Snowball.swift; sourceTree = "<group>"; };
+		C3D4E5F60718293A4B5C6D7E /* SnowballTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnowballTests.swift; sourceTree = "<group>"; };
 		E071C8B79EE8A5BEB39FEDFA /* AppEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEnvironment.swift; sourceTree = "<group>"; };
 		E276A67059927F03A430AD05 /* StatementDayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatementDayView.swift; sourceTree = "<group>"; };
 		E6CC6980CF58C89BB7D7B9FE /* AddEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEntryView.swift; sourceTree = "<group>"; };
@@ -198,6 +202,7 @@
 				190A974AB699BA812D8F02DE /* ForecastTests.swift */,
 				9AA2E360ABC5333C5039DEE0 /* FundingTests.swift */,
 				59E2B3D59208996EE80587CF /* FundTests.swift */,
+				C3D4E5F60718293A4B5C6D7E /* SnowballTests.swift */,
 				4C123A96441A24DE527E16E1 /* InputBoundsTests.swift */,
 				29DE9CCC311070037631895C /* LedgerFiltersTests.swift */,
 				3E431724D5AED12D3CAB0985 /* LoanTests.swift */,
@@ -302,6 +307,7 @@
 				8D4D90A0EE53692CCB069F1C /* Domain.swift */,
 				8F2D8D580EDD694073DBB29F /* Forecast.swift */,
 				DBC592E0853CACC208B9AEB7 /* Fund.swift */,
+				A1B2C3D4E5F60718293A4B5C /* Snowball.swift */,
 				309AA4037C7D1B357F4EB7E4 /* Funding.swift */,
 				83F045E3D61777046C8B88BD /* InputBounds.swift */,
 				2B14EF3277DB4072ECEC8D04 /* LedgerFilters.swift */,
@@ -420,6 +426,7 @@
 				BE588C56B3A912055F87FF0F /* Domain.swift in Sources */,
 				0C97F452621DB44225788B57 /* Forecast.swift in Sources */,
 				06BA394BDDB3D1B2307B9538 /* Fund.swift in Sources */,
+				B2C3D4E5F60718293A4B5C6D /* Snowball.swift in Sources */,
 				73A3213BD6F12A181614A4C2 /* Funding.swift in Sources */,
 				7915D32C0B7A596E1FD4BCA3 /* HomeView.swift in Sources */,
 				FD3D73171D3C2B1E21A7E40A /* InputBounds.swift in Sources */,
@@ -459,6 +466,7 @@
 				2B207117194F37A902FCA24C /* DisplayLabelsTests.swift in Sources */,
 				209CE2119FCD9EFDA1CC15A3 /* ForecastTests.swift in Sources */,
 				AA49368812EEFDEE7F9F9C26 /* FundTests.swift in Sources */,
+				D4E5F60718293A4B5C6D7E8F /* SnowballTests.swift in Sources */,
 				9D95DA2FBA609CE89B20740A /* FundingTests.swift in Sources */,
 				FF47120EA49A691C5B2BC666 /* InputBoundsTests.swift in Sources */,
 				4AEF6E6E3900DD2A3842865E /* LedgerFiltersTests.swift in Sources */,

@@ -74,6 +74,8 @@ Living log of locked **Baseline** choices and parked **For later** work. The pro
 | 2026-08-31 | Receipts: deleting an opening `fund_move` (`Fund.openingNoteMarker`) confirms remove **fund + all linked Fund Moves**. Demo seed fund balances stay ledger-free fixtures until Balance Day. | Operate; avoid orphan moves. |
 | 2026-08-31 | `Fund.effectiveBalanceC` = cash left (`balanceC`); raid already dips balance — do not subtract IOUs again. UI shows In the bank + owed back (no double-count “Feels like”). | Review before merge PR #1. |
 | 2026-08-31 | **Ship flow** (`.cursor/rules/ship-flow.mdc`): branch → implement → docs same pass → verify → commit (when asked) → push → PR → review/fix → ready → merge → update local `main`. No PR before push; no deferred docs. | Locked after PR #1; corrects inverted “PR then docs then commit” habit. |
+| 2026-08-31 | **Phase 5 Slice C** UX: War Chest snowball queue + Sweep confirm (IOU repay before loan-payoff park); Baggage chips read-only; Ready to pay → Checklist; Forecast breathing room → Sweep; no drag-reorder; no Statement-day snowball payout. | Skills Operate/Humanizer/Emil; `docs/SKILLS_REVIEW.md`. |
+| 2026-08-31 | **Phase 5 Slice C** shipped: `Snowball` engine (queue/batches, proposeSweep IOU→park, ready-to-pay, park-another-month); War Chest Snowball + Sweep; BPI remnant seed; Forecast leftover link. Phase 5 A+B+C complete. | Spec §4.10 / §6 repay-before-sweep accept. |
 
 ## For later
 

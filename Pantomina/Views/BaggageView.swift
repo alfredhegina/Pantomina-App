@@ -96,6 +96,11 @@ struct BaggageView: View {
                 .foregroundStyle(Color.pantomina.muted)
             Text(snap.purpose)
                 .font(PantominaFont.body)
+            if snap.status == .active {
+                Text(baggageSnowballChips(snap))
+                    .font(PantominaFont.caption)
+                    .foregroundStyle(Color.pantomina.muted)
+            }
             HStack {
                 Text("\(snap.paidMonths)/\(snap.termMonths) months")
                     .font(PantominaFont.caption.monospacedDigit())
@@ -133,6 +138,18 @@ struct BaggageView: View {
     private func aprLabel(_ apr: Double) -> String {
         if apr == 0 { return "0% APR" }
         return String(format: "%.1f%% APR", apr)
+    }
+
+    private func baggageSnowballChips(_ snap: Loan.Snapshot) -> String {
+        let order = snap.snowballOrder.map(String.init) ?? "—"
+        let batch = snap.snowballBatch.map(String.init) ?? "1"
+        let strat: String
+        switch snap.strategy {
+        case .prepay: strat = "Prepay"
+        case .parkToMaturity: strat = "Park to maturity"
+        case .none: strat = "Prepay"
+        }
+        return "#\(order) · Batch \(batch) · \(strat)"
     }
 
     private func journalSheet(_ loan: LoanRecord) -> some View {

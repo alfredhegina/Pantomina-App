@@ -9,7 +9,8 @@ Shared finance for exactly two people — **Fern** (payer) and **Stark** (contri
 
 **Phase 4 complete** — Slice A (Forecast/Checklist) · B (funding) · C (Cookie Jar).  
 **Phase 5 Slice A** — Baggage (loans), Checklist loan tick (Paid from not prefilled), UB Personal fixture.  
-**Phase 5 Slice B** — War Chest: Start a fund (footer), asset-only home, Top-up, Borrow home→spend pocket + note. **Next:** Slice C (snowball).  
+**Phase 5 Slice B** — War Chest: Start a fund (footer), asset-only home, Top-up, Borrow home→spend pocket + note.  
+**Phase 5 Slice C** — Snowball queue, Sweep leftover (IOU before park), Ready to pay → Checklist. **Next:** Phase 6 Empire / Balance Day.  
 **Phase 4 Slice C** — Cookie Jar running balance, who’s-paid, borrow return; jar Add locks Petty Cash + Just mine.  
 **Phase 4 Slice B** — funding + Count it; Keep Doing Add/Edit/Delete + Category; twin PruLife.  
 **Phase 4 Slice A** — Projection / Forecast / Checklist; recurring rules.  

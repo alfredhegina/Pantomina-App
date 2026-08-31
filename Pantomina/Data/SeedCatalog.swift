@@ -159,43 +159,71 @@ enum SeedCatalog {
         )
     }
 
-    /// UB Personal accept fixture (24/60 → ₱628,916.76). Additive.
+    /// UB Personal accept fixture + second snowball demo loan (additive).
     @MainActor
     static func seedDemoLoansIfNeeded(into context: ModelContext) throws {
         let existing = try context.fetch(FetchDescriptor<LoanRecord>())
-        guard !existing.contains(where: { $0.id == "loan-ub-personal" }) else { return }
-
         let accounts = try context.fetch(FetchDescriptor<AccountRecord>())
         let paymentId = accounts.first { $0.baseName == "BPI Debit" && $0.scope == .fern }?.id
             ?? accounts.first { $0.scope == .fern }?.id
             ?? accounts.first?.id
         guard let paymentId else { return }
 
-        context.insert(
-            LoanRecord(
-                id: "loan-ub-personal",
-                lender: "UnionBank",
-                description: "UB Personal Loan",
-                purpose: "Debt consolidation",
-                owner: .fern,
-                principalC: 850_000_00,
-                totalLoanC: 104_819_460,
-                termMonths: 60,
-                paidMonths: 24,
-                monthlyC: 17_469_91,
-                cutoff: 15,
-                startDateISO: "2024-08-15",
-                endDateISO: "2029-08-15",
-                aprPercent: 18.5,
-                snowballOrder: 1,
-                snowballBatch: 1,
-                journal: [
-                    Loan.JournalEntry(dateISO: "2024-08-01", note: "Took the loan to clear high-APR cards.")
-                ],
-                status: .active,
-                paymentAccountId: paymentId
+        if !existing.contains(where: { $0.id == "loan-ub-personal" }) {
+            context.insert(
+                LoanRecord(
+                    id: "loan-ub-personal",
+                    lender: "UnionBank",
+                    description: "UB Personal Loan",
+                    purpose: "Debt consolidation",
+                    owner: .fern,
+                    principalC: 850_000_00,
+                    totalLoanC: 104_819_460,
+                    termMonths: 60,
+                    paidMonths: 24,
+                    monthlyC: 17_469_91,
+                    cutoff: 15,
+                    startDateISO: "2024-08-15",
+                    endDateISO: "2029-08-15",
+                    aprPercent: 18.5,
+                    snowballOrder: 1,
+                    snowballBatch: 1,
+                    strategy: .prepay,
+                    journal: [
+                        Loan.JournalEntry(dateISO: "2024-08-01", note: "Took the loan to clear high-APR cards.")
+                    ],
+                    status: .active,
+                    paymentAccountId: paymentId
+                )
             )
-        )
+        }
+
+        if !existing.contains(where: { $0.id == "loan-bpi-remnant" }) {
+            context.insert(
+                LoanRecord(
+                    id: "loan-bpi-remnant",
+                    lender: "BPI",
+                    description: "BPI CC remnant",
+                    purpose: "Clear the card",
+                    owner: .fern,
+                    principalC: 40_000_00,
+                    totalLoanC: 40_000_00,
+                    termMonths: 8,
+                    paidMonths: 2,
+                    monthlyC: 5_000_00,
+                    cutoff: 30,
+                    startDateISO: "2026-01-30",
+                    endDateISO: "2026-09-30",
+                    aprPercent: 0,
+                    snowballOrder: 2,
+                    snowballBatch: 1,
+                    strategy: .prepay,
+                    journal: [],
+                    status: .active,
+                    paymentAccountId: paymentId
+                )
+            )
+        }
     }
 
     /// Boarder units + demo jar rows (additive). Matches CookieJarTests fixture shape.
