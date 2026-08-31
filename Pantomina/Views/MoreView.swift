@@ -66,6 +66,21 @@ struct MoreView: View {
                 }
 
                 NavigationLink {
+                    WarChestView()
+                } label: {
+                    Label {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("The War Chest")
+                            Text("Funds")
+                                .font(PantominaFont.caption)
+                                .foregroundStyle(Color.pantomina.muted)
+                        }
+                    } icon: {
+                        Image(systemName: "shield.lefthalf.filled")
+                    }
+                }
+
+                NavigationLink {
                     ThingsWeKeepDoingView()
                 } label: {
                     Label {
@@ -83,7 +98,7 @@ struct MoreView: View {
                 Section {
                     EmptyView()
                 } footer: {
-                    Text("Cookie Jar, loans, recurring, Statement day, and settings — War Chest next.")
+                    Text("Cookie Jar, loans, funds, recurring, Statement day, and settings.")
                         .font(PantominaFont.caption)
                 }
             }

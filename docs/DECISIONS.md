@@ -66,6 +66,13 @@ Living log of locked **Baseline** choices and parked **For later** work. The pro
 | 2026-08-30 | **Phase 5 UX locks (pre-build):** More → Baggage + War Chest first-class; Baggage derived balance only (no hand-type); Checklist loan via Count it; raid sheet intentional (absorb default); snowball confirm + IOU repay before sweep; engines/fixtures before chrome. Funding tranche posts unchanged. | Skills Operate/Humanizer/Emil; `docs/SKILLS_REVIEW.md`. |
 | 2026-08-30 | **Phase 5 Slice A** shipped: `Loan` engine + `LoanRecord`; More → Baggage We're Carrying (active/archive/journal); Checklist `loan_payment` + Count it bumps `paidMonths`; UB Personal seed 24/60 → ₱628,916.76. | Spec §4.11 / §6 accept. |
 | 2026-08-30 | Loan Count it: **Paid from starts empty** (Choose) — no prefill from `paymentAccountId`. Count it sheet binds `countIt ?? item` so account pick updates on first return. Checklist toggle stays on while Count it is open (`pendingTaskId` + same-frame `armedTaskId`). | Operate; avoid false “retention” from seed default; sheet(item) nil flash. |
+| 2026-08-31 | **Phase 5 Slice B** shipped: `Fund` engine (raid order, IOU absorb/add-to-due, repay oldest-first); `FundRecord` + demo Loan payoff / Sinking / Emergency; More → War Chest; Forecast over → Borrow sheet; fund_move ledger + optional Stark due. | Spec §4.10 accept: raid IOU attribution. |
+| 2026-08-31 | War Chest: **Add fund** + **Top-up** (ledger Fund Move + `balanceC`); cards show home account; Borrow picks **destination** (Fern cash/bank/e-wallet) with two-leg Fund Move home→dest + free-text use note (default Cover bills). Repay still fund-record only (no reverse ledger yet). | Operate; envelopes need real setup; Phase 6 owns account balances. |
+| 2026-08-31 | War Chest Add UX: **Start a fund** list footer (no leading `+` beside Back); Home picker = Fern asset pockets only (cash/bank/e-wallet/digital bank — no CC/loan); owner stays payer. Contributor funds and Baggage→fund link deferred. | Operate/Emil; §4.10 / §7.7. |
+| 2026-08-31 | War Chest: **When it happened** = Add-style **compact** DatePicker; Start a fund / Top-up / Borrow sheets use **`.large`** detent so the calendar popover dismisses (wheel was a temporary anti-stick hack). | Match Add entry; Operate. |
+| 2026-08-31 | MVP Borrow / raid UI is **absorb only** (payer). Hide Add to contributor’s due; `Fund.Attribution.addToDue` + `commitRaid` branch retained unused. No Stark wallet picker. | Raids = Fern covers bills; add-to-due needs settlement design later. |
+| 2026-08-31 | Receipts: deleting an opening `fund_move` (`Fund.openingNoteMarker`) confirms remove **fund + all linked Fund Moves**. Demo seed fund balances stay ledger-free fixtures until Balance Day. | Operate; avoid orphan moves. |
+| 2026-08-31 | `Fund.effectiveBalanceC` = cash left (`balanceC`); raid already dips balance — do not subtract IOUs again. UI shows In the bank + owed back (no double-count “Feels like”). | Review before merge PR #1. |
 
 ## For later
 
@@ -84,6 +91,7 @@ Do not implement until a human moves the row to Baseline.
 | 2026-08-23 | Dark mode | Spec is light mode only. |
 | 2026-08-23 | Web / desktop companion | App Store is the product. |
 | 2026-08-29 | Capacitor + React / Vite rewrite | Only if SwiftUI path is abandoned; inverse of prior For-later SwiftUI row. |
+| 2026-08-31 | Raid **add-to-due** UI (and House cash box posting fix) | Engine `Fund.Attribution.addToDue` retained; re-show after settlement design. Not a Stark wallet picker. |
 | 2026-08-23 | Household-scoped funds | Spec: personal-scope in MVP. |
 | 2026-08-23 | Swappable payer / contributor roles | Spec §7.9. |
 | 2026-08-23 | Third person / family seat | Spec §7.1. |

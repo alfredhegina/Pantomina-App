@@ -486,6 +486,76 @@ final class LoanRecord {
 }
 
 @Model
+final class FundRecord {
+    @Attribute(.unique) var id: String
+    var name: String
+    var purposeRaw: String
+    var ownerRaw: String
+    var homeAccountId: String
+    var targetC: Int?
+    var balanceC: Int
+    var iousC: Int
+    var iouLogJSON: Data
+    var raidOrder: Int
+
+    init(
+        id: String = UUID().uuidString,
+        name: String,
+        purpose: Fund.Purpose,
+        owner: PersonId = .fern,
+        homeAccountId: String,
+        targetC: Int? = nil,
+        balanceC: Int,
+        iousC: Int = 0,
+        iouLog: [Fund.IOUEntry] = [],
+        raidOrder: Int? = nil
+    ) {
+        self.id = id
+        self.name = name
+        self.purposeRaw = purpose.rawValue
+        self.ownerRaw = owner.rawValue
+        self.homeAccountId = homeAccountId
+        self.targetC = targetC
+        self.balanceC = balanceC
+        self.iousC = iousC
+        self.iouLogJSON = (try? JSONEncoder().encode(iouLog)) ?? Data("[]".utf8)
+        self.raidOrder = raidOrder ?? Fund.defaultRaidOrder(for: purpose)
+    }
+
+    var purpose: Fund.Purpose {
+        Fund.Purpose(rawValue: purposeRaw) ?? .emergency
+    }
+
+    var engineFund: Fund.Snapshot {
+        let log = (try? JSONDecoder().decode([Fund.IOUEntry].self, from: iouLogJSON)) ?? []
+        return Fund.Snapshot(
+            id: id,
+            name: name,
+            purpose: purpose,
+            owner: PersonId(rawValue: ownerRaw) ?? .fern,
+            homeAccountId: homeAccountId,
+            targetC: targetC,
+            balanceC: balanceC,
+            iousC: iousC,
+            iouLog: log,
+            raidOrder: raidOrder
+        )
+    }
+
+    func apply(_ snapshot: Fund.Snapshot) {
+        name = snapshot.name
+        purposeRaw = snapshot.purpose.rawValue
+        ownerRaw = snapshot.owner.rawValue
+        homeAccountId = snapshot.homeAccountId
+        targetC = snapshot.targetC
+        balanceC = snapshot.balanceC
+        iousC = snapshot.iousC
+        iouLogJSON = (try? JSONEncoder().encode(snapshot.iouLog)) ?? iouLogJSON
+        raidOrder = snapshot.raidOrder
+    }
+}
+
+@Model
 final class AppMeta {
     @Attribute(.unique) var key: String
     var onboardingComplete: Bool

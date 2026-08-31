@@ -8,6 +8,7 @@ struct ReceiptsView: View {
     @Query private var accounts: [AccountRecord]
     @Query private var categories: [CategoryRecord]
     @Query private var people: [PersonRecord]
+    @Query private var funds: [FundRecord]
 
     @State private var personFilter: PersonId?
     @State private var scopeFilter: Scope?
@@ -177,11 +178,25 @@ struct ReceiptsView: View {
                 ),
                 titleVisibility: .visible
             ) {
-                Button("Remove", role: .destructive) {
-                    if let tx = pendingDelete {
-                        deleteTransaction(tx)
+                if pendingOpeningFund != nil {
+                    Button("Remove fund and all Fund Moves", role: .destructive) {
+                        let tx = pendingDelete
+                        let fund = pendingOpeningFund
+                        pendingDelete = nil
+                        Task { @MainActor in
+                            if let tx, let fund {
+                                deleteOpeningFundMove(tx, fund: fund)
+                            }
+                        }
                     }
-                    pendingDelete = nil
+                } else {
+                    Button("Remove", role: .destructive) {
+                        let tx = pendingDelete
+                        pendingDelete = nil
+                        Task { @MainActor in
+                            if let tx { deleteTransaction(tx) }
+                        }
+                    }
                 }
                 Button("Cancel", role: .cancel) {
                     pendingDelete = nil
@@ -202,7 +217,20 @@ struct ReceiptsView: View {
         }
     }
 
+    /// Opening Fund Move that created a War Chest fund — ledger-only delete leaves In the bank wrong.
+    private var pendingOpeningFund: FundRecord? {
+        guard let tx = pendingDelete,
+              tx.settlementRole == .fundMove,
+              let linkedId = tx.linkedId,
+              (tx.note ?? "").contains(Fund.openingNoteMarker)
+        else { return nil }
+        return funds.first { $0.id == linkedId }
+    }
+
     private var deleteDialogTitle: String {
+        if let fund = pendingOpeningFund {
+            return "This opened \(fund.name). Remove that fund and all its Fund Moves from the War Chest?"
+        }
         if pendingDelete?.settlementRole != nil {
             return "This was posted from Bills. Remove it?"
         }
@@ -540,6 +568,34 @@ struct ReceiptsView: View {
             }
         } catch {
             contributionEditError = "Couldn't save. Try again."
+        }
+    }
+
+    private func deleteOpeningFundMove(_ tx: TransactionRecord, fund: FundRecord) {
+        let linkedId = fund.id
+        let linkedMoves = transactions.filter {
+            $0.settlementRole == .fundMove && $0.linkedId == linkedId
+        }
+        for move in linkedMoves {
+            modelContext.delete(move)
+        }
+        if !linkedMoves.contains(where: { $0.id == tx.id }) {
+            modelContext.delete(tx)
+        }
+        modelContext.delete(fund)
+        do {
+            try modelContext.save()
+            Task { @MainActor in
+                PantominaMotion.run(reduceMotion) { toast = "Removed fund and moves." }
+                try? await Task.sleep(nanoseconds: 1_200_000_000)
+                PantominaMotion.run(reduceMotion) { toast = nil }
+            }
+        } catch {
+            Task { @MainActor in
+                PantominaMotion.run(reduceMotion) { toast = "Couldn't remove. Try again." }
+                try? await Task.sleep(nanoseconds: 1_400_000_000)
+                PantominaMotion.run(reduceMotion) { toast = nil }
+            }
         }
     }
 
