@@ -325,6 +325,8 @@ Skills: Operate, Humanizer, Emil, clarify.
 | List meta | `Pay next · #n · Batch · strategy · monthly` | Teach custom order |
 | Ready to pay | “Loan payoff covers…” / Bills → Checklist → Count it | No “from” (not From pocket) |
 | Engine / seed order | Unchanged | Spec custom order |
+| Strategy display | **Stash extras** / **On schedule only** via `DisplayLabels.loanStrategy` | Engine keeps `prepay` / `park_to_maturity`; “Park another month” action name stays |
+| Batch chrome | Hide Batch on list/edit while every active loan is wave 1; **Pay in a later wave…** reveals field | Engine batches unchanged |
 
 ### Explicit non-changes (Slice C)
 

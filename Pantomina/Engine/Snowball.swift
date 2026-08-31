@@ -29,6 +29,17 @@ enum Snowball {
             }
     }
 
+    /// Show Batch chrome only when more than one wave is in play (any batch ≠ 1, or 2+ distinct batches).
+    static func showsBatchChrome(loans: [Loan.Snapshot]) -> Bool {
+        let batches = Set(
+            loans
+                .filter { $0.status == .active }
+                .map { $0.snowballBatch ?? 1 }
+        )
+        guard !batches.isEmpty else { return false }
+        return batches.count > 1 || batches.contains(where: { $0 != 1 })
+    }
+
     static func nextTargetMonthlyC(loans: [Loan.Snapshot]) -> Int? {
         orderedQueue(loans: loans).first?.monthlyC
     }

@@ -106,4 +106,21 @@ enum DisplayLabels {
             return "Paid"
         }
     }
+
+    /// Snowball strategy — plain names; engine still stores `prepay` / `park_to_maturity`.
+    static func loanStrategy(_ strategy: Loan.Strategy?) -> String {
+        switch strategy {
+        case .parkToMaturity: return "On schedule only"
+        case .prepay, .none: return "Stash extras"
+        }
+    }
+
+    static func loanStrategyFooter(_ strategy: Loan.Strategy) -> String {
+        switch strategy {
+        case .parkToMaturity:
+            return "On schedule only — Checklist payments only; no extra stash into Loan payoff."
+        case .prepay:
+            return "Stash extras — OK to put another month into Loan payoff."
+        }
+    }
 }

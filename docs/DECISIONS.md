@@ -79,6 +79,8 @@ Living log of locked **Baseline** choices and parked **For later** work. The pro
 | 2026-08-31 | Park another month: **confirm sheet** with From (default loan-payoff home) + date; Sweep From defaults to same home. No silent first Cash pocket. | Follow-the-money; Operate. |
 | 2026-08-31 | **Accounting map gate** (`.cursor/rules/accounting-map.mdc`): before any money-moving feature, name pockets / envelope / ledger legs and report followability; push back if it worsens dual books or same-sign transfer theater. | Charts/reports must follow the money. |
 | 2026-08-31 | Snowball edit chrome: sheet **Edit payoff order**; labeled Order/Batch sections; list `Pay next · #`; Ready to pay copy without “from”. | Operate/Humanizer; unlabeled twin fields. |
+| 2026-08-31 | Loan strategy **display**: Stash extras / On schedule only (`DisplayLabels`); raw `prepay` / `park_to_maturity` unchanged. | Humanizer; Prepay/Park-to-maturity jargon. |
+| 2026-08-31 | Snowball **Batch** UI hidden until a later wave exists (`Snowball.showsBatchChrome`); edit offers “Pay in a later wave…”. | Operate; one-wave demos. |
 
 ## For later
 

@@ -142,13 +142,12 @@ struct BaggageView: View {
 
     private func baggageSnowballChips(_ snap: Loan.Snapshot) -> String {
         let order = snap.snowballOrder.map(String.init) ?? "—"
-        let batch = snap.snowballBatch.map(String.init) ?? "1"
-        let strat: String
-        switch snap.strategy {
-        case .parkToMaturity: strat = "Park to maturity"
-        case .prepay, .none: strat = "Prepay"
+        var parts = ["Pay next · #\(order)"]
+        if Snowball.showsBatchChrome(loans: loans.map(\.engineLoan)) {
+            parts.append("Batch \(snap.snowballBatch.map(String.init) ?? "1")")
         }
-        return "Pay next · #\(order) · Batch \(batch) · \(strat)"
+        parts.append(DisplayLabels.loanStrategy(snap.strategy))
+        return parts.joined(separator: " · ")
     }
 
     private func journalSheet(_ loan: LoanRecord) -> some View {

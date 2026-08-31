@@ -205,4 +205,19 @@ struct SnowballTests {
         #expect(Snowball.parkAnotherMonthAmountC(loan: park) == nil)
         #expect(Snowball.parkAnotherMonthAmountC(loan: unset) == 5_000_00)
     }
+
+    @Test("batch chrome stays hidden when every active loan is batch 1")
+    func showsBatchChrome() {
+        let singleWave = [
+            loan(id: "a", order: 1, batch: 1),
+            loan(id: "b", order: 2, batch: nil),
+        ]
+        #expect(!Snowball.showsBatchChrome(loans: singleWave))
+        let twoWaves = [
+            loan(id: "a", order: 1, batch: 1),
+            loan(id: "b", order: 1, batch: 2),
+        ]
+        #expect(Snowball.showsBatchChrome(loans: twoWaves))
+        #expect(Snowball.showsBatchChrome(loans: [loan(id: "c", order: 1, batch: 3)]))
+    }
 }

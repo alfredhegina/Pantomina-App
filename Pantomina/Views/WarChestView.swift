@@ -266,6 +266,7 @@ struct WarChestView: View {
             if let id = editLoanId, let loan = loans.first(where: { $0.id == id }) {
                 EditSnowballSheet(
                     loan: loan,
+                    showBatchChrome: Snowball.showsBatchChrome(loans: loans.map(\.engineLoan)),
                     onCancel: { editLoanId = nil },
                     onSave: { order, batch, strategy in
                         loan.applySnowball(order: order, batch: batch, strategy: strategy)
@@ -358,17 +359,19 @@ struct WarChestView: View {
         .padding(.vertical, 4)
     }
 
-    private func snowballMetaLabel(_ snap: Loan.Snapshot) -> String {
-        let order = snap.snowballOrder.map(String.init) ?? "—"
-        let batch = snap.snowballBatch.map(String.init) ?? "1"
-        return "Pay next · #\(order) · Batch \(batch) · \(Self.strategyPlainLabel(snap.strategy)) · \(formatPeso(snap.monthlyC))/mo"
+    private var showBatchInMeta: Bool {
+        Snowball.showsBatchChrome(loans: loans.map(\.engineLoan))
     }
 
-    private static func strategyPlainLabel(_ strategy: Loan.Strategy?) -> String {
-        switch strategy {
-        case .parkToMaturity: return "Park to maturity"
-        case .prepay, .none: return "Prepay"
+    private func snowballMetaLabel(_ snap: Loan.Snapshot) -> String {
+        let order = snap.snowballOrder.map(String.init) ?? "—"
+        var parts = ["Pay next · #\(order)"]
+        if showBatchInMeta {
+            parts.append("Batch \(snap.snowballBatch.map(String.init) ?? "1")")
         }
+        parts.append(DisplayLabels.loanStrategy(snap.strategy))
+        parts.append("\(formatPeso(snap.monthlyC))/mo")
+        return parts.joined(separator: " · ")
     }
 
     private func fundCard(_ record: FundRecord) -> some View {
@@ -1324,12 +1327,16 @@ private struct ParkMonthSheet: View {
 
 private struct EditSnowballSheet: View {
     let loan: LoanRecord
+    let showBatchChrome: Bool
     let onCancel: () -> Void
     let onSave: (Int?, Int?, Loan.Strategy?) -> Void
 
     @State private var orderText = ""
     @State private var batchText = ""
     @State private var strategy: Loan.Strategy = .prepay
+    @State private var revealBatch = false
+
+    private var batchVisible: Bool { showBatchChrome || revealBatch }
 
     var body: some View {
         NavigationStack {
@@ -1343,29 +1350,48 @@ private struct EditSnowballSheet: View {
                     TextField("Number", text: $orderText)
                         .keyboardType(.numberPad)
                 } header: {
-                    Text("Pay next (order)")
+                    Text(batchVisible ? "Pay next (order)" : "Pay next")
                 } footer: {
-                    Text("1 = first in this batch. Custom — not smallest balance first.")
-                        .font(PantominaFont.caption)
+                    Text(
+                        batchVisible
+                            ? "1 = first in this batch. Custom — not smallest balance first."
+                            : "1 = first to pay. Custom — not smallest balance first."
+                    )
+                    .font(PantominaFont.caption)
                 }
 
-                Section {
-                    TextField("Number", text: $batchText)
-                        .keyboardType(.numberPad)
-                } header: {
-                    Text("Batch")
-                } footer: {
-                    Text("Finish every loan in batch 1 before batch 2 starts.")
-                        .font(PantominaFont.caption)
+                if batchVisible {
+                    Section {
+                        TextField("Number", text: $batchText)
+                            .keyboardType(.numberPad)
+                    } header: {
+                        Text("Later wave (batch)")
+                    } footer: {
+                        Text("Finish every loan in batch 1 before batch 2 starts.")
+                            .font(PantominaFont.caption)
+                    }
+                } else {
+                    Section {
+                        Button("Pay in a later wave…") {
+                            revealBatch = true
+                            if batchText.isEmpty || batchText == "1" {
+                                batchText = "2"
+                            }
+                        }
+                        .foregroundStyle(Color.pantomina.sageDeep)
+                    } footer: {
+                        Text("Optional — most people stay in one wave.")
+                            .font(PantominaFont.caption)
+                    }
                 }
 
                 Section {
                     Picker("Strategy", selection: $strategy) {
-                        Text("Prepay").tag(Loan.Strategy.prepay)
-                        Text("Park to maturity").tag(Loan.Strategy.parkToMaturity)
+                        Text(DisplayLabels.loanStrategy(.prepay)).tag(Loan.Strategy.prepay)
+                        Text(DisplayLabels.loanStrategy(.parkToMaturity)).tag(Loan.Strategy.parkToMaturity)
                     }
                 } footer: {
-                    Text(strategyFooter)
+                    Text(DisplayLabels.loanStrategyFooter(strategy))
                         .font(PantominaFont.caption)
                 }
             }
@@ -1378,7 +1404,12 @@ private struct EditSnowballSheet: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
                         let order = Int(orderText.trimmingCharacters(in: .whitespaces))
-                        let batch = Int(batchText.trimmingCharacters(in: .whitespaces))
+                        let batch: Int?
+                        if batchVisible {
+                            batch = Int(batchText.trimmingCharacters(in: .whitespaces))
+                        } else {
+                            batch = loan.snowballBatch ?? 1
+                        }
                         onSave(order, batch, strategy)
                     }
                     .fontWeight(.semibold)
@@ -1388,17 +1419,9 @@ private struct EditSnowballSheet: View {
                 orderText = loan.snowballOrder.map(String.init) ?? ""
                 batchText = loan.snowballBatch.map(String.init) ?? "1"
                 strategy = loan.engineLoan.strategy ?? .prepay
+                revealBatch = false
             }
         }
         .presentationDetents([.large])
-    }
-
-    private var strategyFooter: String {
-        switch strategy {
-        case .parkToMaturity:
-            return "Park to maturity — schedule only; no extra park into Loan payoff."
-        case .prepay:
-            return "Prepay — OK to park another month into Loan payoff."
-        }
     }
 }
