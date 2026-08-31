@@ -52,6 +52,7 @@
 		99092C2481DEA3667FA8F532 /* CookieJarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45C5859EB08FEC5AFA36B722 /* CookieJarTests.swift */; };
 		99111A488DF210754F7ACCCD /* MoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB543846A4324090D51BE2F8 /* MoreView.swift */; };
 		9D95DA2FBA609CE89B20740A /* FundingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AA2E360ABC5333C5039DEE0 /* FundingTests.swift */; };
+		9F6E2B514A152798EAC12C57 /* PocketBalance.swift in Sources */ = {isa = PBXBuildFile; fileRef = C346E1FD7CEFC21F3EA1BD74 /* PocketBalance.swift */; };
 		A22129503D531F3A241A3AB0 /* EmpireView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3354A84A81642BB84FC34FD4 /* EmpireView.swift */; };
 		A3E9A16CD286D09B7BE70ADA /* SnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 563EF0A949E8360B76391790 /* SnapshotTests.swift */; };
 		A5ADB0AF24C90E23F113AE14 /* SeedCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F25187A8EBD065FB0589B4 /* SeedCatalog.swift */; };
@@ -60,6 +61,7 @@
 		B997C3A666C2A4AEBE062F2E /* MoneyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D52988F0894815DC945A48B0 /* MoneyTests.swift */; };
 		BA40269CE56BAA95A5F75CA2 /* ThingsWeKeepDoingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1D312E74CC27D7FAE618E5 /* ThingsWeKeepDoingView.swift */; };
 		BE588C56B3A912055F87FF0F /* Domain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D4D90A0EE53692CCB069F1C /* Domain.swift */; };
+		C1DC4A560BFED47B370A416D /* PocketMiniReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A17BB49D2ACC9E7787F7697 /* PocketMiniReportView.swift */; };
 		C3E95F51368FD5AAA375FDE0 /* AddEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6CC6980CF58C89BB7D7B9FE /* AddEntryView.swift */; };
 		C785A5D2A018E4B9F1939EA5 /* PortfolioFern0820.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC687119248BEDCE63857E36 /* PortfolioFern0820.swift */; };
 		C86288BAE355CC266DE5934F /* BalanceDayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD00C582ADA8430A87413CC1 /* BalanceDayView.swift */; };
@@ -69,6 +71,7 @@
 		D4FF2F58E06191B7E02C2E76 /* Settlement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48FB7376E78D3CE23F7A083B /* Settlement.swift */; };
 		D6E7015F5A609B97D9B8BB33 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9910C65AB0FB2798C53F726A /* Colors.swift */; };
 		E0C377C58755068A82209407 /* Fraunces-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DA78F54A20DB45DBE0FA2FCE /* Fraunces-Italic.ttf */; };
+		E6647E51EB82E578F77194A8 /* PocketBalanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 138C2F792DE0D571761F11F8 /* PocketBalanceTests.swift */; };
 		ED1981E2EB7ABD01F59A5446 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99353A11AE11E00DBA319353 /* RootView.swift */; };
 		F4983B225917F823224DCD36 /* StatementDayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E276A67059927F03A430AD05 /* StatementDayView.swift */; };
 		F8029B79A3F40A55DD3AB987 /* Snowball.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CB2D55CD2258737ECD53836 /* Snowball.swift */; };
@@ -94,6 +97,7 @@
 		11D28B0D4036AD013C2CD12A /* CookieJar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieJar.swift; sourceTree = "<group>"; };
 		12C002964A17D10C56E3CA2F /* BillsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillsView.swift; sourceTree = "<group>"; };
 		13494702B3F803138913FE88 /* CoAMigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoAMigrationTests.swift; sourceTree = "<group>"; };
+		138C2F792DE0D571761F11F8 /* PocketBalanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PocketBalanceTests.swift; sourceTree = "<group>"; };
 		1561D7E09988563B27DBCE28 /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
 		16D33F221EAD453469584BA0 /* Projection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Projection.swift; sourceTree = "<group>"; };
 		190A974AB699BA812D8F02DE /* ForecastTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForecastTests.swift; sourceTree = "<group>"; };
@@ -113,6 +117,7 @@
 		45C5859EB08FEC5AFA36B722 /* CookieJarTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieJarTests.swift; sourceTree = "<group>"; };
 		479074B3B89012A210820BA1 /* BaggageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaggageView.swift; sourceTree = "<group>"; };
 		48FB7376E78D3CE23F7A083B /* Settlement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settlement.swift; sourceTree = "<group>"; };
+		4A17BB49D2ACC9E7787F7697 /* PocketMiniReportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PocketMiniReportView.swift; sourceTree = "<group>"; };
 		4C123A96441A24DE527E16E1 /* InputBoundsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputBoundsTests.swift; sourceTree = "<group>"; };
 		563EF0A949E8360B76391790 /* SnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotTests.swift; sourceTree = "<group>"; };
 		567E6985C02435A4FC2F7323 /* SettlementTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettlementTests.swift; sourceTree = "<group>"; };
@@ -141,6 +146,7 @@
 		B8802F7FAF45C57F3285ECBF /* Realization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Realization.swift; sourceTree = "<group>"; };
 		B8C5305498BDA3098A03D2A1 /* Money.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Money.swift; sourceTree = "<group>"; };
 		BD00C582ADA8430A87413CC1 /* BalanceDayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BalanceDayView.swift; sourceTree = "<group>"; };
+		C346E1FD7CEFC21F3EA1BD74 /* PocketBalance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PocketBalance.swift; sourceTree = "<group>"; };
 		C3E691C1BF781061756C3D47 /* AllocationDefaultsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllocationDefaultsTests.swift; sourceTree = "<group>"; };
 		C4923488F708E4B94BBF1653 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		C8F25187A8EBD065FB0589B4 /* SeedCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeedCatalog.swift; sourceTree = "<group>"; };
@@ -218,6 +224,7 @@
 				29DE9CCC311070037631895C /* LedgerFiltersTests.swift */,
 				3E431724D5AED12D3CAB0985 /* LoanTests.swift */,
 				D52988F0894815DC945A48B0 /* MoneyTests.swift */,
+				138C2F792DE0D571761F11F8 /* PocketBalanceTests.swift */,
 				32D10F884E0E1ADBD27A1EED /* PortfolioFern0820Tests.swift */,
 				CE4A7B2968307E483CC3586C /* ProjectionTests.swift */,
 				696CD15F7EFEAC0E10BE6B3A /* RealizationTests.swift */,
@@ -258,6 +265,7 @@
 				C4923488F708E4B94BBF1653 /* HomeView.swift */,
 				EB543846A4324090D51BE2F8 /* MoreView.swift */,
 				26660CD12EC0C748508FB5B6 /* OnboardingView.swift */,
+				4A17BB49D2ACC9E7787F7697 /* PocketMiniReportView.swift */,
 				9249B8779319C89636800F82 /* ReceiptsView.swift */,
 				99353A11AE11E00DBA319353 /* RootView.swift */,
 				B823599C2B79C430C92D7047 /* SettingsView.swift */,
@@ -328,6 +336,7 @@
 				2B14EF3277DB4072ECEC8D04 /* LedgerFilters.swift */,
 				9DBB89F0C10C598F85F1F68F /* Loan.swift */,
 				B8C5305498BDA3098A03D2A1 /* Money.swift */,
+				C346E1FD7CEFC21F3EA1BD74 /* PocketBalance.swift */,
 				FC687119248BEDCE63857E36 /* PortfolioFern0820.swift */,
 				16D33F221EAD453469584BA0 /* Projection.swift */,
 				B8802F7FAF45C57F3285ECBF /* Realization.swift */,
@@ -457,6 +466,8 @@
 				99111A488DF210754F7ACCCD /* MoreView.swift in Sources */,
 				F987A6153F784EEFDEB25060 /* OnboardingView.swift in Sources */,
 				502E098278508D5D20B01FB5 /* PantominaApp.swift in Sources */,
+				9F6E2B514A152798EAC12C57 /* PocketBalance.swift in Sources */,
+				C1DC4A560BFED47B370A416D /* PocketMiniReportView.swift in Sources */,
 				C785A5D2A018E4B9F1939EA5 /* PortfolioFern0820.swift in Sources */,
 				058DF10F5B2262209C6F1C74 /* Primitives.swift in Sources */,
 				CBE7FD8D2FF241AA81FB0CF9 /* Projection.swift in Sources */,
@@ -493,6 +504,7 @@
 				4AEF6E6E3900DD2A3842865E /* LedgerFiltersTests.swift in Sources */,
 				0A34303C7A5DC9E6792AB706 /* LoanTests.swift in Sources */,
 				B997C3A666C2A4AEBE062F2E /* MoneyTests.swift in Sources */,
+				E6647E51EB82E578F77194A8 /* PocketBalanceTests.swift in Sources */,
 				CE576D5089177ACCF4BBC588 /* PortfolioFern0820Tests.swift in Sources */,
 				84399DE14D44303C7217D9E7 /* ProjectionTests.swift in Sources */,
 				678AE2B0BC20F179C4F9E02D /* RealizationTests.swift in Sources */,

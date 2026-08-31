@@ -436,3 +436,36 @@ Skills: Operate, Humanizer. Fixes nested Personal/Household under Fern/Stark.
 | Demo | Load Fern 08/20 only when Fern has no snapshots; prefer lined check-in over metrics-only for display | Don’t use empty demo as Balance Day prior |
 
 **Next:** Slice B (Empire charts) → C (YTD / drift / Money Sleeps).
+
+---
+
+## Empire dashboard reshape (2026-08-31)
+
+Skills: Operate, Humanizer, accounting-map, write-swift TDD. Spec §4.6 kept; corrects Slice A hand-type-everything.
+
+| Piece | Lock | Push back |
+|---|---|---|
+| Empire | Read-only dashboard — live metrics + pocket list | Not a balance form |
+| PocketBalance | Ledger-known from legs; loan derived; externals lastConfirmed; spoken-for display-only | Don’t naive-sum Fund Move as income |
+| Balance Day | Thin — `investment` / `savingsAsset` / `govMandated` only; empty placeholder (not `0.00`) | Omit derived rows |
+| Shared | Fern confirms Shared once; Stark = personal only | No double-confirm / double-count |
+| Mini-report | Tap pocket → sheet (running balance, recent legs, spoken-for); no edit | Full browser = Money Sleeps (C) |
+| Demo | Portfolio-Fern metrics-only still loadable; live lines preferred when present | |
+
+**Next:** Slice B (Empire charts) → C (YTD / drift / Money Sleeps).
+
+---
+
+## Empire cycle as-of (2026-08-31)
+
+Skills: Operate, Humanizer, accounting-map. Spec §4.6 per-cycle check-in.
+
+| Piece | Lock | Push back |
+|---|---|---|
+| Control | Bills-style **Cycle** Menu under Fern·Stark·Household | Not free from–to; not “statement date” on Empire |
+| Balance | **As-of** selected cycle end (`realizedDate ?? purchaseDate` ≤ end) | In-window-only sum would wipe pocket NW |
+| Mini-report | Opening + legs in `(prevAnchor, selected]` | Full history stays on Receipts |
+| Missing snapshot | Live PocketBalance as-of | Don’t require check-in to see ledger pockets |
+| Balance Day | Stamps Empire’s selected `cycleISO` | Today-only stamp wrong when browsing prior cycle |
+
+**Next:** Slice B (Empire charts) → C (YTD / drift / Money Sleeps).

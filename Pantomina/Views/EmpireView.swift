@@ -10,61 +10,128 @@ struct EmpireView: View {
         var id: String { rawValue }
     }
 
+    private struct PocketRow: Identifiable {
+        var id: String { account.id }
+        var account: AccountRecord
+        var pocket: PocketBalance.Result
+        var line: Snapshot.Line
+    }
+
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \SnapshotRecord.confirmedAt, order: .reverse) private var snapshots: [SnapshotRecord]
     @Query private var people: [PersonRecord]
+    @Query private var accounts: [AccountRecord]
+    @Query private var loans: [LoanRecord]
+    @Query private var funds: [FundRecord]
+    @Query private var transactions: [TransactionRecord]
+    @Query private var categories: [CategoryRecord]
 
     @State private var scope: ScopeTab = .fern
-    /// Last personal tab — Balance Day is always one person’s check-in.
     @State private var balanceDayPerson: PersonId = .fern
     @State private var showBalanceDay = false
+    @State private var miniReport: PocketRow?
+    @State private var selectedAnchor: String?
 
     private var fernName: String { people.first { $0.id == .fern }?.name ?? "Fern" }
     private var starkName: String { people.first { $0.id == .stark }?.name ?? "Stark" }
 
-    private var latestFern: SnapshotRecord? {
-        preferredPersonalSnapshot(personId: PersonId.fern.rawValue)
+    private var categoryFlow: [String: FlowType] {
+        Dictionary(uniqueKeysWithValues: categories.map { ($0.id, $0.flow) })
     }
 
-    private var latestStark: SnapshotRecord? {
-        preferredPersonalSnapshot(personId: PersonId.stark.rawValue)
+    private var activeAnchor: String {
+        selectedAnchor ?? Cycle.cycleFor(isoDate: Self.todayISO()).anchorISO
     }
+
+    private var cycleAnchors: [String] {
+        var set = Set<String>()
+        let today = Cycle.cycleFor(isoDate: Self.todayISO())
+        set.insert(today.anchorISO)
+        var cursor = today
+        for _ in 0..<8 {
+            cursor = Cycle.previousHalfMonth(before: cursor)
+            set.insert(cursor.anchorISO)
+        }
+        cursor = today
+        for _ in 0..<2 {
+            cursor = Cycle.nextHalfMonth(after: cursor)
+            set.insert(cursor.anchorISO)
+        }
+        for tx in transactions {
+            set.insert(Cycle.cycleFor(isoDate: tx.purchaseDate).anchorISO)
+            if let realized = tx.realizedDate {
+                set.insert(Cycle.cycleFor(isoDate: realized).anchorISO)
+            }
+        }
+        for snap in snapshots {
+            set.insert(snap.cycleAnchorISO)
+        }
+        return set.sorted()
+    }
+
+    private var fernPockets: [PocketRow] { livePockets(for: .fern) }
+    private var starkPockets: [PocketRow] { livePockets(for: .stark) }
 
     private var displayMetrics: Snapshot.Metrics? {
         switch scope {
         case .fern:
-            return latestFern?.metrics
+            let lines = fernPockets.map(\.line)
+            guard !lines.isEmpty || metricsOnlySnapshot(personId: PersonId.fern.rawValue) != nil else { return nil }
+            if lines.isEmpty, let snap = metricsOnlySnapshot(personId: PersonId.fern.rawValue) {
+                return snap.metrics
+            }
+            return Snapshot.metrics(
+                lines: lines,
+                prior: priorMetrics(personId: PersonId.fern.rawValue),
+                lens: .personal
+            )
         case .stark:
-            return latestStark?.metrics
+            let lines = starkPockets.map(\.line)
+            guard !lines.isEmpty else { return nil }
+            return Snapshot.metrics(
+                lines: lines,
+                prior: priorMetrics(personId: PersonId.stark.rawValue),
+                lens: .personal
+            )
         case .household:
-            guard let lines = householdLines else { return nil }
+            let lines = fernPockets.map(\.line) + starkPockets.map(\.line)
+            guard !lines.isEmpty else { return nil }
             return Snapshot.metrics(lines: lines, prior: nil, lens: .household)
         }
-    }
-
-    /// Both people need a check-in with real lines before Household can net.
-    private var householdLines: [Snapshot.Line]? {
-        guard let fern = latestFern, !fern.lines.isEmpty,
-              let stark = latestStark, !stark.lines.isEmpty
-        else { return nil }
-        return fern.lines + stark.lines
     }
 
     private var canLoadFernDemo: Bool {
         !snapshots.contains { $0.personId == PersonId.fern.rawValue }
     }
 
+    private var hasExternalsForBalanceDay: Bool {
+        let person = balanceDayPerson
+        return accounts.contains { account in
+            guard !account.archived, PocketBalance.isExternalKind(account.kind) else { return false }
+            switch account.scope {
+            case .fern: return person == .fern
+            case .stark: return person == .stark
+            case .household, .business: return person == .fern
+            }
+        }
+    }
+
     private var footerAsOf: String? {
+        let date = DisplayLabels.displayDate(iso: activeAnchor)
         switch scope {
         case .fern:
-            guard let snap = latestFern else { return nil }
-            return "As of \(snap.cycleAnchorISO) · \(fernName)"
+            if snapshotForCycle(personId: PersonId.fern.rawValue, cycleISO: activeAnchor) != nil {
+                return "As of \(date) · check-in"
+            }
+            return fernPockets.isEmpty ? nil : "As of \(date) · from the ledger"
         case .stark:
-            guard let snap = latestStark else { return nil }
-            return "As of \(snap.cycleAnchorISO) · \(starkName)"
+            if snapshotForCycle(personId: PersonId.stark.rawValue, cycleISO: activeAnchor) != nil {
+                return "As of \(date) · check-in"
+            }
+            return starkPockets.isEmpty ? nil : "As of \(date) · from the ledger"
         case .household:
-            guard householdLines != nil else { return nil }
-            return "Household nets Love Tab & fund IOUs"
+            guard displayMetrics != nil else { return nil }
+            return "As of \(date) · Household nets Love Tab & fund IOUs"
         }
     }
 
@@ -81,32 +148,45 @@ struct EmpireView: View {
                     if new == .fern { balanceDayPerson = .fern }
                     if new == .stark { balanceDayPerson = .stark }
                 }
+
+                Picker("Cycle", selection: Binding(
+                    get: { activeAnchor },
+                    set: { selectedAnchor = $0 }
+                )) {
+                    ForEach(cycleAnchors.reversed(), id: \.self) { anchor in
+                        Text(DisplayLabels.displayDate(iso: anchor)).tag(anchor)
+                    }
+                }
+                .pickerStyle(.menu)
+                .accessibilityLabel("Cycle")
             } footer: {
-                Text("Fern and \(starkName) are personal books. Household is shared — not under either person.")
+                Text("Fern and \(starkName) are personal books. Household is shared — not under either person. Pockets are as of the cycle you pick.")
                     .font(PantominaFont.caption)
             }
 
             if let m = displayMetrics {
                 metricsSection(m)
+                if scope == .fern, canLoadFernDemo {
+                    Section {
+                        Button("Load Fern 08/20 demo metrics") {
+                            loadDemoMetrics()
+                        }
+                        .foregroundStyle(Color.pantomina.sageDeep)
+                    } footer: {
+                        Text("Spec golden for smoke — live pockets stay preferred when present.")
+                            .font(PantominaFont.caption)
+                    }
+                }
             } else {
                 emptySection
             }
 
             if scope != .household {
+                pocketListSection
+                balanceDaySection
+            } else if displayMetrics == nil {
                 Section {
-                    Button {
-                        showBalanceDay = true
-                    } label: {
-                        Label("Check the balances", systemImage: "checklist")
-                    }
-                    .foregroundStyle(Color.pantomina.sageDeep)
-                } footer: {
-                    Text("Balance Day for \(balanceDayPerson == .fern ? fernName : starkName). Charts come later.")
-                        .font(PantominaFont.caption)
-                }
-            } else {
-                Section {
-                    Text("Check the balances from Fern or \(starkName)’s tab — Household only views the netted books.")
+                    Text("Add pockets on Fern or \(starkName) — Household nets both live books.")
                         .font(PantominaFont.caption)
                         .foregroundStyle(Color.pantomina.muted)
                 }
@@ -121,9 +201,81 @@ struct EmpireView: View {
             }
         }
         .sheet(isPresented: $showBalanceDay) {
-            BalanceDayView(personId: balanceDayPerson) {
+            BalanceDayView(personId: balanceDayPerson, cycleISO: activeAnchor) {
                 showBalanceDay = false
             }
+        }
+        .sheet(item: $miniReport) { row in
+            PocketMiniReportView(
+                account: row.account,
+                balanceC: row.pocket.balanceC,
+                spokenForC: row.pocket.spokenForC,
+                sourceLabel: sourceCaption(row.pocket.source),
+                cycleAnchorISO: activeAnchor,
+                onDone: { miniReport = nil }
+            )
+        }
+    }
+
+    @ViewBuilder
+    private var pocketListSection: some View {
+        let rows = scope == .fern ? fernPockets : starkPockets
+        let visible = rows.filter { $0.line.source != .stale || $0.pocket.source == .unknown }
+        if !visible.isEmpty {
+            Section {
+                ForEach(visible) { row in
+                    Button {
+                        miniReport = row
+                    } label: {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(row.account.displayLabel(fernName: fernName, starkName: starkName))
+                                    .foregroundStyle(Color.pantomina.ink)
+                                Text(sourceCaption(row.pocket.source))
+                                    .font(PantominaFont.caption)
+                                    .foregroundStyle(Color.pantomina.muted)
+                            }
+                            Spacer()
+                            if row.pocket.source == .unknown {
+                                Text("—")
+                                    .foregroundStyle(Color.pantomina.muted)
+                            } else {
+                                Text(formatPeso(row.pocket.balanceC))
+                                    .font(PantominaFont.amount)
+                                    .foregroundStyle(Color.pantomina.ink)
+                                    .monospacedDigit()
+                            }
+                        }
+                    }
+                }
+            } header: {
+                Text("Pockets")
+            } footer: {
+                Text("Tap a pocket for this cycle’s moves. Edit on Receipts.")
+                    .font(PantominaFont.caption)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var balanceDaySection: some View {
+        Section {
+            Button {
+                showBalanceDay = true
+            } label: {
+                Label(
+                    hasExternalsForBalanceDay ? "Update investments" : "Refresh cycle snapshot",
+                    systemImage: "checklist"
+                )
+            }
+            .foregroundStyle(Color.pantomina.sageDeep)
+        } footer: {
+            Text(
+                hasExternalsForBalanceDay
+                    ? "External balances for \(balanceDayPerson == .fern ? fernName : starkName) as of \(DisplayLabels.displayDate(iso: activeAnchor)). Shared confirm is on Fern."
+                    : "No external pockets yet — confirm to store \(DisplayLabels.displayDate(iso: activeAnchor))’s live books."
+            )
+            .font(PantominaFont.caption)
         }
     }
 
@@ -132,7 +284,7 @@ struct EmpireView: View {
         Section {
             switch scope {
             case .fern:
-                Text("No check-in yet for \(fernName).")
+                Text("No pockets on \(fernName)’s book yet.")
                     .foregroundStyle(Color.pantomina.muted)
                 if canLoadFernDemo {
                     Button("Load Fern 08/20 demo metrics") {
@@ -141,15 +293,15 @@ struct EmpireView: View {
                     .foregroundStyle(Color.pantomina.sageDeep)
                 }
             case .stark:
-                Text("No check-in yet for \(starkName).")
+                Text("No pockets on \(starkName)’s book yet.")
                     .foregroundStyle(Color.pantomina.muted)
             case .household:
-                Text("Household needs both \(fernName) and \(starkName) check-ins with pocket lines — then Love Tab and fund IOUs net out.")
+                Text("Household needs live pockets on both \(fernName) and \(starkName).")
                     .foregroundStyle(Color.pantomina.muted)
             }
         } footer: {
             if scope == .fern, canLoadFernDemo {
-                Text("Demo uses the Spec Portfolio-Fern golden (negative NW is fine). Or run Check the balances.")
+                Text("Demo uses the Spec Portfolio-Fern golden (negative NW is fine).")
                     .font(PantominaFont.caption)
             }
         }
@@ -188,13 +340,106 @@ struct EmpireView: View {
         .accessibilityElement(children: .combine)
     }
 
-    /// Prefer a check-in with pocket lines; else newest metrics-only (e.g. demo).
-    private func preferredPersonalSnapshot(personId: String) -> SnapshotRecord? {
-        let mine = snapshots.filter { $0.personId == personId }
-        if let withLines = mine.first(where: { !$0.lines.isEmpty }) {
-            return withLines
+    private func sourceCaption(_ source: PocketBalance.Source) -> String {
+        switch source {
+        case .ledger: return "From the ledger"
+        case .confirmed: return "Last check-in"
+        case .unknown: return "Needs a check-in"
         }
-        return mine.first
+    }
+
+    private func livePockets(for person: PersonId) -> [PocketRow] {
+        accounts
+            .filter { !$0.archived }
+            .filter { account in
+                switch account.scope {
+                case .fern: return person == .fern
+                case .stark: return person == .stark
+                case .household, .business: return person == .fern
+                }
+            }
+            .sorted { $0.baseName.localizedCaseInsensitiveCompare($1.baseName) == .orderedAscending }
+            .map { account in
+                let pocket = pocketResult(for: account, person: person)
+                let line = Snapshot.line(
+                    accountId: account.id,
+                    kind: account.kind,
+                    pocket: pocket,
+                    isInternalDebt: account.kind == .receivable
+                )
+                return PocketRow(account: account, pocket: pocket, line: line)
+            }
+    }
+
+    private func pocketResult(for account: AccountRecord, person: PersonId) -> PocketBalance.Result {
+        let legs = transactions
+            .filter { $0.accountId == account.id }
+            .compactMap { tx -> PocketBalance.Leg? in
+                guard let flow = categoryFlow[tx.categoryId] else { return nil }
+                return PocketBalance.Leg(
+                    amountC: tx.amountC,
+                    flow: flow,
+                    realizedStatus: tx.realizedStatus,
+                    purchaseDate: tx.purchaseDate,
+                    realizedDate: tx.realizedDate,
+                    note: tx.note ?? tx.merchant
+                )
+            }
+        let spoken = funds.filter { $0.homeAccountId == account.id }.map(\.balanceC).reduce(0, +)
+        let loanBal: Int?
+        if account.kind == .loan {
+            let active = loans.filter {
+                $0.ownerRaw == person.rawValue && $0.statusRaw != Loan.Status.done.rawValue
+            }
+            if let loan = active.first(where: { $0.paymentAccountId == account.id }) ?? active.first {
+                loanBal = Loan.derivedBalanceC(
+                    totalLoanC: loan.totalLoanC,
+                    paidMonths: loan.paidMonths,
+                    monthlyC: loan.monthlyC
+                )
+            } else {
+                loanBal = 0
+            }
+        } else {
+            loanBal = nil
+        }
+        return PocketBalance.compute(
+            kind: account.kind,
+            legs: legs,
+            loanBalanceC: loanBal,
+            lastConfirmedC: account.lastConfirmedBalanceC,
+            spokenForC: spoken,
+            receivableBalanceC: account.kind == .receivable ? account.lastConfirmedBalanceC : nil,
+            asOfISO: activeAnchor,
+            lastConfirmedCycleISO: account.lastConfirmedCycleISO
+        )
+    }
+
+    private func snapshotForCycle(personId: String, cycleISO: String) -> SnapshotRecord? {
+        snapshots.first {
+            $0.personId == personId && $0.cycleAnchorISO == cycleISO && !$0.lines.isEmpty
+        }
+    }
+
+    private func priorMetrics(personId: String) -> Snapshot.Metrics? {
+        let prev = Cycle.previousHalfMonth(before: Cycle(anchorISO: activeAnchor)).anchorISO
+        if let snap = snapshotForCycle(personId: personId, cycleISO: prev) {
+            return snap.metrics
+        }
+        return snapshots
+            .filter {
+                $0.personId == personId
+                    && !$0.lines.isEmpty
+                    && $0.cycleAnchorISO < activeAnchor
+            }
+            .sorted { $0.cycleAnchorISO > $1.cycleAnchorISO }
+            .first?
+            .metrics
+    }
+
+    /// Metrics-only demo (no pocket lines) for Spec smoke.
+    private func metricsOnlySnapshot(personId: String) -> SnapshotRecord? {
+        snapshots.first { $0.personId == personId && $0.lines.isEmpty }
     }
 
     private func loadDemoMetrics() {
@@ -209,5 +454,15 @@ struct EmpireView: View {
         try? modelContext.save()
         scope = .fern
         balanceDayPerson = .fern
+        selectedAnchor = PortfolioFern0820.cycleAnchorISO
+    }
+
+    private static func todayISO() -> String {
+        let f = DateFormatter()
+        f.calendar = Calendar(identifier: .gregorian)
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.timeZone = TimeZone.current
+        f.dateFormat = "yyyy-MM-dd"
+        return f.string(from: Date())
     }
 }

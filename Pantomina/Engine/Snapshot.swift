@@ -105,4 +105,27 @@ enum Snapshot {
             savingsAssetsC: savingsAssetsC
         )
     }
+
+    /// Maps a live pocket result into a Balance Day / Empire line.
+    static func line(
+        accountId: String,
+        kind: AccountKind,
+        pocket: PocketBalance.Result,
+        isInternalDebt: Bool = false
+    ) -> Line {
+        let source: LineSource
+        switch pocket.source {
+        case .ledger: source = .derived
+        case .confirmed: source = .confirmed
+        case .unknown: source = .stale
+        }
+        return Line(
+            accountId: accountId,
+            balanceC: pocket.balanceC,
+            source: source,
+            isLiability: isLiabilityKind(kind),
+            countsTowardSavingsAssets: countsTowardSavingsAssets(kind: kind),
+            isInternalDebt: isInternalDebt
+        )
+    }
 }
