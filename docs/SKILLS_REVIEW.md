@@ -333,3 +333,58 @@ Skills: Operate, Humanizer, Emil, clarify.
 Empire / Balance Day; household funds; add-to-due UI; drag-reorder; Statement-day loan payout; funding-tranche rewrite; signed ± Fund Move legs (known mess — fix with Balance Day / transfer model, don’t add more unsigned dual-legs).
 
 **Phase 5 complete** (A+B+C). **Next:** Phase 6 Snapshots & Empire.
+
+---
+
+## Phase 6 skills critique (2026-08-31, pre-build)
+
+Skills: Impeccable Operate, Humanizer, Emil / apple-design, UI UX Pro Max (mobile Operate), write-swift TDD, accounting-map. Spec §4.6 + §6 Phase 6 accept. **Docs lock — Slice A may start after fixtures + explicit implement ask.**
+
+Phase 6 owns **pocket balances as truth**. Envelope `Fund.balanceC` stays the War Chest book.
+
+| Surface | Recommendation | Why / Push back |
+|---|---|---|
+| Method | Fixtures + pure `Snapshot` / metrics engine **before** Empire chrome | Accept is numeric |
+| IA | More → **Our Little Empire** + **Our Year So Far** first-class (not Fine Print). **Where the Money Sleeps** in Slice C | Spec More grid; don’t invent a third NW room |
+| Balance Day | Per person · per cycle anchor; non-archived accounts; tiers **derived** (confirm only) / **prefilled** (edit) / **stale** (skip). Confirm → snapshot + seven metrics | One job — check-in |
+| Pocket truth | Snapshot lines = store of record; last-confirmed on account for next prefill | Stop treating envelope-only as NW |
+| Spoken-for | Fund envelopes (+ funding reserves) on home pocket — exclude from feels-spendable; **not** a second asset on top of pocket | Accounting-map: no BPI Debit + loan-payoff double-count |
+| Seven metrics | assets / liabilities / netWorth / deltas vs prior / **savingsAssets as pesos** | Spec; negative NW unbothered |
+| Household | Empire Seg Fern / Stark / Household; Household **nets** Love Tab + fund IOUs to zero (**engine in A**) | Accept; not reverse Love Tab |
+| Charts | Swift Charts; negative-friendly axes; ease-out; Reduce Motion = static | Stack + vibe — **Slice B** |
+| YTD | Person Seg + split vs just-mine; income/expense bars; category donut; Needs-vs-Wants | Spec — **Slice C** |
+| Interest drift | Unexplained positive fund-home drift → confirm “Book as interest?” — **never silent** | Accounting-map — **Slice C** |
+| Fund Moves | Balance Day reconciles pockets; **do not** rewrite unsigned two-leg history in A | Known mess; don’t naive-sum Fund Move in charts |
+| Copy | Empire / Year So Far cheese titles; Balance Day plain (“Check the balances”); stale = “Skipped” | Humanizer; cheese quarantine on amounts |
+
+### Slice shape
+
+| Slice | Scope | Accept focus |
+|---|---|---|
+| **A** | Snapshot engine + Balance Day + seven metrics (+ household netting in engine) + golden fixtures; More → Empire **metrics cards** + Balance Day CTA (**no** charts) | Portfolio-Fern 08/20; NW −₱151,537.98 |
+| **B** | Empire NW line + A/L area; household Seg chrome | Household nets tab + IOUs to zero in UI |
+| **C** | Our Year So Far; interest-drift confirm; Where the Money Sleeps | Follow-the-money charts; drift never silent |
+
+### Explicit non-changes (Phase 6 skills)
+
+Phase 7 chat / backup; Phase 8 sync; household-scoped funds; raid add-to-due UI; swappable payer/contributor (§7.9); auto-sorting snowball; Statement-day loan payout; silent rewrite of historical same-sign Fund Moves; **inventing** Portfolio-Fern numbers.
+
+---
+
+## Phase 6 Slice A — Balance Day + Snapshot engine (locks) (2026-08-31)
+
+Skills: Operate, Humanizer, write-swift TDD, accounting-map. Spec §4.6. Phase locks above reused.
+
+| Piece | Lock | Push back |
+|---|---|---|
+| Engine | Pure Snapshot metrics from lines + prior deltas; household lens nets Love Tab + fund IOUs | UI never recomputes NW |
+| Persistence | Snapshot lines + metrics; last-confirmed on account for next prefill | No envelope pesos as Empire assets |
+| Tiers | derived = confirm only; prefilled = investments overwrite; skip → stale | Loan balances stay derived (no hand-type) |
+| Spoken-for | Sum fund `balanceC` (+ funding reserves) on home — feels-spendable exclusion only | Don’t add on top of pocket |
+| More | **Our Little Empire** — latest seven metrics cards + **Balance Day** CTA | Charts / YTD / Money Sleeps = B/C |
+| Balance Day copy | “Check the balances”; skipped = “Skipped” | — |
+| Fund Moves | Leave unsigned dual-leg history alone | No rewrite in A |
+| Interest drift | Parked to C | No silent interest booking |
+| Fixtures | Portfolio-Fern 08/20 + NW −₱151,537.98 **required** before accept / claiming Slice A done | Do not invent from prototype `pantomina-app.jsx` mocks |
+
+**Next:** Obtain Portfolio-Fern golden column → implement Slice A (when asked). Then B (Empire charts) → C (YTD / drift / Money Sleeps).

@@ -83,6 +83,8 @@ Living log of locked **Baseline** choices and parked **For later** work. The pro
 | 2026-08-31 | Snowball **Batch** UI hidden until a later wave exists (`Snowball.showsBatchChrome`); edit offers “Pay in a later wave…”. | Operate; one-wave demos. |
 | 2026-08-31 | Park/Sweep sheets dismiss only after successful commit (Forecast leftover keeps War Chest open on failure). | Review before merge PR #3. |
 | 2026-08-31 | **Input bounds hygiene:** fund + Keep Doing titles use display-name clamp (≤40); borrow/journal notes use note clamp (≤200); snowball order/batch via `clampQueueIndex` **1…99** (empty order → nil). Rule `.cursor/rules/input-bounds.mdc` + skill `input-bounds-hygiene`. | Close unbound TextFields; shared engine only. |
+| 2026-08-31 | **Phase 6 UX locks (pre-build):** slices A Balance Day/Snapshot engine → B Empire charts → C YTD/drift/Money Sleeps; pocket truth on Balance Day; spoken-for = envelopes on home (not double assets); household netting in engine; metrics cards before charts; interest drift never silent (C). | Skills Operate/Humanizer/Emil/accounting-map; `docs/SKILLS_REVIEW.md`. |
+| 2026-08-31 | **Phase 6 Slice A fixtures gate:** Portfolio-Fern 08/20 + NW −₱151,537.98 must be supplied before Slice A accept tests; do not invent from prototype mocks. | Spec §6 accept is numeric; numbers not in-repo yet. |
 
 ## For later
 
