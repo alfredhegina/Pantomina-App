@@ -221,9 +221,10 @@ struct WarChestView: View {
                 defaultFromAccountId: loanPayoffFund?.homeAccountId,
                 onCancel: { showSweep = false },
                 onConfirm: { amountC, fromId, dateISO in
-                    commitSweep(surplusC: amountC, fromAccountId: fromId, dateISO: dateISO)
-                    showSweep = false
-                    onSweepComplete?()
+                    if commitSweep(surplusC: amountC, fromAccountId: fromId, dateISO: dateISO) {
+                        showSweep = false
+                        onSweepComplete?()
+                    }
                 }
             )
         }
@@ -295,14 +296,15 @@ struct WarChestView: View {
                     starkName: starkName,
                     onCancel: { parkLoanId = nil },
                     onConfirm: { fromId, dateISO in
-                        commitParkAnotherMonth(
+                        if commitParkAnotherMonth(
                             amountC: amountC,
                             payoff: payoff,
                             fromAccountId: fromId,
                             loanName: loan.loanDescription,
                             dateISO: dateISO
-                        )
-                        parkLoanId = nil
+                        ) {
+                            parkLoanId = nil
+                        }
                     }
                 )
             }
@@ -694,7 +696,7 @@ struct WarChestView: View {
         flashToast("Repaid \(formatPeso(amountC))")
     }
 
-    private func commitSweep(surplusC: Int, fromAccountId: String, dateISO: String) {
+    private func commitSweep(surplusC: Int, fromAccountId: String, dateISO: String) -> Bool {
         guard let catId = fundMoveCategoryId(),
               let plan = Snowball.proposeSweep(
                 surplusC: surplusC,
@@ -703,7 +705,7 @@ struct WarChestView: View {
               )
         else {
             flashToast("Couldn't sweep — check amount and loan-payoff fund.")
-            return
+            return false
         }
 
         for repay in plan.iouRepays {
@@ -711,7 +713,7 @@ struct WarChestView: View {
                   let updated = Fund.repayOldest(in: fund.engineFund, amountC: repay.amountC, restoreBalance: true)
             else {
                 flashToast("Couldn't repay an IOU — try again.")
-                return
+                return false
             }
             fund.apply(updated)
             insertFundMove(
@@ -761,6 +763,7 @@ struct WarChestView: View {
 
         try? modelContext.save()
         flashToast("Swept \(formatPeso(plan.totalAllocatedC))")
+        return true
     }
 
     private func commitParkAnotherMonth(
@@ -769,12 +772,12 @@ struct WarChestView: View {
         fromAccountId: String,
         loanName: String,
         dateISO: String
-    ) {
+    ) -> Bool {
         guard let catId = fundMoveCategoryId(),
               let updated = Fund.topUp(to: payoff.engineFund, amountC: amountC)
         else {
             flashToast("Couldn't park — try again.")
-            return
+            return false
         }
         payoff.apply(updated)
         if fromAccountId != payoff.homeAccountId {
@@ -797,6 +800,7 @@ struct WarChestView: View {
         )
         try? modelContext.save()
         flashToast("Parked \(formatPeso(amountC))")
+        return true
     }
 
     private func flashToast(_ message: String) {

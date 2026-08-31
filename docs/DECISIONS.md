@@ -81,6 +81,7 @@ Living log of locked **Baseline** choices and parked **For later** work. The pro
 | 2026-08-31 | Snowball edit chrome: sheet **Edit payoff order**; labeled Order/Batch sections; list `Pay next · #`; Ready to pay copy without “from”. | Operate/Humanizer; unlabeled twin fields. |
 | 2026-08-31 | Loan strategy **display**: Stash extras / On schedule only (`DisplayLabels`); raw `prepay` / `park_to_maturity` unchanged. | Humanizer; Prepay/Park-to-maturity jargon. |
 | 2026-08-31 | Snowball **Batch** UI hidden until a later wave exists (`Snowball.showsBatchChrome`); edit offers “Pay in a later wave…”. | Operate; one-wave demos. |
+| 2026-08-31 | Park/Sweep sheets dismiss only after successful commit (Forecast leftover keeps War Chest open on failure). | Review before merge PR #3. |
 
 ## For later
 
