@@ -313,6 +313,19 @@ Skills: Operate, Humanizer, Emil, write-swift TDD. Spec §4.10–4.11.
 | Seed | UB #1 + BPI CC remnant #2 batch 1 | Queue demo |
 | Accounting gate | Before any new money path: pockets / envelope / legs / report followability | Push back on unsigned dual-leg or dual truth; see `.cursor/rules/accounting-map.mdc` |
 
+### Queue place clarity polish (2026-08-31)
+
+Skills: Operate, Humanizer, Emil, clarify.
+
+| Piece | Lock | Push back |
+|---|---|---|
+| Sheet title | **Edit payoff order** | Drop jargon “Queue place” |
+| Order / Batch | Separate sections + footers (custom not smallest-first; batch gating) | No twin bare unlabeled numbers |
+| Strategy footer | Consequence line for Prepay vs Park to maturity | — |
+| List meta | `Pay next · #n · Batch · strategy · monthly` | Teach custom order |
+| Ready to pay | “Loan payoff covers…” / Bills → Checklist → Count it | No “from” (not From pocket) |
+| Engine / seed order | Unchanged | Spec custom order |
+
 ### Explicit non-changes (Slice C)
 
 Empire / Balance Day; household funds; add-to-due UI; drag-reorder; Statement-day loan payout; funding-tranche rewrite; signed ± Fund Move legs (known mess — fix with Balance Day / transfer model, don’t add more unsigned dual-legs).

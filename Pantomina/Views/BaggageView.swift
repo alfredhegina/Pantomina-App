@@ -145,11 +145,10 @@ struct BaggageView: View {
         let batch = snap.snowballBatch.map(String.init) ?? "1"
         let strat: String
         switch snap.strategy {
-        case .prepay: strat = "Prepay"
         case .parkToMaturity: strat = "Park to maturity"
-        case .none: strat = "Prepay"
+        case .prepay, .none: strat = "Prepay"
         }
-        return "#\(order) · Batch \(batch) · \(strat)"
+        return "Pay next · #\(order) · Batch \(batch) · \(strat)"
     }
 
     private func journalSheet(_ loan: LoanRecord) -> some View {

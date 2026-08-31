@@ -78,6 +78,7 @@ Living log of locked **Baseline** choices and parked **For later** work. The pro
 | 2026-08-31 | **Phase 5 Slice C** shipped: `Snowball` engine (queue/batches, proposeSweep IOU→park, ready-to-pay, park-another-month); War Chest Snowball + Sweep; BPI remnant seed; Forecast leftover link. Phase 5 A+B+C complete. | Spec §4.10 / §6 repay-before-sweep accept. |
 | 2026-08-31 | Park another month: **confirm sheet** with From (default loan-payoff home) + date; Sweep From defaults to same home. No silent first Cash pocket. | Follow-the-money; Operate. |
 | 2026-08-31 | **Accounting map gate** (`.cursor/rules/accounting-map.mdc`): before any money-moving feature, name pockets / envelope / ledger legs and report followability; push back if it worsens dual books or same-sign transfer theater. | Charts/reports must follow the money. |
+| 2026-08-31 | Snowball edit chrome: sheet **Edit payoff order**; labeled Order/Batch sections; list `Pay next · #`; Ready to pay copy without “from”. | Operate/Humanizer; unlabeled twin fields. |
 
 ## For later
 

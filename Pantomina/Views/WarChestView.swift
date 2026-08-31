@@ -93,10 +93,10 @@ struct WarChestView: View {
                         .foregroundStyle(Color.pantomina.muted)
                 } else {
                     if readyToPay, let top = snowballQueue.first {
-                        Text("Ready to pay · \(top.description)")
+                        Text("Loan payoff covers the next payment · \(top.description)")
                             .font(PantominaFont.caption.weight(.medium))
                             .foregroundStyle(Color.pantomina.sageDeep)
-                        Text("Pay it from Checklist → Count it when the due lands.")
+                        Text("When it’s due: Bills → Checklist → Count it.")
                             .font(PantominaFont.caption)
                             .foregroundStyle(Color.pantomina.muted)
                     }
@@ -115,7 +115,7 @@ struct WarChestView: View {
             } header: {
                 Text("Snowball")
             } footer: {
-                Text("Pay back the chest first, then park the rest. Nothing moves until you confirm.")
+                Text("Order is yours — not auto smallest-first. Sweep leftover pays the chest back before parking more.")
                     .font(PantominaFont.caption)
             }
 
@@ -271,7 +271,7 @@ struct WarChestView: View {
                         loan.applySnowball(order: order, batch: batch, strategy: strategy)
                         try? modelContext.save()
                         editLoanId = nil
-                        flashToast("Queue updated")
+                        flashToast("Payoff order updated")
                     }
                 )
             }
@@ -341,6 +341,7 @@ struct WarChestView: View {
                     .font(PantominaFont.caption.weight(.medium))
                     .foregroundStyle(Color.pantomina.sageDeep)
                     .buttonStyle(.borderless)
+                    .accessibilityLabel("Edit payoff order")
                 if let parkC = Snowball.parkAnotherMonthAmountC(loan: snap),
                    loanPayoffFund != nil {
                     Button("Park another month") { parkLoanId = snap.id }
@@ -360,13 +361,14 @@ struct WarChestView: View {
     private func snowballMetaLabel(_ snap: Loan.Snapshot) -> String {
         let order = snap.snowballOrder.map(String.init) ?? "—"
         let batch = snap.snowballBatch.map(String.init) ?? "1"
-        let strat: String
-        switch snap.strategy {
-        case .prepay: strat = "Prepay"
-        case .parkToMaturity: strat = "Park to maturity"
-        case .none: strat = "Prepay"
+        return "Pay next · #\(order) · Batch \(batch) · \(Self.strategyPlainLabel(snap.strategy)) · \(formatPeso(snap.monthlyC))/mo"
+    }
+
+    private static func strategyPlainLabel(_ strategy: Loan.Strategy?) -> String {
+        switch strategy {
+        case .parkToMaturity: return "Park to maturity"
+        case .prepay, .none: return "Prepay"
         }
-        return "#\(order) · Batch \(batch) · \(strat) · \(formatPeso(snap.monthlyC))/mo"
     }
 
     private func fundCard(_ record: FundRecord) -> some View {
@@ -1335,20 +1337,39 @@ private struct EditSnowballSheet: View {
                 Section {
                     Text(loan.loanDescription)
                         .foregroundStyle(Color.pantomina.muted)
-                    TextField("Order", text: $orderText)
+                }
+
+                Section {
+                    TextField("Number", text: $orderText)
                         .keyboardType(.numberPad)
-                    TextField("Batch", text: $batchText)
+                } header: {
+                    Text("Pay next (order)")
+                } footer: {
+                    Text("1 = first in this batch. Custom — not smallest balance first.")
+                        .font(PantominaFont.caption)
+                }
+
+                Section {
+                    TextField("Number", text: $batchText)
                         .keyboardType(.numberPad)
+                } header: {
+                    Text("Batch")
+                } footer: {
+                    Text("Finish every loan in batch 1 before batch 2 starts.")
+                        .font(PantominaFont.caption)
+                }
+
+                Section {
                     Picker("Strategy", selection: $strategy) {
                         Text("Prepay").tag(Loan.Strategy.prepay)
                         Text("Park to maturity").tag(Loan.Strategy.parkToMaturity)
                     }
                 } footer: {
-                    Text("Custom order — not auto smallest-first. Edit here, not on Baggage.")
+                    Text(strategyFooter)
                         .font(PantominaFont.caption)
                 }
             }
-            .navigationTitle("Queue place")
+            .navigationTitle("Edit payoff order")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -1369,6 +1390,15 @@ private struct EditSnowballSheet: View {
                 strategy = loan.engineLoan.strategy ?? .prepay
             }
         }
-        .presentationDetents([.medium])
+        .presentationDetents([.large])
+    }
+
+    private var strategyFooter: String {
+        switch strategy {
+        case .parkToMaturity:
+            return "Park to maturity — schedule only; no extra park into Loan payoff."
+        case .prepay:
+            return "Prepay — OK to park another month into Loan payoff."
+        }
     }
 }
