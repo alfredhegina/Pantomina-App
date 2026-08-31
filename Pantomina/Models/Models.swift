@@ -32,6 +32,9 @@ final class AccountRecord {
     var settlementRaw: String
     var statementCutoff: Int?
     var archived: Bool
+    /// Last Balance Day confirmed balance (centavos). Prefill for next check-in.
+    var lastConfirmedBalanceC: Int?
+    var lastConfirmedCycleISO: String?
 
     init(
         id: String = UUID().uuidString,
@@ -41,7 +44,9 @@ final class AccountRecord {
         kind: AccountKind,
         settlement: SettlementKind,
         statementCutoff: Int? = nil,
-        archived: Bool = false
+        archived: Bool = false,
+        lastConfirmedBalanceC: Int? = nil,
+        lastConfirmedCycleISO: String? = nil
     ) {
         self.id = id
         self.baseName = baseName
@@ -51,6 +56,8 @@ final class AccountRecord {
         self.settlementRaw = settlement.rawValue
         self.statementCutoff = statementCutoff
         self.archived = archived
+        self.lastConfirmedBalanceC = lastConfirmedBalanceC
+        self.lastConfirmedCycleISO = lastConfirmedCycleISO
     }
 
     var scope: Scope { Scope(rawValue: scopeRaw) ?? .household }
@@ -558,6 +565,60 @@ final class FundRecord {
         iousC = snapshot.iousC
         iouLogJSON = (try? JSONEncoder().encode(snapshot.iouLog)) ?? iouLogJSON
         raidOrder = snapshot.raidOrder
+    }
+}
+
+@Model
+final class SnapshotRecord {
+    @Attribute(.unique) var id: String
+    var cycleAnchorISO: String
+    var personId: String
+    var linesJSON: Data
+    var assetsC: Int
+    var liabilitiesC: Int
+    var netWorthC: Int
+    var netWorthDeltaC: Int
+    var assetsDeltaC: Int
+    var liabilitiesDeltaC: Int
+    var savingsAssetsC: Int
+    var confirmedAt: Date
+
+    init(
+        id: String = UUID().uuidString,
+        cycleAnchorISO: String,
+        personId: String,
+        lines: [Snapshot.Line],
+        metrics: Snapshot.Metrics,
+        confirmedAt: Date = .now
+    ) {
+        self.id = id
+        self.cycleAnchorISO = cycleAnchorISO
+        self.personId = personId
+        self.linesJSON = (try? JSONEncoder().encode(lines)) ?? Data("[]".utf8)
+        self.assetsC = metrics.assetsC
+        self.liabilitiesC = metrics.liabilitiesC
+        self.netWorthC = metrics.netWorthC
+        self.netWorthDeltaC = metrics.netWorthDeltaC
+        self.assetsDeltaC = metrics.assetsDeltaC
+        self.liabilitiesDeltaC = metrics.liabilitiesDeltaC
+        self.savingsAssetsC = metrics.savingsAssetsC
+        self.confirmedAt = confirmedAt
+    }
+
+    var lines: [Snapshot.Line] {
+        (try? JSONDecoder().decode([Snapshot.Line].self, from: linesJSON)) ?? []
+    }
+
+    var metrics: Snapshot.Metrics {
+        Snapshot.Metrics(
+            assetsC: assetsC,
+            liabilitiesC: liabilitiesC,
+            netWorthC: netWorthC,
+            netWorthDeltaC: netWorthDeltaC,
+            assetsDeltaC: assetsDeltaC,
+            liabilitiesDeltaC: liabilitiesDeltaC,
+            savingsAssetsC: savingsAssetsC
+        )
     }
 }
 

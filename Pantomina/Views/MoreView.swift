@@ -36,6 +36,21 @@ struct MoreView: View {
                 }
 
                 NavigationLink {
+                    EmpireView()
+                } label: {
+                    Label {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Our Little Empire")
+                            Text("Net worth")
+                                .font(PantominaFont.caption)
+                                .foregroundStyle(Color.pantomina.muted)
+                        }
+                    } icon: {
+                        Image(systemName: "building.columns")
+                    }
+                }
+
+                NavigationLink {
                     CookieJarView()
                 } label: {
                     Label {
@@ -98,7 +113,7 @@ struct MoreView: View {
                 Section {
                     EmptyView()
                 } footer: {
-                    Text("Cookie Jar, loans, funds, recurring, Statement day, and settings.")
+                    Text("Empire, Cookie Jar, loans, funds, recurring, Statement day, and settings.")
                         .font(PantominaFont.caption)
                 }
             }

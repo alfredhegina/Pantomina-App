@@ -388,3 +388,84 @@ Skills: Operate, Humanizer, write-swift TDD, accounting-map. Spec §4.6. Phase l
 | Fixtures | Portfolio-Fern 08/20 + NW −₱151,537.98 **required** before accept / claiming Slice A done | Do not invent from prototype `pantomina-app.jsx` mocks |
 
 **Next:** Obtain Portfolio-Fern golden column → implement Slice A (when asked). Then B (Empire charts) → C (YTD / drift / Money Sleeps).
+
+---
+
+## Portfolio-Fern 08/20 golden (2026-08-31)
+
+Skills: Operate, accounting-map, write-swift. Spec §6 Phase 6 accept.
+
+| Piece | Lock | Push back |
+|---|---|---|
+| Metrics | `PortfolioFern0820.metrics` — Fern personal 08/20 seven fields; NW −₱151,537.98 | Prototype JSX 8/20 discarded |
+| Line vs totals | Sheet asset/liab rows do not sum to SS3 totals | No bridging formula; manual mess |
+| Negative NW | Valid starting state; UI unbothered; recovery via tools not lectures | No shame chrome on Empire |
+| Savings | Sheet “Savings Rate” pesos → `savingsAssetsC` | Not a percentage |
+| Stark | Separate fixture when column arrives | — |
+
+**Next:** Implement Phase 6 Slice A (Snapshot engine + Balance Day) when asked. Then B → C.
+
+---
+
+## Phase 6 Slice A — shipped (2026-08-31)
+
+Skills: Operate, Humanizer, write-swift TDD, accounting-map. Spec §4.6.
+
+| Piece | Behavior |
+|---|---|
+| Engine | `Snapshot.metrics` — personal/household lens; stale skip; internal debts net on household; negative NW OK |
+| Golden | `PortfolioFern0820` Spec accept constants (no line-sum bridge) |
+| Persist | `SnapshotRecord` + `AccountRecord.lastConfirmedBalanceC` |
+| More | **Our Little Empire** — seven metric cards, person + lens, Balance Day CTA, Preprod demo load |
+| Balance Day | “Check the balances” — confirm / skip / prefill; loans derived |
+| Non-changes | Charts, YTD, Money Sleeps, interest drift |
+
+**Next:** Slice B (Empire charts) → C (YTD / drift / Money Sleeps).
+
+---
+
+## Empire scope Seg polish (2026-08-31)
+
+Skills: Operate, Humanizer. Fixes nested Personal/Household under Fern/Stark.
+
+| Piece | Lock | Push back |
+|---|---|---|
+| Empire Seg | **One** peer Seg: Fern · Stark · Household | Not Personal/Household under a person |
+| Household | Shared netting view; needs both check-ins with lines | Not “Fern’s household” |
+| Balance Day | Whose person on sheet / personal tabs only | No Balance Day from Household tab |
+| Demo | Load Fern 08/20 only when Fern has no snapshots; prefer lined check-in over metrics-only for display | Don’t use empty demo as Balance Day prior |
+
+**Next:** Slice B (Empire charts) → C (YTD / drift / Money Sleeps).
+
+---
+
+## Empire dashboard reshape (2026-08-31)
+
+Skills: Operate, Humanizer, accounting-map, write-swift TDD. Spec §4.6 kept; corrects Slice A hand-type-everything.
+
+| Piece | Lock | Push back |
+|---|---|---|
+| Empire | Read-only dashboard — live metrics + pocket list | Not a balance form |
+| PocketBalance | Ledger-known from legs; loan derived; externals lastConfirmed; spoken-for display-only | Don’t naive-sum Fund Move as income |
+| Balance Day | Thin — `investment` / `savingsAsset` / `govMandated` only; empty placeholder (not `0.00`) | Omit derived rows |
+| Shared | Fern confirms Shared once; Stark = personal only | No double-confirm / double-count |
+| Mini-report | Tap pocket → sheet (running balance, recent legs, spoken-for); no edit | Full browser = Money Sleeps (C) |
+| Demo | Portfolio-Fern metrics-only still loadable; live lines preferred when present | |
+
+**Next:** Slice B (Empire charts) → C (YTD / drift / Money Sleeps).
+
+---
+
+## Empire cycle as-of (2026-08-31)
+
+Skills: Operate, Humanizer, accounting-map. Spec §4.6 per-cycle check-in.
+
+| Piece | Lock | Push back |
+|---|---|---|
+| Control | Bills-style **Cycle** Menu under Fern·Stark·Household | Not free from–to; not “statement date” on Empire |
+| Balance | **As-of** selected cycle end (`realizedDate ?? purchaseDate` ≤ end) | In-window-only sum would wipe pocket NW |
+| Mini-report | Opening + legs in `(prevAnchor, selected]` | Full history stays on Receipts |
+| Missing snapshot | Live PocketBalance as-of | Don’t require check-in to see ledger pockets |
+| Balance Day | Stamps Empire’s selected `cycleISO` | Today-only stamp wrong when browsing prior cycle |
+
+**Next:** Slice B (Empire charts) → C (YTD / drift / Money Sleeps).
