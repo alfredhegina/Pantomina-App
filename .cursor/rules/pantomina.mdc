@@ -15,4 +15,4 @@ Ship target is the **iOS App Store** via SwiftUI + Xcode + TestFlight; do not tr
 
 For UI/UX, apply the installed design skills (Taste, Impeccable, Emil Kowalski, UI UX Pro Max, write-swift, apple-design). For method, apply Superpowers. **Spec + DECISIONS win on conflict.**
 
-Use the golden fixtures named in each phase's acceptance checks; when the spec is ambiguous or conflicts with an instruction, ask before coding. Commit per task with descriptive messages. No new dependencies beyond the stack in SPEC §6 without asking. Same-pass docs: see `update-docs-with-code.mdc`.
+Use the golden fixtures named in each phase's acceptance checks; when the spec is ambiguous or conflicts with an instruction, ask before coding. Commit per task with descriptive messages. No new dependencies beyond the stack in SPEC §6 without asking. Same-pass docs: see `update-docs-with-code.mdc`. Ship order: see `ship-flow.mdc`.

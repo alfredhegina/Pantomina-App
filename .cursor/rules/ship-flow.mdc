@@ -1,0 +1,28 @@
+---
+description: Branch → implement → docs → verify → commit → push → PR → review → merge
+alwaysApply: true
+---
+
+# Pantomina — Ship flow
+
+Use this order for slice/feature work. Do not open a PR before there is a pushable commit. Docs are not a post-PR step — they ship in the same pass as the code (see `update-docs-with-code.mdc`).
+
+## Flow
+
+1. **Branch** off current `main` for the slice or task.
+2. **Implement** — engine tests first where rules change; UI consumes engines only.
+3. **Docs in the same pass** — update every log the change touches (`DECISIONS`, and others only if affected).
+4. **Verify** — phase/slice acceptance checks and the relevant tests must pass before treating the work as ready.
+5. **Commit** — only when the user asks; descriptive messages; prefer one coherent commit per finished task/slice unless they ask otherwise.
+6. **Push** the branch.
+7. **Open PR** — draft is fine while iterating; ready when review-worthy.
+8. **Review** — fix Important findings on the branch; push again as needed.
+9. **Mark ready → merge** — then update local `main` (and drop the feature branch if merge did not).
+
+## Do not
+
+- Create a PR before commit/push.
+- Defer docs to “after the PR.”
+- Start the next phase or slice before this one’s acceptance checks pass.
+- Implement **For later** items.
+- Commit, push, or merge unless the user asked (or they asked to ship/merge that PR).
