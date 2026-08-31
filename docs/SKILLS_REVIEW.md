@@ -306,12 +306,15 @@ Skills: Operate, Humanizer, Emil, write-swift TDD. Spec §4.10–4.11.
 | Sweep | Confirm card: IOUs oldest-first, remainder → loan-payoff; From + date | No silent auto-sweep; Love Tab credit ≠ surplus |
 | Forecast | Breathing room → “Park leftover…” opens Sweep with suggested amount | Mirrors over → Borrow |
 | Ready to pay | Chip when loan-payoff ≥ next monthly → Checklist / Count it | **Not** Statement day (CC realization) |
+| Park From | Confirm sheet: locked `monthlyC`, **From** picker (default fund home), date; Confirm | No silent first Cash pocket; From = home → one Fund Move |
+| Sweep From default | Prefill loan-payoff **home** (not first asset) | Align with Top-up / Park |
 | Target bar | Cash progress + terra owed sliver | Slice B polish gap |
 | Engine | `Snowball` + tests before chrome | Phase 5 accept: repay before park |
 | Seed | UB #1 + BPI CC remnant #2 batch 1 | Queue demo |
+| Accounting gate | Before any new money path: pockets / envelope / legs / report followability | Push back on unsigned dual-leg or dual truth; see `.cursor/rules/accounting-map.mdc` |
 
 ### Explicit non-changes (Slice C)
 
-Empire / Balance Day; household funds; add-to-due UI; drag-reorder; Statement-day loan payout; funding-tranche rewrite.
+Empire / Balance Day; household funds; add-to-due UI; drag-reorder; Statement-day loan payout; funding-tranche rewrite; signed ± Fund Move legs (known mess — fix with Balance Day / transfer model, don’t add more unsigned dual-legs).
 
 **Phase 5 complete** (A+B+C). **Next:** Phase 6 Snapshots & Empire.

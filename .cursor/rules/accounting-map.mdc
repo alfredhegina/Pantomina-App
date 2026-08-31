@@ -1,0 +1,44 @@
+---
+description: Follow-the-money gate — check accounting map before any ledger/fund/settlement work
+alwaysApply: true
+---
+
+# Pantomina — Accounting map gate
+
+Before designing or coding **any money-moving process** (Fund Moves, raids, parks, top-ups, sweeps, contributions, loan pays, jar, settlement, charts, reports), stop and check the accounting map. Do not invent a parallel book that reports cannot follow.
+
+## Three layers (do not conflate)
+
+1. **Pockets** — `AccountRecord` (Cash, BPI Debit, CCs, House cash box…). Real instruments on Receipts.
+2. **Envelopes** — `FundRecord.balanceC` / `iousC` with `homeAccountId` (logical earmark on a pocket; several funds may share one home).
+3. **Ledger legs** — `TransactionRecord` rows (`settlementRole`, category, allocations). Charts and reports must be able to **follow the money** through these rows.
+
+Cookie Jar filters **House cash box**. Checklist loan pay uses a loan’s `paymentAccountId`. Those are not War Chest envelope counters.
+
+## Known mess (do not make worse)
+
+- Envelope `balanceC` and pocket Fund Moves are **dual books** until Balance Day (Phase 6) reconciles pocket truth.
+- Demo fund balances may exist **without** opening Fund Moves (ledger-free fixtures).
+- Cross-pocket Top-up / Park / Borrow / Sweep often post **two same-sign Fund Move rows** (transfer theater). Receipts can look like double income; that is unsafe for naive sum-by-category charts.
+- Silent “first spend pocket” as From is forbidden — user picks From; default to **fund home** when present (one leg when From = home).
+
+## Gate (every money feature)
+
+Ask and answer before coding:
+
+1. Which **pockets** change?
+2. Which **envelope** fields change (`balanceC` / `iousC`)?
+3. Which **ledger legs** post (count, sign, account, role, linkedId)?
+4. Can YTD / Empire / a future cashflow chart **follow this path without double-counting**?
+
+If any answer is unclear, or the design would add another unsigned dual-leg or a second source of truth for the same pesos, **push back** — propose a follow-the-money shape (or park to Phase 6 Balance Day) instead of shipping the mess.
+
+## Prefer
+
+- Explicit From / destination pickers; default From = fund home for into-envelope flows.
+- One vocabulary for “money into a fund” (Top-up / Park / Sweep park).
+- Document new money paths in `docs/DECISIONS.md` with Why.
+
+## Docs
+
+Accounting map prose also lives in skills/plan notes and Baseline `DECISIONS` rows. Spec + DECISIONS win on conflict.

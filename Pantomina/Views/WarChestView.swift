@@ -16,6 +16,7 @@ struct WarChestView: View {
     @State private var topUpFundId: String?
     @State private var repayFundId: String?
     @State private var editLoanId: String?
+    @State private var parkLoanId: String?
     @State private var repayAmountText = ""
     @State private var toast: String?
 
@@ -217,6 +218,7 @@ struct WarChestView: View {
                 starkName: starkName,
                 funds: funds.map(\.engineFund),
                 loanPayoffFundId: loanPayoffFund?.id,
+                defaultFromAccountId: loanPayoffFund?.homeAccountId,
                 onCancel: { showSweep = false },
                 onConfirm: { amountC, fromId, dateISO in
                     commitSweep(surplusC: amountC, fromAccountId: fromId, dateISO: dateISO)
@@ -274,6 +276,36 @@ struct WarChestView: View {
                 )
             }
         }
+        .sheet(isPresented: Binding(
+            get: { parkLoanId != nil },
+            set: { if !$0 { parkLoanId = nil } }
+        )) {
+            if let id = parkLoanId,
+               let loan = loans.first(where: { $0.id == id }),
+               let payoff = loanPayoffFund,
+               let amountC = Snowball.parkAnotherMonthAmountC(loan: loan.engineLoan) {
+                ParkMonthSheet(
+                    loanName: loan.loanDescription,
+                    amountC: amountC,
+                    homeAccountId: payoff.homeAccountId,
+                    fundName: payoff.name,
+                    fernAccounts: fernAssetPockets,
+                    fernName: fernName,
+                    starkName: starkName,
+                    onCancel: { parkLoanId = nil },
+                    onConfirm: { fromId, dateISO in
+                        commitParkAnotherMonth(
+                            amountC: amountC,
+                            payoff: payoff,
+                            fromAccountId: fromId,
+                            loanName: loan.loanDescription,
+                            dateISO: dateISO
+                        )
+                        parkLoanId = nil
+                    }
+                )
+            }
+        }
         .overlay(alignment: .bottom) {
             if let toast {
                 Text(toast)
@@ -308,19 +340,14 @@ struct WarChestView: View {
                 Button("Edit queue") { editLoanId = snap.id }
                     .font(PantominaFont.caption.weight(.medium))
                     .foregroundStyle(Color.pantomina.sageDeep)
+                    .buttonStyle(.borderless)
                 if let parkC = Snowball.parkAnotherMonthAmountC(loan: snap),
-                   let payoff = loanPayoffFund,
-                   let fromId = fernAssetPockets.first?.id {
-                    Button("Park another month") {
-                        commitParkAnotherMonth(
-                            amountC: parkC,
-                            payoff: payoff,
-                            fromAccountId: fromId,
-                            loanName: snap.description
-                        )
-                    }
-                    .font(PantominaFont.caption.weight(.medium))
-                    .foregroundStyle(Color.pantomina.sageDeep)
+                   loanPayoffFund != nil {
+                    Button("Park another month") { parkLoanId = snap.id }
+                        .font(PantominaFont.caption.weight(.medium))
+                        .foregroundStyle(Color.pantomina.sageDeep)
+                        .buttonStyle(.borderless)
+                        .accessibilityLabel("Park another month \(formatPeso(parkC))")
                 }
             }
             if record == nil {
@@ -735,9 +762,9 @@ struct WarChestView: View {
         amountC: Int,
         payoff: FundRecord,
         fromAccountId: String,
-        loanName: String
+        loanName: String,
+        dateISO: String
     ) {
-        let dateISO = Self.todayISO()
         guard let catId = fundMoveCategoryId(),
               let updated = Fund.topUp(to: payoff.engineFund, amountC: amountC)
         else {
@@ -1106,6 +1133,7 @@ private struct SweepSheet: View {
     let starkName: String
     let funds: [Fund.Snapshot]
     let loanPayoffFundId: String?
+    var defaultFromAccountId: String? = nil
     let onCancel: () -> Void
     let onConfirm: (Int, String, String) -> Void
 
@@ -1178,7 +1206,12 @@ private struct SweepSheet: View {
             }
             .onAppear {
                 if fromAccountId.isEmpty {
-                    fromAccountId = fernAccounts.first?.id ?? ""
+                    if let preferred = defaultFromAccountId,
+                       fernAccounts.contains(where: { $0.id == preferred }) {
+                        fromAccountId = preferred
+                    } else {
+                        fromAccountId = fernAccounts.first?.id ?? ""
+                    }
                 }
                 if amountText.isEmpty, let suggested = suggestedAmountC, suggested > 0 {
                     amountText = String(format: "%.2f", Double(suggested) / 100)
@@ -1202,6 +1235,86 @@ private struct SweepSheet: View {
             return
         }
         onConfirm(amountC, fromAccountId, WarChestView.isoString(from: happenedOn))
+    }
+}
+
+// MARK: - Park another month
+
+private struct ParkMonthSheet: View {
+    let loanName: String
+    let amountC: Int
+    let homeAccountId: String
+    let fundName: String
+    let fernAccounts: [AccountRecord]
+    let fernName: String
+    let starkName: String
+    let onCancel: () -> Void
+    let onConfirm: (String, String) -> Void
+
+    @State private var fromAccountId = ""
+    @State private var happenedOn = Date()
+    @State private var error: String?
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                if let error {
+                    Text(error).foregroundStyle(Color.pantomina.terraDeep)
+                }
+                Section {
+                    LabeledContent("Amount") {
+                        Text(formatPeso(amountC))
+                            .font(PantominaFont.body.monospacedDigit())
+                    }
+                    Picker("From", selection: $fromAccountId) {
+                        ForEach(fernAccounts, id: \.id) { acct in
+                            Text(acct.displayLabel(fernName: fernName, starkName: starkName)).tag(acct.id)
+                        }
+                    }
+                    DatePicker(
+                        "When it happened",
+                        selection: $happenedOn,
+                        displayedComponents: .date
+                    )
+                    .datePickerStyle(.compact)
+                } header: {
+                    Text(loanName)
+                } footer: {
+                    Text("Into \(fundName). Same pocket as home → one Fund Move; different pocket → two legs. Nothing moves until you confirm.")
+                        .font(PantominaFont.caption)
+                }
+            }
+            .navigationTitle("Park another month")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel", action: onCancel)
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Confirm") { submit() }
+                        .fontWeight(.semibold)
+                }
+            }
+            .onAppear {
+                if fromAccountId.isEmpty {
+                    if fernAccounts.contains(where: { $0.id == homeAccountId }) {
+                        fromAccountId = homeAccountId
+                    } else {
+                        fromAccountId = fernAccounts.first?.id ?? ""
+                    }
+                }
+            }
+        }
+        .presentationDetents([.large])
+    }
+
+    private func submit() {
+        error = nil
+        guard !fromAccountId.isEmpty else {
+            error = "Pick where it comes from."
+            return
+        }
+        onConfirm(fromAccountId, WarChestView.isoString(from: happenedOn))
     }
 }
 
