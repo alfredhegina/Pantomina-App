@@ -1,0 +1,24 @@
+---
+description: Clamp every free-text and money field through InputBounds
+alwaysApply: true
+---
+
+# Pantomina — Input bounds
+
+All form clamps go through `Pantomina/Engine/InputBounds.swift`. UI does not invent parallel limits.
+
+## Wiring
+
+| Field kind | Live typing | On save / commit |
+|---|---|---|
+| Person / fund / Keep Doing titles | `limiting(_:max: maxDisplayNameLength)` | `clampDisplayName` |
+| Pet names | `limiting` + `maxPetNameLength` | `clampPetName` |
+| Notes (Add, jar, borrow, journal, …) | `clampNote` via `onChange` | `clampNote` then trim |
+| Money (peso text) | optional | `centavos(fromPesosText:)` / `isValidAmountC` |
+| Snowball order / batch | number pad | `clampQueueIndex` — empty order → `nil`; batch when shown must parse |
+
+## Do not
+
+- Ship a new `TextField` without matching the table above.
+- Hard-code 40 / 24 / 200 / 100M / 99 in views — use `InputBounds` constants.
+- Reimplement parse/clamp in the view layer.

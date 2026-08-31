@@ -372,6 +372,10 @@ private struct AddRecurringRuleSheet: View {
                 }
                 Section {
                     TextField("Name", text: $title)
+                        .onChange(of: title) { _, new in
+                            let limited = InputBounds.limiting(new, max: InputBounds.maxDisplayNameLength)
+                            if limited != new { title = limited }
+                        }
                     TextField("Amount", text: $amountText)
                         .keyboardType(.decimalPad)
                     Button {
@@ -506,7 +510,7 @@ private struct AddRecurringRuleSheet: View {
 
     private func save() {
         error = nil
-        let cleaned = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        let cleaned = InputBounds.clampDisplayName(title)
         guard !cleaned.isEmpty else {
             error = "Give it a name."
             return

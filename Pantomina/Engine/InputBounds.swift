@@ -8,6 +8,9 @@ public enum InputBounds {
     public static let maxAmountPesos = 100_000_000
     public static let maxAmountC = maxAmountPesos * 100
     public static let minAmountC = 1
+    /// Snowball payoff order and batch wave index (1-based).
+    public static let maxQueueIndex = 99
+    public static let minQueueIndex = 1
 
     /// Length-only clamp for live typing (no trim).
     public static func limiting(_ raw: String, max: Int) -> String {
@@ -31,6 +34,14 @@ public enum InputBounds {
 
     public static func clampNote(_ raw: String) -> String {
         limiting(raw, max: maxNoteLength)
+    }
+
+    /// Parses snowball order/batch text. Empty → nil (unordered). Out of range / non-int → nil.
+    public static func clampQueueIndex(_ raw: String) -> Int? {
+        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty, let value = Int(trimmed) else { return nil }
+        guard value >= minQueueIndex, value <= maxQueueIndex else { return nil }
+        return value
     }
 
     public static func isValidAmountC(_ amountC: Int) -> Bool {

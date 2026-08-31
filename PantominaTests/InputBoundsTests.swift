@@ -45,4 +45,16 @@ struct InputBoundsTests {
         #expect(InputBounds.centavos(fromPesosText: "0") == nil)
         #expect(InputBounds.centavos(fromPesosText: "abc") == nil)
     }
+
+    @Test("queue index accepts 1 through 99")
+    func queueIndexRange() {
+        #expect(InputBounds.maxQueueIndex == 99)
+        #expect(InputBounds.clampQueueIndex("1") == 1)
+        #expect(InputBounds.clampQueueIndex(" 99 ") == 99)
+        #expect(InputBounds.clampQueueIndex("") == nil)
+        #expect(InputBounds.clampQueueIndex("0") == nil)
+        #expect(InputBounds.clampQueueIndex("100") == nil)
+        #expect(InputBounds.clampQueueIndex("abc") == nil)
+        #expect(InputBounds.clampQueueIndex("-1") == nil)
+    }
 }
