@@ -67,6 +67,8 @@ TypeScript types below are the conceptual model; production code is **Swift** (s
 | Pet name | max **24**; empty allowed (greetings fall back to display name) |
 | Note (ledger entry) | max **200** |
 | Money amount (Add amount, custom split legs, any user-entered peso) | **₱1 … ₱100,000,000** inclusive → **1 … 10_000_000_000** centavos |
+| Snowball order / batch (`snowballOrder`, `snowballBatch`) | integer **1 … 99**; empty order → unordered (`nil`); UI rejects out-of-range |
+| Fund name / Keep Doing title | same as display name (≤40); not person ids |
 
 ```ts
 type PersonId = 'fern' | 'stark';                       // system ids; display names + pet names in Settings
