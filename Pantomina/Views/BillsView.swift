@@ -23,6 +23,7 @@ struct BillsView: View {
     @State private var countItError: String?
     @State private var statementRoute: String?
     @State private var showForecastRaid = false
+    @State private var showForecastSweep = false
     @AppStorage("checklistDoneIds") private var checklistDoneRaw = ""
 
     private var checklistDoneIds: Set<String> {
@@ -186,6 +187,9 @@ struct BillsView: View {
                         onPickCycle: { AnyView(cycleMenu) },
                         onCoverShortfall: {
                             showForecastRaid = true
+                        },
+                        onParkLeftover: {
+                            showForecastSweep = true
                         }
                     )
                 case 2:
@@ -249,6 +253,21 @@ struct BillsView: View {
                     .toolbar {
                         ToolbarItem(placement: .cancellationAction) {
                             Button("Close") { showForecastRaid = false }
+                        }
+                    }
+                }
+            }
+            .sheet(isPresented: $showForecastSweep) {
+                NavigationStack {
+                    WarChestView(
+                        suggestedSurplusC: forecast.verdict == .breathingRoom
+                            ? forecast.breathingRoomC
+                            : nil,
+                        onSweepComplete: { showForecastSweep = false }
+                    )
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Close") { showForecastSweep = false }
                         }
                     }
                 }

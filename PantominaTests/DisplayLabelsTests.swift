@@ -60,4 +60,13 @@ struct DisplayLabelsTests {
             ) == "Shared"
         )
     }
+
+    @Test("loan strategy display never shows engine jargon")
+    func loanStrategyLabels() {
+        #expect(DisplayLabels.loanStrategy(.prepay) == "Stash extras")
+        #expect(DisplayLabels.loanStrategy(.parkToMaturity) == "On schedule only")
+        #expect(DisplayLabels.loanStrategy(nil) == "Stash extras")
+        #expect(DisplayLabels.loanStrategyFooter(.prepay).hasPrefix("Stash extras"))
+        #expect(DisplayLabels.loanStrategyFooter(.parkToMaturity).hasPrefix("On schedule only"))
+    }
 }

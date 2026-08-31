@@ -7,6 +7,7 @@ struct BillsForecastPane: View {
     let forecast: Forecast.Result
     let onPickCycle: () -> AnyView
     var onCoverShortfall: (() -> Void)? = nil
+    var onParkLeftover: (() -> Void)? = nil
 
     var body: some View {
         ScrollView {
@@ -32,6 +33,17 @@ struct BillsForecastPane: View {
                             }
                             .buttonStyle(.plain)
                             .accessibilityLabel("Borrow from a fund to cover the shortfall")
+                        } else if forecast.verdict == .breathingRoom, forecast.breathingRoomC > 0 {
+                            Button {
+                                onParkLeftover?()
+                            } label: {
+                                Text("Leftover? Park it toward loan payoff.")
+                                    .font(PantominaFont.caption)
+                                    .foregroundStyle(Color.pantomina.sageDeep)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel("Park leftover toward loan payoff")
                         }
                         VStack(alignment: .leading, spacing: 2) {
                             Text("In \(formatPeso(forecast.expectedInC))")

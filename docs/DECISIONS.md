@@ -74,6 +74,14 @@ Living log of locked **Baseline** choices and parked **For later** work. The pro
 | 2026-08-31 | Receipts: deleting an opening `fund_move` (`Fund.openingNoteMarker`) confirms remove **fund + all linked Fund Moves**. Demo seed fund balances stay ledger-free fixtures until Balance Day. | Operate; avoid orphan moves. |
 | 2026-08-31 | `Fund.effectiveBalanceC` = cash left (`balanceC`); raid already dips balance — do not subtract IOUs again. UI shows In the bank + owed back (no double-count “Feels like”). | Review before merge PR #1. |
 | 2026-08-31 | **Ship flow** (`.cursor/rules/ship-flow.mdc`): branch → implement → docs same pass → verify → commit (when asked) → push → PR → review/fix → ready → merge → update local `main`. No PR before push; no deferred docs. | Locked after PR #1; corrects inverted “PR then docs then commit” habit. |
+| 2026-08-31 | **Phase 5 Slice C** UX: War Chest snowball queue + Sweep confirm (IOU repay before loan-payoff park); Baggage chips read-only; Ready to pay → Checklist; Forecast breathing room → Sweep; no drag-reorder; no Statement-day snowball payout. | Skills Operate/Humanizer/Emil; `docs/SKILLS_REVIEW.md`. |
+| 2026-08-31 | **Phase 5 Slice C** shipped: `Snowball` engine (queue/batches, proposeSweep IOU→park, ready-to-pay, park-another-month); War Chest Snowball + Sweep; BPI remnant seed; Forecast leftover link. Phase 5 A+B+C complete. | Spec §4.10 / §6 repay-before-sweep accept. |
+| 2026-08-31 | Park another month: **confirm sheet** with From (default loan-payoff home) + date; Sweep From defaults to same home. No silent first Cash pocket. | Follow-the-money; Operate. |
+| 2026-08-31 | **Accounting map gate** (`.cursor/rules/accounting-map.mdc`): before any money-moving feature, name pockets / envelope / ledger legs and report followability; push back if it worsens dual books or same-sign transfer theater. | Charts/reports must follow the money. |
+| 2026-08-31 | Snowball edit chrome: sheet **Edit payoff order**; labeled Order/Batch sections; list `Pay next · #`; Ready to pay copy without “from”. | Operate/Humanizer; unlabeled twin fields. |
+| 2026-08-31 | Loan strategy **display**: Stash extras / On schedule only (`DisplayLabels`); raw `prepay` / `park_to_maturity` unchanged. | Humanizer; Prepay/Park-to-maturity jargon. |
+| 2026-08-31 | Snowball **Batch** UI hidden until a later wave exists (`Snowball.showsBatchChrome`); edit offers “Pay in a later wave…”. | Operate; one-wave demos. |
+| 2026-08-31 | Park/Sweep sheets dismiss only after successful commit (Forecast leftover keeps War Chest open on failure). | Review before merge PR #3. |
 
 ## For later
 
