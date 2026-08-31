@@ -227,7 +227,7 @@ Skills: Impeccable Operate, Humanizer, Emil / apple-design, UI UX Pro Max (mobil
 | More IA | **Baggage We're Carrying** + **The War Chest** as first-class links (not under Fine Print). Footer: more rooms later. | Don’t invent a third “debts” room; Love Tab stays partner receivable |
 | Baggage | Active list + archive (“Baggage we put down”); derived balance prominent; purpose + APR (0% distinct); journal dated notes; **no hand-typed balance** | Balance Day confirm = Phase 6 |
 | War Chest | Fund cards: In the bank · owed-back · whole-again-at · target + IOU sliver; summary when owed | No household-scoped fund toggle (For later) |
-| Raid | Sheet from Forecast over + War Chest; raid order; amount ≤ balance; absorb (default) vs add-to-due | No auto-raid on open |
+| Raid | Sheet from Forecast over + War Chest; raid order; amount ≤ balance; **MVP absorb only** | No add-to-due in UI; engine retains attribution |
 | Checklist loan | Emit `loan_payment`; Count it → ledger + `loanPayment` role + `paidMonths++` | No separate loan-pay screen |
 | Snowball | War Chest queue; custom order; IOU repay **before** sweep; confirm card | No silent auto-sweep |
 | Method | Engines + UB / raid / repay fixtures before chrome | No empty War Chest shell without engine |
@@ -252,3 +252,40 @@ Skills: Operate, Humanizer, write-swift TDD. Spec §4.11.
 | Count it UX | Loan Paid from starts **Choose** (no prefill); sheet `countIt ?? item` keeps pick; toggle armed while sheet open |
 
 **Next:** Slice B (funds / raids / War Chest).
+
+---
+
+## Phase 5 Slice B — Funds + War Chest + raids (2026-08-31)
+
+Skills: Operate, Humanizer, write-swift TDD. Spec §4.10. Phase locks reused (no separate micro-pass).
+
+| Piece | Behavior |
+|---|---|
+| Engine | Raid order loan_payoff → sinking → emergency; IOU absorb / add_to_due; repay oldest-first; effective = balance − ious |
+| More | **The War Chest** — fund cards, owed summary, Borrow / Repay sheets |
+| Forecast | Over → “Borrow from a fund” opens War Chest raid (suggested shortfall) |
+| Ledger | `fund_move` home→dest; MVP absorb only (IOU on fund) | add-to-due UI hidden; engine path kept |
+| Seed | Loan payoff · Sinking · Emergency (Fern / BPI Debit) |
+
+**Next:** Slice C (snowball — repay IOUs before sweep).
+
+---
+
+## War Chest Add / Borrow polish (2026-08-31)
+
+Skills: Operate, Humanizer, Emil. Spec §4.10 transfer home → spend pocket.
+
+| Piece | Lock | Push back |
+|---|---|---|
+| Add placement | List footer **Start a fund** (no leading `+` next to Back); trailing **Borrow** only | — |
+| Add fund | Name, purpose, home (Fern **asset** pocket), opening → Fund Move + `balanceC` | No hand-edit balance; no CC/loan as home |
+| Owner | Payer (`fern`) only | No contributor War Chest in MVP (§7.7) |
+| Top-up | Amount + from account; Fund Move into home; bump `balanceC` | — |
+| Card | Show home account label under name | — |
+| Borrow | Destination = Fern cash/bank/e-wallet/digital; two-leg Fund Move home→dest; free-text note (default Cover bills) | No Shared/CC dest; Phase 6 owns account balances |
+| When it happened | Compact DatePicker (like Add) on Start a fund, Top-up, Borrow; sheets `.large` | Wheel temporary; Repay undated |
+| Opening delete | Receipts opening `fund_move` → confirm removes **fund + row** | No ledger-only (orphans In the bank) |
+| Repay ledger | Still fund-record only | Reverse dest→home later |
+| Loan → fund | Deferred (Baggage “Park payoff…”) | Not this polish |
+
+**Next:** Phase 5 Slice C (snowball — IOU repay before sweep). Then Phase 6 Empire / Balance Day.

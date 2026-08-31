@@ -7,8 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		00D91CA514CDF247D9750577 /* WarChestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03680BE1ACE48C7E11CA3842 /* WarChestView.swift */; };
 		012AB156F8A5D3527E607D82 /* Layout.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB19BB64CC3C1ABB1DF02C4E /* Layout.swift */; };
 		058DF10F5B2262209C6F1C74 /* Primitives.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EFCF0FB550B4A59D85E89E4 /* Primitives.swift */; };
+		06BA394BDDB3D1B2307B9538 /* Fund.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBC592E0853CACC208B9AEB7 /* Fund.swift */; };
 		0A34303C7A5DC9E6792AB706 /* LoanTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E431724D5AED12D3CAB0985 /* LoanTests.swift */; };
 		0C97F452621DB44225788B57 /* Forecast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F2D8D580EDD694073DBB29F /* Forecast.swift */; };
 		0CC4AD15DA2DEF6DC46FF174 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 750E8203BBAB2B9E6AD5BF54 /* PrivacyInfo.xcprivacy */; };
@@ -50,6 +52,7 @@
 		9D95DA2FBA609CE89B20740A /* FundingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AA2E360ABC5333C5039DEE0 /* FundingTests.swift */; };
 		A5ADB0AF24C90E23F113AE14 /* SeedCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F25187A8EBD065FB0589B4 /* SeedCatalog.swift */; };
 		A77581FD06F01FA6180ED957 /* SettlementTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567E6985C02435A4FC2F7323 /* SettlementTests.swift */; };
+		AA49368812EEFDEE7F9F9C26 /* FundTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59E2B3D59208996EE80587CF /* FundTests.swift */; };
 		B997C3A666C2A4AEBE062F2E /* MoneyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D52988F0894815DC945A48B0 /* MoneyTests.swift */; };
 		BA40269CE56BAA95A5F75CA2 /* ThingsWeKeepDoingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1D312E74CC27D7FAE618E5 /* ThingsWeKeepDoingView.swift */; };
 		BE588C56B3A912055F87FF0F /* Domain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D4D90A0EE53692CCB069F1C /* Domain.swift */; };
@@ -78,6 +81,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		03680BE1ACE48C7E11CA3842 /* WarChestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarChestView.swift; sourceTree = "<group>"; };
 		063875082A5AF605BF68F225 /* Fraunces.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fraunces.ttf; sourceTree = "<group>"; };
 		11D28B0D4036AD013C2CD12A /* CookieJar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieJar.swift; sourceTree = "<group>"; };
 		12C002964A17D10C56E3CA2F /* BillsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillsView.swift; sourceTree = "<group>"; };
@@ -100,6 +104,7 @@
 		48FB7376E78D3CE23F7A083B /* Settlement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settlement.swift; sourceTree = "<group>"; };
 		4C123A96441A24DE527E16E1 /* InputBoundsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputBoundsTests.swift; sourceTree = "<group>"; };
 		567E6985C02435A4FC2F7323 /* SettlementTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettlementTests.swift; sourceTree = "<group>"; };
+		59E2B3D59208996EE80587CF /* FundTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FundTests.swift; sourceTree = "<group>"; };
 		6325E061F64F2C2AC149C4EC /* Bootstrap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bootstrap.swift; sourceTree = "<group>"; };
 		696CD15F7EFEAC0E10BE6B3A /* RealizationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealizationTests.swift; sourceTree = "<group>"; };
 		6A34EF3046046EC6B4BAC16A /* ChecklistTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChecklistTests.swift; sourceTree = "<group>"; };
@@ -131,6 +136,7 @@
 		D5D497E9ABAA59A66B9DA2B7 /* CookieJarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieJarView.swift; sourceTree = "<group>"; };
 		D9505F4A33598A4C2021201C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		DA78F54A20DB45DBE0FA2FCE /* Fraunces-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fraunces-Italic.ttf"; sourceTree = "<group>"; };
+		DBC592E0853CACC208B9AEB7 /* Fund.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fund.swift; sourceTree = "<group>"; };
 		E071C8B79EE8A5BEB39FEDFA /* AppEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEnvironment.swift; sourceTree = "<group>"; };
 		E276A67059927F03A430AD05 /* StatementDayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatementDayView.swift; sourceTree = "<group>"; };
 		E6CC6980CF58C89BB7D7B9FE /* AddEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEntryView.swift; sourceTree = "<group>"; };
@@ -191,6 +197,7 @@
 				B7231909121283955C536ADB /* DisplayLabelsTests.swift */,
 				190A974AB699BA812D8F02DE /* ForecastTests.swift */,
 				9AA2E360ABC5333C5039DEE0 /* FundingTests.swift */,
+				59E2B3D59208996EE80587CF /* FundTests.swift */,
 				4C123A96441A24DE527E16E1 /* InputBoundsTests.swift */,
 				29DE9CCC311070037631895C /* LedgerFiltersTests.swift */,
 				3E431724D5AED12D3CAB0985 /* LoanTests.swift */,
@@ -235,6 +242,7 @@
 				B823599C2B79C430C92D7047 /* SettingsView.swift */,
 				E276A67059927F03A430AD05 /* StatementDayView.swift */,
 				AB1D312E74CC27D7FAE618E5 /* ThingsWeKeepDoingView.swift */,
+				03680BE1ACE48C7E11CA3842 /* WarChestView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -293,6 +301,7 @@
 				22B8023D3CB8E4B30986D2F3 /* DisplayLabels.swift */,
 				8D4D90A0EE53692CCB069F1C /* Domain.swift */,
 				8F2D8D580EDD694073DBB29F /* Forecast.swift */,
+				DBC592E0853CACC208B9AEB7 /* Fund.swift */,
 				309AA4037C7D1B357F4EB7E4 /* Funding.swift */,
 				83F045E3D61777046C8B88BD /* InputBounds.swift */,
 				2B14EF3277DB4072ECEC8D04 /* LedgerFilters.swift */,
@@ -410,6 +419,7 @@
 				5EAFCDB1B460FB0A44F13981 /* DisplayLabels.swift in Sources */,
 				BE588C56B3A912055F87FF0F /* Domain.swift in Sources */,
 				0C97F452621DB44225788B57 /* Forecast.swift in Sources */,
+				06BA394BDDB3D1B2307B9538 /* Fund.swift in Sources */,
 				73A3213BD6F12A181614A4C2 /* Funding.swift in Sources */,
 				7915D32C0B7A596E1FD4BCA3 /* HomeView.swift in Sources */,
 				FD3D73171D3C2B1E21A7E40A /* InputBounds.swift in Sources */,
@@ -432,6 +442,7 @@
 				F4983B225917F823224DCD36 /* StatementDayView.swift in Sources */,
 				BA40269CE56BAA95A5F75CA2 /* ThingsWeKeepDoingView.swift in Sources */,
 				3DD058C8C0E182D9693F3464 /* Typography.swift in Sources */,
+				00D91CA514CDF247D9750577 /* WarChestView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -447,6 +458,7 @@
 				4143427B70772B07CA6A2F81 /* CycleTests.swift in Sources */,
 				2B207117194F37A902FCA24C /* DisplayLabelsTests.swift in Sources */,
 				209CE2119FCD9EFDA1CC15A3 /* ForecastTests.swift in Sources */,
+				AA49368812EEFDEE7F9F9C26 /* FundTests.swift in Sources */,
 				9D95DA2FBA609CE89B20740A /* FundingTests.swift in Sources */,
 				FF47120EA49A691C5B2BC666 /* InputBoundsTests.swift in Sources */,
 				4AEF6E6E3900DD2A3842865E /* LedgerFiltersTests.swift in Sources */,

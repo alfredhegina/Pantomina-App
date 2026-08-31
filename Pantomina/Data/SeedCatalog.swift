@@ -111,7 +111,52 @@ enum SeedCatalog {
         try seedDemoFundingIfNeeded(into: context)
         try seedDemoJarIfNeeded(into: context)
         try seedDemoLoansIfNeeded(into: context)
+        try seedDemoFundsIfNeeded(into: context)
         try context.save()
+    }
+
+    /// Demo War Chest funds (Fern personal). Additive.
+    @MainActor
+    static func seedDemoFundsIfNeeded(into context: ModelContext) throws {
+        let existing = try context.fetch(FetchDescriptor<FundRecord>())
+        guard !existing.contains(where: { $0.id == "fund-emergency" }) else { return }
+
+        let accounts = try context.fetch(FetchDescriptor<AccountRecord>())
+        let homeId = accounts.first { $0.baseName == "BPI Debit" && $0.scope == .fern }?.id
+            ?? accounts.first { $0.scope == .fern }?.id
+            ?? accounts.first?.id
+        guard let homeId else { return }
+
+        context.insert(
+            FundRecord(
+                id: "fund-loan-payoff",
+                name: "Loan payoff",
+                purpose: .loanPayoff,
+                homeAccountId: homeId,
+                targetC: nil,
+                balanceC: 25_000_00
+            )
+        )
+        context.insert(
+            FundRecord(
+                id: "fund-sinking",
+                name: "Sinking · car",
+                purpose: .sinking,
+                homeAccountId: homeId,
+                targetC: 80_000_00,
+                balanceC: 18_000_00
+            )
+        )
+        context.insert(
+            FundRecord(
+                id: "fund-emergency",
+                name: "Emergency",
+                purpose: .emergency,
+                homeAccountId: homeId,
+                targetC: 100_000_00,
+                balanceC: 50_000_00
+            )
+        )
     }
 
     /// UB Personal accept fixture (24/60 → ₱628,916.76). Additive.

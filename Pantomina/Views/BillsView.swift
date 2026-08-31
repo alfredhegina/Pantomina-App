@@ -22,6 +22,7 @@ struct BillsView: View {
     @State private var showCountAccountPicker = false
     @State private var countItError: String?
     @State private var statementRoute: String?
+    @State private var showForecastRaid = false
     @AppStorage("checklistDoneIds") private var checklistDoneRaw = ""
 
     private var checklistDoneIds: Set<String> {
@@ -182,7 +183,10 @@ struct BillsView: View {
                     BillsForecastPane(
                         cycleISO: activeAnchor,
                         forecast: forecast,
-                        onPickCycle: { AnyView(cycleMenu) }
+                        onPickCycle: { AnyView(cycleMenu) },
+                        onCoverShortfall: {
+                            showForecastRaid = true
+                        }
                     )
                 case 2:
                     BillsChecklistPane(
@@ -233,6 +237,21 @@ struct BillsView: View {
             }
             .sheet(isPresented: $showLogContribution) {
                 contributionSheet(starkName: stark)
+            }
+            .sheet(isPresented: $showForecastRaid) {
+                NavigationStack {
+                    WarChestView(
+                        suggestedRaidAmountC: forecast.verdict == .over
+                            ? abs(forecast.breathingRoomC)
+                            : nil,
+                        onRaidComplete: { showForecastRaid = false }
+                    )
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Close") { showForecastRaid = false }
+                        }
+                    }
+                }
             }
             .overlay(alignment: .bottom) {
                 if let toast {

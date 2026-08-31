@@ -6,6 +6,7 @@ struct BillsForecastPane: View {
     let cycleISO: String
     let forecast: Forecast.Result
     let onPickCycle: () -> AnyView
+    var onCoverShortfall: (() -> Void)? = nil
 
     var body: some View {
         ScrollView {
@@ -21,9 +22,16 @@ struct BillsForecastPane: View {
                                 forecast.verdict == .over ? Color.pantomina.terraDeep : Color.pantomina.ink
                             )
                         if forecast.verdict == .over {
-                            Text("Short? Fund raids land in Phase 5 — for now, trim spends or log a contribution on The split.")
-                                .font(PantominaFont.caption)
-                                .foregroundStyle(Color.pantomina.terraDeep)
+                            Button {
+                                onCoverShortfall?()
+                            } label: {
+                                Text("Short? Borrow from a fund to cover it.")
+                                    .font(PantominaFont.caption)
+                                    .foregroundStyle(Color.pantomina.terraDeep)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel("Borrow from a fund to cover the shortfall")
                         }
                         VStack(alignment: .leading, spacing: 2) {
                             Text("In \(formatPeso(forecast.expectedInC))")
