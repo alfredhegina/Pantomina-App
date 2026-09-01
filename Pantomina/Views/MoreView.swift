@@ -51,6 +51,36 @@ struct MoreView: View {
                 }
 
                 NavigationLink {
+                    YearSoFarView()
+                } label: {
+                    Label {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Our Year So Far")
+                            Text("Year to date")
+                                .font(PantominaFont.caption)
+                                .foregroundStyle(Color.pantomina.muted)
+                        }
+                    } icon: {
+                        Image(systemName: "chart.bar")
+                    }
+                }
+
+                NavigationLink {
+                    MoneySleepsView()
+                } label: {
+                    Label {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Where the Money Sleeps")
+                            Text("Accounts")
+                                .font(PantominaFont.caption)
+                                .foregroundStyle(Color.pantomina.muted)
+                        }
+                    } icon: {
+                        Image(systemName: "map")
+                    }
+                }
+
+                NavigationLink {
                     CookieJarView()
                 } label: {
                     Label {
@@ -113,7 +143,7 @@ struct MoreView: View {
                 Section {
                     EmptyView()
                 } footer: {
-                    Text("Empire, Cookie Jar, loans, funds, recurring, Statement day, and settings.")
+                    Text("Empire, Year So Far, Money Sleeps, Cookie Jar, loans, funds, recurring, Statement day, and settings.")
                         .font(PantominaFont.caption)
                 }
             }

@@ -32,6 +32,7 @@ struct EmpireView: View {
     @State private var miniReport: PocketRow?
     @State private var selectedAnchor: String?
     @State private var showMetricDetails = false
+    @State private var selectedYear: Int = Calendar.current.component(.year, from: Date())
 
     private var fernName: String { people.first { $0.id == .fern }?.name ?? "Fern" }
     private var starkName: String { people.first { $0.id == .stark }?.name ?? "Stark" }
@@ -44,7 +45,8 @@ struct EmpireView: View {
         selectedAnchor ?? Cycle.cycleFor(isoDate: Self.todayISO()).anchorISO
     }
 
-    private var cycleAnchors: [String] {
+    /// Unbounded candidate set (storage truth). Menus never show this raw.
+    private var allCycleAnchors: [String] {
         var set = Set<String>()
         let today = Cycle.cycleFor(isoDate: Self.todayISO())
         set.insert(today.anchorISO)
@@ -70,6 +72,27 @@ struct EmpireView: View {
         return set.sorted()
     }
 
+    private var yearOptions: [Int] {
+        var years = Set(allCycleAnchors.compactMap { Int($0.prefix(4)) })
+        years.insert(selectedYear)
+        years.insert(Calendar.current.component(.year, from: Date()))
+        return years.sorted(by: >)
+    }
+
+    /// Cycle Menu: anchors in the selected year only (≤ ~24).
+    private var cycleAnchors: [String] {
+        var inYear = Cycle.anchors(inYear: selectedYear, from: allCycleAnchors)
+        if inYear.isEmpty {
+            inYear = Cycle.recentAnchors(from: allCycleAnchors, aroundISO: activeAnchor, limit: 24)
+        }
+        if !inYear.contains(activeAnchor),
+           activeAnchor.hasPrefix(String(format: "%04d-", selectedYear)) {
+            inYear.append(activeAnchor)
+            inYear.sort()
+        }
+        return inYear
+    }
+
     private var fernPockets: [PocketRow] { livePockets(for: .fern) }
     private var starkPockets: [PocketRow] { livePockets(for: .stark) }
 
@@ -87,19 +110,20 @@ struct EmpireView: View {
 
     private var chartSeries: [EmpireCharts.Point] {
         let inputs = chartSnapInputs
+        let full: [EmpireCharts.Point]
         switch scope {
         case .fern:
             let base = EmpireCharts.personalSeries(snapshots: inputs, personId: PersonId.fern.rawValue)
             let live = displayMetrics.map {
                 EmpireCharts.Point(cycleAnchorISO: activeAnchor, metrics: $0)
             }
-            return EmpireCharts.withLiveTip(series: base, live: live, activeAnchor: activeAnchor)
+            full = EmpireCharts.withLiveTip(series: base, live: live, activeAnchor: activeAnchor)
         case .stark:
             let base = EmpireCharts.personalSeries(snapshots: inputs, personId: PersonId.stark.rawValue)
             let live = displayMetrics.map {
                 EmpireCharts.Point(cycleAnchorISO: activeAnchor, metrics: $0)
             }
-            return EmpireCharts.withLiveTip(series: base, live: live, activeAnchor: activeAnchor)
+            full = EmpireCharts.withLiveTip(series: base, live: live, activeAnchor: activeAnchor)
         case .household:
             let fern = inputs.filter { $0.personId == PersonId.fern.rawValue }
             let stark = inputs.filter { $0.personId == PersonId.stark.rawValue }
@@ -107,8 +131,9 @@ struct EmpireView: View {
             let live = displayMetrics.map {
                 EmpireCharts.Point(cycleAnchorISO: activeAnchor, metrics: $0)
             }
-            return EmpireCharts.withLiveTip(series: base, live: live, activeAnchor: activeAnchor)
+            full = EmpireCharts.withLiveTip(series: base, live: live, activeAnchor: activeAnchor)
         }
+        return EmpireCharts.points(inYear: selectedYear, series: full)
     }
 
     private var displayMetrics: Snapshot.Metrics? {
@@ -203,9 +228,26 @@ struct EmpireView: View {
                     if new == .stark { balanceDayPerson = .stark }
                 }
 
+                Picker("Year", selection: $selectedYear) {
+                    ForEach(yearOptions, id: \.self) { y in
+                        Text(String(y)).tag(y)
+                    }
+                }
+                .pickerStyle(.menu)
+                .accessibilityLabel("Year")
+                .onChange(of: selectedYear) { _, newYear in
+                    let inYear = Cycle.anchors(inYear: newYear, from: allCycleAnchors)
+                    if !activeAnchor.hasPrefix(String(format: "%04d-", newYear)) {
+                        selectedAnchor = inYear.last
+                    }
+                }
+
                 Picker("Cycle", selection: Binding(
                     get: { activeAnchor },
-                    set: { selectedAnchor = $0 }
+                    set: { new in
+                        selectedAnchor = new
+                        if let y = Int(new.prefix(4)) { selectedYear = y }
+                    }
                 )) {
                     ForEach(cycleAnchors.reversed(), id: \.self) { anchor in
                         Text(DisplayLabels.displayDate(iso: anchor)).tag(anchor)
@@ -254,6 +296,9 @@ struct EmpireView: View {
             ToolbarItem(placement: .principal) {
                 PetTitle("Our Little Empire")
             }
+        }
+        .onAppear {
+            if let y = Int(activeAnchor.prefix(4)) { selectedYear = y }
         }
         .sheet(isPresented: $showBalanceDay) {
             BalanceDayView(personId: balanceDayPerson, cycleISO: activeAnchor) {
@@ -597,6 +642,9 @@ struct EmpireView: View {
         scope = .fern
         balanceDayPerson = .fern
         selectedAnchor = PortfolioFern0820.cycleAnchorISO
+        if let y = Int(PortfolioFern0820.cycleAnchorISO.prefix(4)) {
+            selectedYear = y
+        }
     }
 
     private static func todayISO() -> String {

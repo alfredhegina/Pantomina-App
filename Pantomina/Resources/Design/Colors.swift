@@ -16,6 +16,24 @@ struct PantominaColors {
     let terraDeep = Color(hex: "#D9764F")
     let blush = Color(hex: "#F6DCE1")
     let rose = Color(hex: "#B8405E")
+
+    /// Where it Went expense slices — amount-rank palette (tweak here; not Charts auto hues).
+    let categoryAmber = Color(hex: "#D9A066")
+    let categoryOlive = Color(hex: "#7A8F6E")
+    let categorySlateTeal = Color(hex: "#6E8B8A")
+    let categoryCocoa = Color(hex: "#8B6B5C")
+
+    /// Rank 0…4 then muted for Other / overflow. Stable for later aesthetic retunes.
+    func categorySlice(rank: Int) -> Color {
+        switch rank {
+        case 0: return terra
+        case 1: return categoryAmber
+        case 2: return categoryOlive
+        case 3: return categorySlateTeal
+        case 4: return categoryCocoa
+        default: return muted
+        }
+    }
 }
 
 extension Color {

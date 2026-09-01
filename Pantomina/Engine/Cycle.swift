@@ -126,6 +126,33 @@ public struct Cycle: Equatable, Sendable {
         return range.count
     }
 
+    /// Cycle Menu window: anchors whose ISO year matches (≤ ~24 half-months).
+    public static func anchors(inYear year: Int, from candidates: [String]) -> [String] {
+        let prefix = String(format: "%04d-", year)
+        return Array(Set(candidates.filter { $0.hasPrefix(prefix) })).sorted()
+    }
+
+    /// Cap an unbounded candidate list to `limit` anchors nearest `aroundISO` (chronological).
+    public static func recentAnchors(
+        from candidates: [String],
+        aroundISO: String,
+        limit: Int = 24
+    ) -> [String] {
+        precondition(limit > 0)
+        let sorted = Array(Set(candidates)).sorted()
+        guard !sorted.isEmpty else { return [] }
+        if sorted.count <= limit { return sorted }
+        let target = cycleFor(isoDate: aroundISO).anchorISO
+        let idx = sorted.firstIndex(of: target)
+            ?? sorted.firstIndex(where: { $0 >= target })
+            ?? (sorted.count - 1)
+        var end = min(sorted.count, idx + 1 + limit / 2)
+        var start = max(0, end - limit)
+        end = min(sorted.count, start + limit)
+        start = max(0, end - limit)
+        return Array(sorted[start..<end])
+    }
+
     private static func matchesCutoff(_ cycle: Cycle, cutoff: Int) -> Bool {
         let day = Int(cycle.anchorISO.split(separator: "-")[2]) ?? 0
         if cutoff == 15 { return day == 15 }

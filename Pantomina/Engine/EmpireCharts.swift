@@ -80,6 +80,12 @@ enum EmpireCharts {
         return (series + [live]).sorted { $0.cycleAnchorISO < $1.cycleAnchorISO }
     }
 
+    /// Chart series for one calendar year (store-all, plot-windowed).
+    static func points(inYear year: Int, series: [Point]) -> [Point] {
+        let prefix = String(format: "%04d-", year)
+        return series.filter { $0.cycleAnchorISO.hasPrefix(prefix) }
+    }
+
     /// NW step vs previous point in series (nil for first / missing). Pure; for tooltip copy.
     static func netWorthDeltaVsPrevious(series: [Point], cycleAnchorISO: String) -> Int? {
         let sorted = series.sorted { $0.cycleAnchorISO < $1.cycleAnchorISO }

@@ -174,4 +174,16 @@ struct EmpireChartsTests {
         #expect(EmpireCharts.netWorthDeltaVsPrevious(series: series, cycleAnchorISO: "2026-09-15") == -4)
         #expect(EmpireCharts.netWorthDeltaVsPrevious(series: series, cycleAnchorISO: "2099-01-01") == nil)
     }
+
+    @Test("points(inYear:) windows series without mutating storage order")
+    func pointsInYear() {
+        let series = [
+            EmpireCharts.Point(cycleAnchorISO: "2025-12-31", assetsC: 1, liabilitiesC: 0, netWorthC: 1),
+            EmpireCharts.Point(cycleAnchorISO: "2026-08-15", assetsC: 2, liabilitiesC: 0, netWorthC: 2),
+            EmpireCharts.Point(cycleAnchorISO: "2026-08-31", assetsC: 3, liabilitiesC: 0, netWorthC: 3),
+            EmpireCharts.Point(cycleAnchorISO: "2027-01-15", assetsC: 4, liabilitiesC: 0, netWorthC: 4),
+        ]
+        let y26 = EmpireCharts.points(inYear: 2026, series: series)
+        #expect(y26.map(\.cycleAnchorISO) == ["2026-08-15", "2026-08-31"])
+    }
 }
