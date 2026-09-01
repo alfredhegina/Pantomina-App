@@ -92,6 +92,7 @@ Living log of locked **Baseline** choices and parked **For later** work. The pro
 | 2026-08-31 | PocketBalance v1: asset = income/savings/sinking/transfer − expense; liability CC opposite; loans derived; externals lastConfirmed; spoken-for display-only. Fund Move dual-leg skew accepted until transfer model. | Honest follow-the-money; don’t invent fixes. |
 | 2026-08-31 | Empire **Cycle** Menu (Bills-style anchors): pocket NW **as-of** cycle end; mini-report lists that cycle’s window; missing snapshot → ledger. Label Cycle not statement date. Balance Day stamps Empire’s selected cycle. | Operate; in-window-only would wipe NW; Statement day owns CC paper. |
 | 2026-08-31 | PocketBalance **excludes** `contribution` / `receivable` / `fund_move` legs from pocket sums; Love Tab line from `Settlement.history` (internal debt). Loan payments still count. | Settlement theater must not inflate House cash / NW. |
+| 2026-09-01 | Portfolio-Fern **metrics-only demo** shows Spec golden when Cycle matches its anchor (`2026-08-20`), even if seed pockets exist; other cycles stay live ledger. | Smoke button was a no-op while live pockets always won. |
 
 ## For later
 
