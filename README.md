@@ -9,7 +9,7 @@ Shared finance for exactly two people — **Fern** (payer) and **Stark** (contri
 
 **Phase 4 complete** — Slice A (Forecast/Checklist) · B (funding) · C (Cookie Jar).  
 **Phase 5 complete** — A Baggage/loans · B War Chest funds/raids · C Snowball (queue, Sweep, Park From, stash labels).  
-**Phase 6 Slice A** — Snapshot + Empire metrics; dashboard reshape + Cycle as-of. **Slice B** — Empire charts + hybrid NW hero (full-width line + selection tooltip). **Next:** C YTD/drift/Money Sleeps.  
+**Phase 6 complete** — A Snapshot/Empire · B charts+hybrid hero · C Year So Far (Fern·Stark·Household + history year window) / drift / Money Sleeps. **Next:** Phase 7.  
 **Phase 4 Slice C** — Cookie Jar running balance, who’s-paid, borrow return; jar Add locks Petty Cash + Just mine.  
 **Phase 4 Slice B** — funding + Count it; Keep Doing Add/Edit/Delete + Category; twin PruLife.  
 **Phase 4 Slice A** — Projection / Forecast / Checklist; recurring rules.  

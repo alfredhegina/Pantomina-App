@@ -19,6 +19,8 @@ struct BalanceDayView: View {
 
     @State private var drafts: [String: DraftLine] = [:]
     @State private var error: String?
+    @State private var driftQueue: [InterestDrift.Prompt] = []
+    @State private var activeDrift: InterestDrift.Prompt?
 
     private struct DraftLine {
         var balanceText: String
@@ -131,6 +133,16 @@ struct BalanceDayView: View {
                 }
             }
             .onAppear { seedDraftsIfNeeded() }
+            .sheet(item: $activeDrift) { prompt in
+                InterestDriftSheet(
+                    prompt: prompt,
+                    accountLabel: accounts.first { $0.id == prompt.homeAccountId }?
+                        .displayLabel(fernName: fernName, starkName: starkName)
+                        ?? "This pocket",
+                    onBook: { bookInterest(prompt); advanceDriftQueue() },
+                    onSkip: { advanceDriftQueue() }
+                )
+            }
         }
         .presentationDetents([.large])
     }
@@ -239,6 +251,7 @@ struct BalanceDayView: View {
     private func confirm() {
         error = nil
         var externalBalances: [String: (amountC: Int, skipped: Bool)] = [:]
+        var pendingDrift: [InterestDrift.Prompt] = []
 
         for account in allEditable {
             let draft = drafts[account.id] ?? defaultDraft(for: account)
@@ -257,6 +270,21 @@ struct BalanceDayView: View {
             else {
                 error = "Check the amount on \(account.baseName)."
                 return
+            }
+            let isFundHome = funds.contains { $0.homeAccountId == account.id }
+            if isFundHome, let previous = account.lastConfirmedBalanceC {
+                let explained = explainedIncomeC(
+                    accountId: account.id,
+                    afterCycleISO: account.lastConfirmedCycleISO
+                )
+                if let prompt = InterestDrift.prompt(
+                    homeAccountId: account.id,
+                    previousConfirmedBalanceC: previous,
+                    currentBalanceC: amountC,
+                    explainedIncomeC: explained
+                ) {
+                    pendingDrift.append(prompt)
+                }
             }
             externalBalances[account.id] = (amountC, false)
             account.lastConfirmedBalanceC = amountC
@@ -314,7 +342,68 @@ struct BalanceDayView: View {
         )
         modelContext.insert(record)
         try? modelContext.save()
-        onDone()
+
+        if pendingDrift.isEmpty {
+            onDone()
+        } else {
+            driftQueue = pendingDrift
+            activeDrift = pendingDrift.first
+        }
+    }
+
+    private func explainedIncomeC(accountId: String, afterCycleISO: String?) -> Int {
+        transactions
+            .filter { $0.accountId == accountId && $0.realizedStatus == .realized }
+            .filter { tx in
+                guard let after = afterCycleISO else { return true }
+                let effective = tx.realizedDate ?? tx.purchaseDate
+                return effective > after
+            }
+            .filter { categoryFlow[$0.categoryId] == .income }
+            .filter {
+                switch $0.settlementRole {
+                case .contribution, .receivable, .fundMove: return false
+                case .loanPayment, nil: return true
+                }
+            }
+            .reduce(0) { $0 + $1.amountC }
+    }
+
+    private func bookInterest(_ prompt: InterestDrift.Prompt) {
+        let incomeCat = categories.first { $0.flow == .income && $0.item == "Side hustle" }
+            ?? categories.first { $0.flow == .income }
+        guard let incomeCat else { return }
+        let tx = TransactionRecord(
+            purchaseDate: cycleISO,
+            realizedDate: cycleISO,
+            realizedStatus: .realized,
+            amountC: prompt.unexplainedPositiveC,
+            accountId: prompt.homeAccountId,
+            categoryId: incomeCat.id,
+            paidBy: personId,
+            allocation: Allocation(
+                fern: personId == .fern ? prompt.unexplainedPositiveC : 0,
+                stark: personId == .stark ? prompt.unexplainedPositiveC : 0
+            ),
+            note: "Interest"
+        )
+        modelContext.insert(tx)
+        try? modelContext.save()
+    }
+
+    private func advanceDriftQueue() {
+        guard !driftQueue.isEmpty else {
+            activeDrift = nil
+            onDone()
+            return
+        }
+        driftQueue.removeFirst()
+        if let next = driftQueue.first {
+            activeDrift = next
+        } else {
+            activeDrift = nil
+            onDone()
+        }
     }
 
     private func priorMetrics() -> Snapshot.Metrics? {

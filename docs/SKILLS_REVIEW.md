@@ -509,3 +509,58 @@ Skills: Operate, Humanizer, Emil; energy + hedging refs for **composition only**
 | Motion / cheese | Ease-out reveal; Reduce Motion static; rose heart on gain; cheese off amounts | — |
 
 **Next:** Slice C (YTD / interest-drift / Where the Money Sleeps).
+
+---
+
+## Phase 6 Slice C — skills + inspiration (2026-09-01)
+
+Skills: Operate, Humanizer, Emil / apple-design, accounting-map, write-swift TDD. Spec More: Our Year So Far, interest drift, Where the Money Sleeps.
+
+**Ship order:** YTD first → interest-drift confirm → Money Sleeps. Gate: Slice B Empire charts merged (#9).
+
+### Inspiration (composition only)
+
+Modern soft finance dashboards (calm cards, income/expense bars, category donut) and prior energy/hedging refs inform **layout**, not skin.
+
+| Steal | Push back |
+|---|---|
+| Soft card stack; one year control; income vs expense bars; category donut; quiet Needs/Wants totals | Dark/neon/purple fintech; Inter-only AI dashboards; Sankey/FIRE |
+| Money Sleeps as scoped account map with spoken-for flags | Second NW room duplicating Empire |
+| Drift as confirm sheet (“Book as interest?”) | Silent auto-book; Day/Week/Month grain |
+
+### Product locks
+
+| Piece | Lock | Push back |
+|---|---|---|
+| YTD | More → Our Year So Far; Fern/Stark Seg; split vs just-mine; monthly bars; expense donut; Needs/Wants from `needWant` | Naive Fund Move dual-leg sums; purchaseDate grouping; projected in totals |
+| Accounting | `realizedDate` year window; jar via `jar.kind`; exclude contribution/receivable/fund_move | Envelope pesos as YTD income |
+| Drift | Unexplained **positive** fund-home pocket drift → confirm book interest — never silent | Auto-post without confirm |
+| Money Sleeps | More link; accounts by scope + spoken-for; edit on Receipts | Seven Empire metrics / NW charts |
+| Cheese | Pet title only; empty teach copy; amounts plain | Shame chrome on Needs/Wants |
+
+### Explicit non-changes
+
+Fund Move signed-leg rewrite; dark mode; inventing May–Aug fixture timelines for YTD.
+
+**Next:** Implement YTD engine + UI; then drift; then Money Sleeps.
+
+### Shipped same day (YTD cut)
+
+| Piece | Status |
+|---|---|
+| `YearSoFar` + Our Year So Far UI | Shipped |
+| `InterestDrift` + Balance Day sheet | Shipped |
+| Where the Money Sleeps | Shipped |
+
+### Follow-up (Seg + history + donut palette) — 2026-09-01
+
+Skills: Operate / Humanizer / Emil; Spec cheese quarantine.
+
+| Lock | Choice | Reject |
+|---|---|---|
+| YTD Seg | Fern · Stark · Household (Empire peer); Split\|Just mine only on personal | Person-only Seg; Household + Just mine |
+| Household YTD | Full `amountC` once per leg | Fern-split + Stark-split |
+| History | Year-window Cycle Menu + chart series; `Cycle.anchors(inYear:)` / `recentAnchors` | Unbounded flat Cycle lists |
+| Where it Went | Rank palette tokens + center Spend; top 5 + Other | Charts auto hues; purple/hatch refs |
+
+**Phase 6 complete** (A+B+C + Seg/history polish). **Next:** Phase 7 (chat Add / backup / polish) when asked. Palette aesthetics may retune later via `Colors.categorySlice` only.

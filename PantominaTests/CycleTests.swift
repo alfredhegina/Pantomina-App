@@ -32,4 +32,33 @@ struct CycleTests {
     func februaryFirstHalf() {
         #expect(Cycle.cycleFor(isoDate: "2026-02-10").anchorISO == "2026-02-15")
     }
+
+    @Test("anchors(inYear:) keeps only that calendar year, sorted")
+    func anchorsInYear() {
+        let all = [
+            "2016-01-15", "2016-01-31",
+            "2025-12-31",
+            "2026-01-15", "2026-08-15", "2026-08-31",
+            "2027-01-15",
+        ]
+        #expect(Cycle.anchors(inYear: 2026, from: all) == [
+            "2026-01-15", "2026-08-15", "2026-08-31",
+        ])
+    }
+
+    @Test("recentAnchors caps by limit around a center, chronological")
+    func recentAnchorsCap() {
+        var all: [String] = []
+        var cursor = Cycle(anchorISO: "2020-01-15")
+        for _ in 0..<40 {
+            all.append(cursor.anchorISO)
+            cursor = Cycle.nextHalfMonth(after: cursor)
+        }
+        let around = "2021-06-15"
+        let capped = Cycle.recentAnchors(from: all, aroundISO: around, limit: 6)
+        #expect(capped.count == 6)
+        #expect(capped.contains(around) || capped.contains(Cycle.cycleFor(isoDate: around).anchorISO))
+        #expect(capped == capped.sorted())
+        #expect(capped.last! <= all.last!)
+    }
 }
