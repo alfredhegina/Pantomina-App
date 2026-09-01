@@ -1,4 +1,4 @@
-# Pantomina
+# Pantomina - Money Manager for Two
 
 Shared finance for exactly two people — **Fern** (payer) and **Stark** (contributor) as system ids; display names are yours.
 
