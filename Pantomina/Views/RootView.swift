@@ -48,7 +48,7 @@ struct MainTabView: View {
 
     var body: some View {
         TabView(selection: $tab) {
-            HomeView(onAdd: { showAddSheet = true })
+            HomeView(onAdd: { showAddSheet = true }, onOpenBills: { tab = 3 })
                 .tabItem { Label("Home", systemImage: "house") }
                 .tag(0)
             ReceiptsView()

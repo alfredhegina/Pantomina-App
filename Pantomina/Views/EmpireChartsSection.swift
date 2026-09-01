@@ -58,13 +58,7 @@ struct EmpireChartsSection: View {
         } else {
             VStack(alignment: .leading, spacing: Spacing.sm) {
                 heroChart
-                    .frame(height: 168)
-                    .padding(.vertical, Spacing.xs)
-                    .padding(.horizontal, Spacing.sm)
-                    .background(
-                        RoundedRectangle(cornerRadius: Spacing.radius, style: .continuous)
-                            .fill(celebrateGain ? Color.pantomina.blush.opacity(0.45) : Color.pantomina.card)
-                    )
+                    .frame(height: 160)
                     .mask(alignment: .leading) {
                         Rectangle()
                             .scaleEffect(x: max(reveal, 0.001), anchor: .leading)
@@ -87,30 +81,35 @@ struct EmpireChartsSection: View {
     @ViewBuilder
     private var assetsLiabilitiesBody: some View {
         if series.isEmpty {
-            Section {
-                Text("Confirm a cycle’s balances—the empire line starts here.")
-                    .foregroundStyle(Color.pantomina.muted)
-            }
+            Text("Confirm a cycle’s balances—the empire line starts here.")
+                .font(PantominaFont.caption)
+                .foregroundStyle(Color.pantomina.muted)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(20)
         } else {
-            Section {
+            VStack(alignment: .leading, spacing: 14) {
+                HStack(alignment: .firstTextBaseline) {
+                    Text("Assets & liabilities")
+                        .font(PantominaFont.body.weight(.semibold))
+                        .foregroundStyle(Color.pantomina.ink)
+                    Spacer()
+                    HStack(spacing: 12) {
+                        legendDot(Color.pantomina.quietAccent, "Assets")
+                        legendDot(Color.pantomina.expenseBar, "Liabilities")
+                    }
+                    .font(PantominaFont.caption)
+                }
                 assetsLiabilitiesChart
-                    .frame(height: 180)
+                    .frame(height: 120)
                 if let p = selectedALPoint {
                     Text(
                         "\(DisplayLabels.displayDate(iso: p.cycleAnchorISO)) · assets \(formatPeso(p.assetsC)) · liabilities \(formatPeso(p.liabilitiesC))"
                     )
                     .font(PantominaFont.caption)
                     .foregroundStyle(Color.pantomina.muted)
-                } else {
-                    HStack(spacing: Spacing.md) {
-                        legendDot(Color.pantomina.sage, "Assets")
-                        legendDot(Color.pantomina.terra, "Liabilities")
-                    }
-                    .font(PantominaFont.caption)
                 }
-            } header: {
-                Text("Assets & liabilities")
             }
+            .padding(20)
         }
     }
 
@@ -127,7 +126,7 @@ struct EmpireChartsSection: View {
             if let stepDeltaC {
                 Text(stepDeltaC > 0 ? "Up \(formatPeso(stepDeltaC))" : formatPeso(stepDeltaC))
                     .font(PantominaFont.caption)
-                    .foregroundStyle(gainedStep ? Color.pantomina.sageDeep : Color.pantomina.muted)
+                    .foregroundStyle(gainedStep ? Color.pantomina.quietAccent : Color.pantomina.muted)
             }
         }
         .padding(.horizontal, Spacing.sm)
@@ -150,14 +149,14 @@ struct EmpireChartsSection: View {
                 x: .value("Cycle", point.cycleAnchorISO),
                 y: .value("Net worth", pesos(point.netWorthC))
             )
-            .foregroundStyle(Color.pantomina.sage.opacity(0.22))
+            .foregroundStyle(Color.pantomina.quietAccent.opacity(celebrateGain ? 0.32 : 0.22))
             .interpolationMethod(.linear)
 
             LineMark(
                 x: .value("Cycle", point.cycleAnchorISO),
                 y: .value("Net worth", pesos(point.netWorthC))
             )
-            .foregroundStyle(Color.pantomina.sageDeep)
+            .foregroundStyle(Color.pantomina.quietAccent)
             .lineStyle(StrokeStyle(lineWidth: 2.5))
             .interpolationMethod(.linear)
 
@@ -166,7 +165,7 @@ struct EmpireChartsSection: View {
                     x: .value("Cycle", point.cycleAnchorISO),
                     y: .value("Net worth", pesos(point.netWorthC))
                 )
-                .foregroundStyle(Color.pantomina.sageDeep)
+                .foregroundStyle(Color.pantomina.quietAccent)
                 .symbolSize(selectedNW == point.cycleAnchorISO ? 64 : 36)
             }
 
@@ -190,7 +189,7 @@ struct EmpireChartsSection: View {
                     y: .value("Assets", pesos(point.assetsC)),
                     stacking: .unstacked
                 )
-                .foregroundStyle(Color.pantomina.sage.opacity(0.28))
+                .foregroundStyle(Color.pantomina.quietAccent.opacity(0.28))
                 .interpolationMethod(.linear)
 
                 LineMark(
@@ -198,7 +197,7 @@ struct EmpireChartsSection: View {
                     y: .value("Assets", pesos(point.assetsC)),
                     series: .value("Series", "Assets")
                 )
-                .foregroundStyle(Color.pantomina.sageDeep)
+                .foregroundStyle(Color.pantomina.quietAccent)
                 .interpolationMethod(.linear)
 
                 AreaMark(
@@ -206,7 +205,7 @@ struct EmpireChartsSection: View {
                     y: .value("Liabilities", pesos(point.liabilitiesC)),
                     stacking: .unstacked
                 )
-                .foregroundStyle(Color.pantomina.terra.opacity(0.22))
+                .foregroundStyle(Color.pantomina.expenseBar.opacity(0.22))
                 .interpolationMethod(.linear)
 
                 LineMark(
@@ -214,7 +213,7 @@ struct EmpireChartsSection: View {
                     y: .value("Liabilities", pesos(point.liabilitiesC)),
                     series: .value("Series", "Liabilities")
                 )
-                .foregroundStyle(Color.pantomina.terraDeep)
+                .foregroundStyle(Color.pantomina.expenseBar)
                 .interpolationMethod(.linear)
             }
 

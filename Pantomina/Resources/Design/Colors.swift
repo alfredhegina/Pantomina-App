@@ -40,6 +40,11 @@ struct PantominaColors {
         default: return muted
         }
     }
+
+    /// Quiet ledger: amounts are ink; only income is green.
+    func ledgerAmount(flow: FlowType?) -> Color {
+        flow == .income ? quietAccent : ink
+    }
 }
 
 extension Color {

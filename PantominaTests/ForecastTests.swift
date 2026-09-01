@@ -77,4 +77,56 @@ struct ForecastTests {
         #expect(built.committed.contains { $0.reason == .cardLandsHere })
         #expect(built.committedC == 21_000_00)
     }
+
+    @Test("Due next is empty when the next cycle has no committed bills")
+    func dueNextEmpty() {
+        let strip = HomeDueNext.strip(
+            todayISO: "2026-09-01",
+            upcoming: [
+                (anchorISO: "2026-09-30", committed: []),
+                (anchorISO: "2026-10-15", committed: []),
+            ]
+        )
+        #expect(strip == nil)
+    }
+
+    @Test("Due next uses the following cycle, caps two cards, and keeps the full bill count")
+    func dueNextNextCycleTwoCards() {
+        let committed = [
+            Forecast.Line(id: "rent", title: "Rent · House", amountC: 20_000_00, reason: .fixed),
+            Forecast.Line(id: "net", title: "Internet PLDT", amountC: 1_799_00, reason: .fixed),
+            Forecast.Line(id: "power", title: "Electricity", amountC: 3_000_00, reason: .estimate),
+        ]
+        let strip = HomeDueNext.strip(
+            todayISO: "2026-09-01",
+            upcoming: [
+                (anchorISO: "2026-09-30", committed: committed),
+            ]
+        )
+        #expect(strip != nil)
+        #expect(strip?.dueISO == "2026-09-30")
+        #expect(strip?.billCount == 3)
+        #expect(strip?.totalC == 24_799_00)
+        #expect(strip?.cards.count == 2)
+        #expect(strip?.cards[0].title == "Rent · House")
+        #expect(strip?.cards[0].amountC == 20_000_00)
+        #expect(strip?.cards[0].daysUntil == 29)
+        #expect(strip?.cards[1].title == "Internet PLDT")
+    }
+
+    @Test("Due next skips an empty half-month so 15th bills still surface")
+    func dueNextSkipsEmptyCycle() {
+        let committed = [
+            Forecast.Line(id: "rent", title: "Rent · House", amountC: 20_000_00, reason: .fixed),
+        ]
+        let strip = HomeDueNext.strip(
+            todayISO: "2026-09-01",
+            upcoming: [
+                (anchorISO: "2026-09-30", committed: []),
+                (anchorISO: "2026-10-15", committed: committed),
+            ]
+        )
+        #expect(strip?.dueISO == "2026-10-15")
+        #expect(strip?.cards.first?.daysUntil == 44)
+    }
 }

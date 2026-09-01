@@ -106,3 +106,54 @@ enum Forecast {
         )
     }
 }
+
+/// Home “Due next” — next cycle’s committed bills. Display-only; no ledger legs.
+enum HomeDueNext {
+    struct Card: Equatable, Sendable {
+        var id: String
+        var title: String
+        var amountC: Int
+        var daysUntil: Int
+    }
+
+    struct Strip: Equatable, Sendable {
+        var dueISO: String
+        var billCount: Int
+        var totalC: Int
+        var cards: [Card]
+    }
+
+    /// First following cycle with committed bills. `upcoming` is ordered next-cycle first.
+    static func strip(
+        todayISO: String,
+        upcoming: [(anchorISO: String, committed: [Forecast.Line])],
+        limit: Int = 2
+    ) -> Strip? {
+        guard let hit = upcoming.first(where: { !$0.committed.isEmpty }) else { return nil }
+        let daysUntil = daysBetween(fromISO: todayISO, toISO: hit.anchorISO)
+        let cards = hit.committed.prefix(limit).map {
+            Card(id: $0.id, title: $0.title, amountC: $0.amountC, daysUntil: daysUntil)
+        }
+        return Strip(
+            dueISO: hit.anchorISO,
+            billCount: hit.committed.count,
+            totalC: hit.committed.reduce(0) { $0 + $1.amountC },
+            cards: Array(cards)
+        )
+    }
+
+    static func daysBetween(fromISO: String, toISO: String) -> Int {
+        guard let from = parseISO(fromISO), let to = parseISO(toISO) else { return 0 }
+        let days = Calendar(identifier: .gregorian).dateComponents([.day], from: from, to: to).day ?? 0
+        return days
+    }
+
+    private static func parseISO(_ iso: String) -> Date? {
+        let f = DateFormatter()
+        f.calendar = Calendar(identifier: .gregorian)
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.timeZone = TimeZone(secondsFromGMT: 0)
+        f.dateFormat = "yyyy-MM-dd"
+        return f.date(from: iso)
+    }
+}

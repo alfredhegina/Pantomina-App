@@ -236,37 +236,14 @@ struct YearSoFarView: View {
     // MARK: - Chrome
 
     private var scopeTabs: some View {
-        HStack(spacing: 24) {
-            scopeTabButton(fernName, .fern)
-            scopeTabButton(starkName, .stark)
-            scopeTabButton("Household", .household)
-            Spacer(minLength: 0)
-        }
-        .padding(.horizontal, 20)
-        .padding(.top, 4)
-        .overlay(alignment: .bottom) {
-            Rectangle()
-                .fill(Color.pantomina.rule)
-                .frame(height: 1)
-        }
-    }
-
-    private func scopeTabButton(_ title: String, _ tab: ScopeTab) -> some View {
-        let selected = scopeTab == tab
-        return Button {
-            scopeTab = tab
-        } label: {
-            Text(title)
-                .font(PantominaFont.body.weight(selected ? .semibold : .regular))
-                .foregroundStyle(selected ? Color.pantomina.ink : Color.pantomina.muted)
-                .padding(.vertical, 10)
-                .overlay(alignment: .bottom) {
-                    Rectangle()
-                        .fill(selected ? Color.pantomina.ink : Color.clear)
-                        .frame(height: 2)
-                }
-        }
-        .buttonStyle(.plain)
+        QuietScopeTabs(
+            tabs: [
+                (fernName, ScopeTab.fern),
+                (starkName, ScopeTab.stark),
+                ("Household", ScopeTab.household),
+            ],
+            selection: $scopeTab
+        )
     }
 
     private var heroBlock: some View {

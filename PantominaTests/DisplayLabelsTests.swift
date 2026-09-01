@@ -61,6 +61,34 @@ struct DisplayLabelsTests {
         )
     }
 
+    @Test("short date drops the year")
+    func displayDateShort() {
+        #expect(DisplayLabels.displayDateShort(iso: "2026-10-15") == "Oct 15")
+        #expect(DisplayLabels.displayDateShort(iso: "bad") == "bad")
+    }
+
+    @Test("ledger meta is event date, scope, and automatic for jar rows")
+    func ledgerMeta() {
+        #expect(
+            DisplayLabels.ledgerMeta(
+                eventISO: "2026-09-01",
+                scope: .fern,
+                fernName: "Fern",
+                starkName: "Stark",
+                isAutomatic: false
+            ) == "Sep 1 · Fern"
+        )
+        #expect(
+            DisplayLabels.ledgerMeta(
+                eventISO: "2026-08-10",
+                scope: .household,
+                fernName: "Fern",
+                starkName: "Stark",
+                isAutomatic: true
+            ) == "Aug 10 · Shared · automatic"
+        )
+    }
+
     @Test("loan strategy display never shows engine jargon")
     func loanStrategyLabels() {
         #expect(DisplayLabels.loanStrategy(.prepay) == "Stash extras")
