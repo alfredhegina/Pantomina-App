@@ -469,3 +469,43 @@ Skills: Operate, Humanizer, accounting-map. Spec §4.6 per-cycle check-in.
 | Balance Day | Stamps Empire’s selected `cycleISO` | Today-only stamp wrong when browsing prior cycle |
 
 **Next:** Slice B (Empire charts) → C (YTD / drift / Money Sleeps).
+
+---
+
+## Phase 6 Slice B — Empire charts (2026-09-01)
+
+Skills: Operate, Humanizer, Emil, write-swift TDD. Spec More Empire charts.
+
+| Piece | Lock | Push back |
+|---|---|---|
+| Charts | NW `LineMark` + assets/liabilities area (sage/terra); stacked portrait | No spreadsheet dual-axis Δ; no per-point labels; no drop shadows |
+| Series | `EmpireCharts` from snapshots (+ live tip if cycle missing); household needs both lined | No invented May’25–Aug’26 fixture timeline |
+| Interaction | Chart X selection → one caption; Reduce Motion = static | — |
+| Savings line | Not in B (`savingsAssets` stays a metric card) | Park denser savings chart |
+| Non-changes | YTD / drift / Money Sleeps = C | — |
+
+### Empire sticky flair (same day)
+
+Skills: Operate, Humanizer, Emil, Spec §1 cheese quarantine. Charts felt buried; no new psychology skills.
+
+| Piece | Lock | Push back |
+|---|---|---|
+| Above fold | NW amount + compact sparkline (+ blush wash when Δ > 0) | Don’t put full A/L chart above fold |
+| Metrics | Assets / liabilities compact; changes & savings in DisclosureGroup | Don’t restore seven stacked metric cards |
+| Micro-moment | Rose heart pulse once on positive NW Δ | Never on amounts, axes, or negative NW |
+| Motion | Ease-out horizontal reveal on appear / series change; Reduce Motion = full reveal | No bounce loops; no fake progress |
+| Copy | Empty: “Confirm a cycle’s balances—the empire line starts here.” Quiet empty: “Rare quiet moment.” | No lecture, no shame chrome |
+
+### Empire hybrid hero (same day — supersedes sparkline-beside-NW)
+
+Skills: Operate, Humanizer, Emil; energy + hedging refs for **composition only**.
+
+| Piece | Lock | Push back |
+|---|---|---|
+| Above fold | NW amount + **full-width** NW line/area (~168pt); blush when cycle Δ > 0 | No dark canvas, orange accents, glow, or 4-KPI strip |
+| Tooltip | Chart X selection → card: date, NW, step Δ vs prior point | No dual market/hedged lines; no forecast dashed tail |
+| Below fold | Assets & liabilities chart only (NW not duplicated); pockets unchanged | No per-row sparklines |
+| Cycle | Keep Bills-style Cycle Menu | No Day/Week/Month chips (series is cycle anchors) |
+| Motion / cheese | Ease-out reveal; Reduce Motion static; rose heart on gain; cheese off amounts | — |
+
+**Next:** Slice C (YTD / interest-drift / Where the Money Sleeps).

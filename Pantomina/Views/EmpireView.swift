@@ -31,6 +31,7 @@ struct EmpireView: View {
     @State private var showBalanceDay = false
     @State private var miniReport: PocketRow?
     @State private var selectedAnchor: String?
+    @State private var showMetricDetails = false
 
     private var fernName: String { people.first { $0.id == .fern }?.name ?? "Fern" }
     private var starkName: String { people.first { $0.id == .stark }?.name ?? "Stark" }
@@ -71,6 +72,44 @@ struct EmpireView: View {
 
     private var fernPockets: [PocketRow] { livePockets(for: .fern) }
     private var starkPockets: [PocketRow] { livePockets(for: .stark) }
+
+    private var chartSnapInputs: [EmpireCharts.SnapInput] {
+        snapshots.map { snap in
+            EmpireCharts.SnapInput(
+                cycleAnchorISO: snap.cycleAnchorISO,
+                personId: snap.personId,
+                confirmedAt: snap.confirmedAt,
+                lines: snap.lines,
+                metrics: snap.metrics
+            )
+        }
+    }
+
+    private var chartSeries: [EmpireCharts.Point] {
+        let inputs = chartSnapInputs
+        switch scope {
+        case .fern:
+            let base = EmpireCharts.personalSeries(snapshots: inputs, personId: PersonId.fern.rawValue)
+            let live = displayMetrics.map {
+                EmpireCharts.Point(cycleAnchorISO: activeAnchor, metrics: $0)
+            }
+            return EmpireCharts.withLiveTip(series: base, live: live, activeAnchor: activeAnchor)
+        case .stark:
+            let base = EmpireCharts.personalSeries(snapshots: inputs, personId: PersonId.stark.rawValue)
+            let live = displayMetrics.map {
+                EmpireCharts.Point(cycleAnchorISO: activeAnchor, metrics: $0)
+            }
+            return EmpireCharts.withLiveTip(series: base, live: live, activeAnchor: activeAnchor)
+        case .household:
+            let fern = inputs.filter { $0.personId == PersonId.fern.rawValue }
+            let stark = inputs.filter { $0.personId == PersonId.stark.rawValue }
+            let base = EmpireCharts.householdSeries(fern: fern, stark: stark)
+            let live = displayMetrics.map {
+                EmpireCharts.Point(cycleAnchorISO: activeAnchor, metrics: $0)
+            }
+            return EmpireCharts.withLiveTip(series: base, live: live, activeAnchor: activeAnchor)
+        }
+    }
 
     private var displayMetrics: Snapshot.Metrics? {
         switch scope {
@@ -180,7 +219,8 @@ struct EmpireView: View {
             }
 
             if let m = displayMetrics {
-                metricsSection(m)
+                heroSection(m)
+                EmpireChartsSection(series: chartSeries, style: .assetsLiabilities)
                 if scope == .fern, canLoadFernDemo {
                     Section {
                         Button("Load Fern 08/20 demo metrics") {
@@ -299,7 +339,7 @@ struct EmpireView: View {
         Section {
             switch scope {
             case .fern:
-                Text("No pockets on \(fernName)’s book yet.")
+                Text("Nothing on \(fernName)’s book yet. Rare quiet moment.")
                     .foregroundStyle(Color.pantomina.muted)
                 if canLoadFernDemo {
                     Button("Load Fern 08/20 demo metrics") {
@@ -308,7 +348,7 @@ struct EmpireView: View {
                     .foregroundStyle(Color.pantomina.sageDeep)
                 }
             case .stark:
-                Text("No pockets on \(starkName)’s book yet.")
+                Text("Nothing on \(starkName)’s book yet. Rare quiet moment.")
                     .foregroundStyle(Color.pantomina.muted)
             case .household:
                 Text("Household needs live pockets on both \(fernName) and \(starkName).")
@@ -322,24 +362,80 @@ struct EmpireView: View {
         }
     }
 
+    /// Above-fold: NW amount + full-width hero chart, compact assets/liabilities, optional deltas.
     @ViewBuilder
-    private func metricsSection(_ m: Snapshot.Metrics) -> some View {
+    private func heroSection(_ m: Snapshot.Metrics) -> some View {
+        let gained = m.netWorthDeltaC > 0
         Section {
-            metricRow("Total assets", m.assetsC)
-            metricRow("Total liabilities", m.liabilitiesC)
-            metricRow("Net worth", m.netWorthC)
-        }
-        Section {
-            metricRow("Net worth change", m.netWorthDeltaC)
-            metricRow("Assets change", m.assetsDeltaC)
-            metricRow("Liabilities change", m.liabilitiesDeltaC)
-            metricRow("Savings assets", m.savingsAssetsC)
+            VStack(alignment: .leading, spacing: Spacing.sm) {
+                HStack(spacing: Spacing.sm) {
+                    Text("Net worth")
+                        .font(PantominaFont.caption)
+                        .foregroundStyle(Color.pantomina.muted)
+                    if gained {
+                        EmpireGainHeart()
+                    }
+                }
+                Text(formatPeso(m.netWorthC))
+                    .font(PantominaFont.amount)
+                    .foregroundStyle(Color.pantomina.ink)
+                    .monospacedDigit()
+                    .minimumScaleFactor(0.7)
+                    .lineLimit(1)
+                if gained {
+                    Text("Up \(formatPeso(m.netWorthDeltaC)) this check-in")
+                        .font(PantominaFont.caption)
+                        .foregroundStyle(Color.pantomina.sageDeep)
+                } else if m.netWorthDeltaC < 0 {
+                    Text("Change \(formatPeso(m.netWorthDeltaC))")
+                        .font(PantominaFont.caption)
+                        .foregroundStyle(Color.pantomina.muted)
+                }
+
+                EmpireChartsSection(
+                    series: chartSeries,
+                    style: .hero,
+                    celebrateGain: gained
+                )
+            }
+            .accessibilityElement(children: .contain)
+
+            HStack(spacing: Spacing.lg) {
+                compactStat(title: "Assets", amountC: m.assetsC)
+                compactStat(title: "Liabilities", amountC: m.liabilitiesC)
+            }
+
+            DisclosureGroup(isExpanded: $showMetricDetails) {
+                metricRow("Net worth change", m.netWorthDeltaC)
+                metricRow("Assets change", m.assetsDeltaC)
+                metricRow("Liabilities change", m.liabilitiesDeltaC)
+                metricRow("Savings assets", m.savingsAssetsC)
+            } label: {
+                Text("Changes & savings")
+                    .font(PantominaFont.caption)
+                    .foregroundStyle(Color.pantomina.muted)
+            }
         } footer: {
             if let footerAsOf {
                 Text(footerAsOf)
                     .font(PantominaFont.caption)
             }
         }
+    }
+
+    private func compactStat(title: String, amountC: Int) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(PantominaFont.caption)
+                .foregroundStyle(Color.pantomina.muted)
+            Text(formatPeso(amountC))
+                .font(PantominaFont.body.weight(.semibold))
+                .foregroundStyle(Color.pantomina.ink)
+                .monospacedDigit()
+                .minimumScaleFactor(0.8)
+                .lineLimit(1)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func metricRow(_ label: String, _ amountC: Int) -> some View {
