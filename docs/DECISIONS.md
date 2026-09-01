@@ -93,6 +93,9 @@ Living log of locked **Baseline** choices and parked **For later** work. The pro
 | 2026-08-31 | Empire **Cycle** Menu (Bills-style anchors): pocket NW **as-of** cycle end; mini-report lists that cycle’s window; missing snapshot → ledger. Label Cycle not statement date. Balance Day stamps Empire’s selected cycle. | Operate; in-window-only would wipe NW; Statement day owns CC paper. |
 | 2026-08-31 | PocketBalance **excludes** `contribution` / `receivable` / `fund_move` legs from pocket sums; Love Tab line from `Settlement.history` (internal debt). Loan payments still count. | Settlement theater must not inflate House cash / NW. |
 | 2026-09-01 | Portfolio-Fern **metrics-only demo** shows Spec golden when Cycle matches its anchor (`2026-08-20`), even if seed pockets exist; other cycles stay live ledger. | Smoke button was a no-op while live pockets always won. |
+| 2026-09-01 | **Phase 6 Slice B** shipped: Empire Swift Charts — NW line + assets/liabilities area from `SnapshotRecord` series (+ live tip); negative Y domain; tap selection readout; Reduce Motion static. No dual-axis Δ overlays; no savings line; no invented history. | Spec More Empire charts; spreadsheet samples adapted for phone. |
+| 2026-09-01 | Empire **sticky flair:** above-fold NW hero + compact sparkline (blush on gain); full charts below; rose heart pulse on positive Δ; ease-out draw reveal (static under Reduce Motion); deltas under DisclosureGroup. Cheese stays off amounts. | Charts were below the fold; Spec §1 one micro-moment; Operate compact metrics. |
+| 2026-09-01 | Empire **hybrid hero** (supersedes sparkline-beside-NW): full-width NW line above fold + selection tooltip (date / NW / step Δ); Assets\|Liabilities compact under it; A/L chart only below; Cycle Menu unchanged. No dark/orange skin, no Day/Week/Month chips, no row sparklines. | Energy+hedging composition refs; Spec light-mode + cheese quarantine. |
 
 ## For later
 
