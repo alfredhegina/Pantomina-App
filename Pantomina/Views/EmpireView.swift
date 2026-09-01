@@ -33,6 +33,8 @@ struct EmpireView: View {
     @State private var selectedAnchor: String?
     @State private var showMetricDetails = false
     @State private var selectedYear: Int = Calendar.current.component(.year, from: Date())
+    @State private var showCycleWheel = false
+    @State private var wheelDraftAnchor = ""
 
     private var fernName: String { people.first { $0.id == .fern }?.name ?? "Fern" }
     private var starkName: String { people.first { $0.id == .stark }?.name ?? "Stark" }
@@ -72,25 +74,20 @@ struct EmpireView: View {
         return set.sorted()
     }
 
-    private var yearOptions: [Int] {
-        var years = Set(allCycleAnchors.compactMap { Int($0.prefix(4)) })
-        years.insert(selectedYear)
-        years.insert(Calendar.current.component(.year, from: Date()))
-        return years.sorted(by: >)
-    }
-
-    /// Cycle Menu: anchors in the selected year only (≤ ~24).
-    private var cycleAnchors: [String] {
-        var inYear = Cycle.anchors(inYear: selectedYear, from: allCycleAnchors)
-        if inYear.isEmpty {
-            inYear = Cycle.recentAnchors(from: allCycleAnchors, aroundISO: activeAnchor, limit: 24)
+    /// Cycle wheel — only 15th / month-end anchors; capped when history is large.
+    private var wheelCycleAnchors: [String] {
+        let all = allCycleAnchors
+        var list: [String]
+        if all.count <= 48 {
+            list = all
+        } else {
+            list = Cycle.recentAnchors(from: all, aroundISO: activeAnchor, limit: 48)
         }
-        if !inYear.contains(activeAnchor),
-           activeAnchor.hasPrefix(String(format: "%04d-", selectedYear)) {
-            inYear.append(activeAnchor)
-            inYear.sort()
+        if !list.contains(activeAnchor) {
+            list.append(activeAnchor)
+            list.sort()
         }
-        return inYear
+        return list
     }
 
     private var fernPockets: [PocketRow] { livePockets(for: .fern) }
@@ -215,90 +212,81 @@ struct EmpireView: View {
     }
 
     var body: some View {
-        List {
-            Section {
-                Picker("Scope", selection: $scope) {
-                    Text(fernName).tag(ScopeTab.fern)
-                    Text(starkName).tag(ScopeTab.stark)
-                    Text("Household").tag(ScopeTab.household)
-                }
-                .pickerStyle(.segmented)
+        ScrollView {
+            VStack(spacing: 0) {
+                QuietScopeTabs(
+                    tabs: [
+                        (fernName, ScopeTab.fern),
+                        (starkName, ScopeTab.stark),
+                        ("Household", ScopeTab.household),
+                    ],
+                    selection: $scope
+                )
                 .onChange(of: scope) { _, new in
                     if new == .fern { balanceDayPerson = .fern }
                     if new == .stark { balanceDayPerson = .stark }
                 }
 
-                Picker("Year", selection: $selectedYear) {
-                    ForEach(yearOptions, id: \.self) { y in
-                        Text(String(y)).tag(y)
-                    }
-                }
-                .pickerStyle(.menu)
-                .accessibilityLabel("Year")
-                .onChange(of: selectedYear) { _, newYear in
-                    let inYear = Cycle.anchors(inYear: newYear, from: allCycleAnchors)
-                    if !activeAnchor.hasPrefix(String(format: "%04d-", newYear)) {
-                        selectedAnchor = inYear.last
-                    }
-                }
-
-                Picker("Cycle", selection: Binding(
-                    get: { activeAnchor },
-                    set: { new in
-                        selectedAnchor = new
-                        if let y = Int(new.prefix(4)) { selectedYear = y }
-                    }
-                )) {
-                    ForEach(cycleAnchors.reversed(), id: \.self) { anchor in
-                        Text(DisplayLabels.displayDate(iso: anchor)).tag(anchor)
-                    }
-                }
-                .pickerStyle(.menu)
-                .accessibilityLabel("Cycle")
-            } footer: {
-                Text("Fern and \(starkName) are personal books. Household is shared — not under either person. Pockets are as of the cycle you pick.")
-                    .font(PantominaFont.caption)
-            }
-
-            if let m = displayMetrics {
-                heroSection(m)
-                EmpireChartsSection(series: chartSeries, style: .assetsLiabilities)
-                if scope == .fern, canLoadFernDemo {
-                    Section {
+                if let m = displayMetrics {
+                    heroSection(m)
+                    EmpireChartsSection(series: chartSeries, style: .assetsLiabilities)
+                    if scope == .fern, canLoadFernDemo {
                         Button("Load Fern 08/20 demo metrics") {
                             loadDemoMetrics()
                         }
-                        .foregroundStyle(Color.pantomina.sageDeep)
-                    } footer: {
-                        Text("Loads Spec golden metrics for Aug 20. Pick that cycle to see them; other cycles stay live from the ledger.")
-                            .font(PantominaFont.caption)
+                        .font(PantominaFont.body.weight(.semibold))
+                        .foregroundStyle(Color.pantomina.quietAccent)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(20)
                     }
+                } else {
+                    emptySection
                 }
-            } else {
-                emptySection
-            }
 
-            if scope != .household {
-                pocketListSection
-                balanceDaySection
-            } else if displayMetrics == nil {
-                Section {
+                if scope != .household {
+                    pocketListSection
+                    balanceDaySection
+                } else if displayMetrics == nil {
                     Text("Add pockets on Fern or \(starkName) — Household nets both live books.")
                         .font(PantominaFont.caption)
                         .foregroundStyle(Color.pantomina.muted)
+                        .padding(20)
                 }
             }
         }
-        .scrollContentBackground(.hidden)
         .background(Color.pantomina.ground)
+        .toolbarBackground(Color.pantomina.ground, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
                 PetTitle("Our Little Empire")
             }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    wheelDraftAnchor = activeAnchor
+                    showCycleWheel = true
+                } label: {
+                    HStack(spacing: 4) {
+                        Text(DisplayLabels.displayDate(iso: activeAnchor))
+                            .font(PantominaFont.body.weight(.medium))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.85)
+                        Image(systemName: "chevron.down")
+                            .font(.system(size: 10, weight: .semibold))
+                    }
+                    .foregroundStyle(Color.pantomina.quietAccent)
+                }
+                .accessibilityLabel("Cycle")
+            }
         }
         .onAppear {
             if let y = Int(activeAnchor.prefix(4)) { selectedYear = y }
+            try? SeedCatalog.seedDemoExternalsIfNeeded(into: modelContext)
+            try? modelContext.save()
+        }
+        .sheet(isPresented: $showCycleWheel) {
+            cycleWheelSheet
         }
         .sheet(isPresented: $showBalanceDay) {
             BalanceDayView(personId: balanceDayPerson, cycleISO: activeAnchor) {
@@ -317,12 +305,66 @@ struct EmpireView: View {
         }
     }
 
+    private var cycleWheelSheet: some View {
+        NavigationStack {
+            Picker("Cycle", selection: $wheelDraftAnchor) {
+                ForEach(wheelCycleAnchors, id: \.self) { anchor in
+                    Text(DisplayLabels.displayDate(iso: anchor))
+                        .tag(anchor)
+                }
+            }
+            .pickerStyle(.wheel)
+            .labelsHidden()
+            .frame(maxHeight: 220)
+            .padding(.horizontal, 20)
+            .navigationTitle("Cycle")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { showCycleWheel = false }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") {
+                        applyCycleSelection(wheelDraftAnchor)
+                        showCycleWheel = false
+                    }
+                    .fontWeight(.semibold)
+                }
+            }
+        }
+        .presentationDetents([.medium])
+        .presentationDragIndicator(.visible)
+        .presentationBackground(Color.pantomina.ground)
+    }
+
+    private func applyCycleSelection(_ anchor: String) {
+        selectedAnchor = anchor
+        if let y = Int(anchor.prefix(4)) {
+            selectedYear = y
+        }
+    }
+
     @ViewBuilder
     private var pocketListSection: some View {
         let rows = scope == .fern ? fernPockets : starkPockets
         let visible = rows.filter { $0.line.source != .stale || $0.pocket.source == .unknown }
         if !visible.isEmpty {
-            Section {
+            VStack(spacing: 0) {
+                HStack {
+                    Text("Pockets")
+                        .font(PantominaFont.body.weight(.semibold))
+                        .foregroundStyle(Color.pantomina.ink)
+                    Spacer()
+                    Text("\(visible.count)")
+                        .font(PantominaFont.body)
+                        .foregroundStyle(Color.pantomina.muted)
+                }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 15)
+                .overlay(alignment: .bottom) {
+                    Rectangle().fill(Color.pantomina.rule).frame(height: 1)
+                }
+
                 ForEach(visible) { row in
                     Button {
                         miniReport = row
@@ -341,69 +383,76 @@ struct EmpireView: View {
                                     .foregroundStyle(Color.pantomina.muted)
                             } else {
                                 Text(formatPeso(row.pocket.balanceC))
-                                    .font(PantominaFont.amount)
+                                    .font(PantominaFont.body.weight(.semibold).monospacedDigit())
                                     .foregroundStyle(Color.pantomina.ink)
-                                    .monospacedDigit()
                             }
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundStyle(Color.pantomina.muted)
                         }
                     }
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 12)
+                    .overlay(alignment: .bottom) {
+                        Rectangle().fill(Color(hex: "#EDEAE3")).frame(height: 1)
+                    }
                 }
-            } header: {
-                Text("Pockets")
-            } footer: {
-                Text("Tap a pocket for this cycle’s moves. Edit on Receipts.")
-                    .font(PantominaFont.caption)
             }
         }
     }
 
     @ViewBuilder
     private var balanceDaySection: some View {
-        Section {
+        VStack(alignment: .leading, spacing: 8) {
             Button {
                 showBalanceDay = true
             } label: {
-                Label(
-                    hasExternalsForBalanceDay ? "Update investments" : "Refresh cycle snapshot",
-                    systemImage: "checklist"
-                )
+                Text(hasExternalsForBalanceDay ? "Update investments" : "Refresh cycle snapshot")
+                    .font(PantominaFont.body.weight(.semibold))
+                    .foregroundStyle(Color.pantomina.quietAccent)
             }
-            .foregroundStyle(Color.pantomina.sageDeep)
-        } footer: {
             Text(
                 hasExternalsForBalanceDay
                     ? "External balances for \(balanceDayPerson == .fern ? fernName : starkName) as of \(DisplayLabels.displayDate(iso: activeAnchor)). Shared confirm is on Fern."
                     : "No external pockets yet — confirm to store \(DisplayLabels.displayDate(iso: activeAnchor))’s live books."
             )
             .font(PantominaFont.caption)
+            .foregroundStyle(Color.pantomina.muted)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(20)
     }
 
     @ViewBuilder
     private var emptySection: some View {
-        Section {
+        let name: String = {
             switch scope {
-            case .fern:
-                Text("Nothing on \(fernName)’s book yet. Rare quiet moment.")
-                    .foregroundStyle(Color.pantomina.muted)
-                if canLoadFernDemo {
-                    Button("Load Fern 08/20 demo metrics") {
-                        loadDemoMetrics()
-                    }
-                    .foregroundStyle(Color.pantomina.sageDeep)
-                }
-            case .stark:
-                Text("Nothing on \(starkName)’s book yet. Rare quiet moment.")
-                    .foregroundStyle(Color.pantomina.muted)
-            case .household:
-                Text("Household needs live pockets on both \(fernName) and \(starkName).")
-                    .foregroundStyle(Color.pantomina.muted)
+            case .fern: return fernName
+            case .stark: return starkName
+            case .household: return "Household"
             }
-        } footer: {
-            if scope == .fern, canLoadFernDemo {
-                Text("Demo uses the Spec Portfolio-Fern golden (negative NW is fine).")
-                    .font(PantominaFont.caption)
+        }()
+        QuietEmptyBlock(
+            systemImage: "building.columns",
+            title: scope == .household
+                ? "Household needs live pockets on both \(fernName) and \(starkName)."
+                : "Nothing on \(name)’s book yet.",
+            message: scope == .household
+                ? "Rare quiet moment. Confirm a cycle snapshot on each book."
+                : "Rare quiet moment. Confirm a cycle snapshot and net worth starts tracking from there.",
+            actionTitle: scope == .household ? nil : (hasExternalsForBalanceDay ? "Update investments" : "Refresh cycle snapshot"),
+            filled: true,
+            action: scope == .household ? nil : { showBalanceDay = true }
+        )
+        .padding(.top, 48)
+        .padding(.bottom, 24)
+        if scope == .fern, canLoadFernDemo {
+            Button("Load Fern 08/20 demo metrics") {
+                loadDemoMetrics()
             }
+            .font(PantominaFont.body.weight(.semibold))
+            .foregroundStyle(Color.pantomina.quietAccent)
+            .padding(.bottom, 24)
         }
     }
 
@@ -411,43 +460,64 @@ struct EmpireView: View {
     @ViewBuilder
     private func heroSection(_ m: Snapshot.Metrics) -> some View {
         let gained = m.netWorthDeltaC > 0
-        Section {
-            VStack(alignment: .leading, spacing: Spacing.sm) {
-                HStack(spacing: Spacing.sm) {
+        VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 8) {
                     Text("Net worth")
-                        .font(PantominaFont.caption)
+                        .font(PantominaFont.caption.weight(.medium))
                         .foregroundStyle(Color.pantomina.muted)
                     if gained {
                         EmpireGainHeart()
                     }
                 }
                 Text(formatPeso(m.netWorthC))
-                    .font(PantominaFont.amount)
+                    .font(PantominaFont.heroAmount(centavos: m.netWorthC))
                     .foregroundStyle(Color.pantomina.ink)
                     .monospacedDigit()
                     .minimumScaleFactor(0.7)
                     .lineLimit(1)
-                if gained {
+                if let footerAsOf {
+                    Text(footerAsOf)
+                        .font(PantominaFont.caption)
+                        .foregroundStyle(Color.pantomina.muted)
+                } else if gained {
                     Text("Up \(formatPeso(m.netWorthDeltaC)) this check-in")
                         .font(PantominaFont.caption)
-                        .foregroundStyle(Color.pantomina.sageDeep)
+                        .foregroundStyle(Color.pantomina.quietAccent)
                 } else if m.netWorthDeltaC < 0 {
                     Text("Change \(formatPeso(m.netWorthDeltaC))")
                         .font(PantominaFont.caption)
                         .foregroundStyle(Color.pantomina.muted)
                 }
-
-                EmpireChartsSection(
-                    series: chartSeries,
-                    style: .hero,
-                    celebrateGain: gained
-                )
             }
-            .accessibilityElement(children: .contain)
+            .padding(.horizontal, 20)
+            .padding(.top, 22)
+            .padding(.bottom, 16)
 
-            HStack(spacing: Spacing.lg) {
+            EmpireChartsSection(
+                series: chartSeries,
+                style: .hero,
+                celebrateGain: gained
+            )
+            .padding(.horizontal, 20)
+            .padding(.bottom, 18)
+            .overlay(alignment: .bottom) {
+                Rectangle().fill(Color.pantomina.rule).frame(height: 1)
+            }
+
+            HStack(spacing: 0) {
                 compactStat(title: "Assets", amountC: m.assetsC)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 16)
                 compactStat(title: "Liabilities", amountC: m.liabilitiesC)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 16)
+                    .overlay(alignment: .leading) {
+                        Rectangle().fill(Color(hex: "#EDEAE3")).frame(width: 1)
+                    }
+            }
+            .overlay(alignment: .bottom) {
+                Rectangle().fill(Color.pantomina.rule).frame(height: 1)
             }
 
             DisclosureGroup(isExpanded: $showMetricDetails) {
@@ -457,15 +527,16 @@ struct EmpireView: View {
                 metricRow("Savings assets", m.savingsAssetsC)
             } label: {
                 Text("Changes & savings")
-                    .font(PantominaFont.caption)
-                    .foregroundStyle(Color.pantomina.muted)
+                    .font(PantominaFont.body)
+                    .foregroundStyle(Color.pantomina.ink)
             }
-        } footer: {
-            if let footerAsOf {
-                Text(footerAsOf)
-                    .font(PantominaFont.caption)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 15)
+            .overlay(alignment: .bottom) {
+                Rectangle().fill(Color.pantomina.rule).frame(height: 1)
             }
         }
+        .accessibilityElement(children: .contain)
     }
 
     private func compactStat(title: String, amountC: Int) -> some View {
@@ -489,7 +560,7 @@ struct EmpireView: View {
                 .foregroundStyle(Color.pantomina.ink)
             Spacer()
             Text(formatPeso(amountC))
-                .font(PantominaFont.amount)
+                .font(PantominaFont.body.weight(.semibold).monospacedDigit())
                 .foregroundStyle(Color.pantomina.ink)
                 .monospacedDigit()
         }

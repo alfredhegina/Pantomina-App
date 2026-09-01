@@ -61,6 +61,41 @@ enum DisplayLabels {
         return out.string(from: date)
     }
 
+    /// Ledger row dates — year lives on the group header, not every row.
+    static func displayDateShort(iso: String) -> String {
+        let parser = DateFormatter()
+        parser.calendar = Calendar(identifier: .gregorian)
+        parser.locale = Locale(identifier: "en_US_POSIX")
+        parser.timeZone = TimeZone(secondsFromGMT: 0)
+        parser.dateFormat = "yyyy-MM-dd"
+        guard let date = parser.date(from: iso) else { return iso }
+
+        let out = DateFormatter()
+        out.calendar = Calendar(identifier: .gregorian)
+        out.locale = Locale(identifier: "en_US")
+        out.timeZone = TimeZone(secondsFromGMT: 0)
+        out.dateFormat = "MMM d"
+        return out.string(from: date)
+    }
+
+    /// Quiet ledger caption: `Sep 1 · Fern` or `Aug 10 · Shared · automatic`.
+    static func ledgerMeta(
+        eventISO: String,
+        scope: Scope,
+        fernName: String,
+        starkName: String,
+        isAutomatic: Bool
+    ) -> String {
+        var parts = [
+            displayDateShort(iso: eventISO),
+            self.scope(scope, fernName: fernName, starkName: starkName),
+        ]
+        if isAutomatic {
+            parts.append("automatic")
+        }
+        return parts.joined(separator: " · ")
+    }
+
     static func settlementHint(isStatement: Bool, anchorISO: String) -> String {
         let when = displayDate(iso: anchorISO)
         if isStatement {

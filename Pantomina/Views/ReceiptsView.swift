@@ -83,13 +83,16 @@ struct ReceiptsView: View {
                                     NavigationLink(value: Route.statementDay) {
                                         Text("Statement day")
                                             .font(PantominaFont.caption.weight(.semibold))
-                                            .foregroundStyle(Color.pantomina.sage)
+                                            .foregroundStyle(Color.pantomina.quietAccent)
                                     }
                                 }
+                                .listRowInsets(EdgeInsets(top: 12, leading: 20, bottom: 8, trailing: 20))
+                                .listRowSeparator(.hidden)
+                                .listRowBackground(Color.pantomina.ground)
                                 ForEach(Array(pending.prefix(5)), id: \.id) { tx in
                                     receiptRow(
                                         tx,
-                                        dateISO: tx.proposedRealizedDate ?? tx.purchaseDate,
+                                        dateISO: tx.purchaseDate,
                                         accountById: accountById,
                                         categoryById: categoryById,
                                         fernName: fern,
@@ -100,9 +103,15 @@ struct ReceiptsView: View {
                                     Text("+\(pending.count - 5) more")
                                         .font(PantominaFont.caption)
                                         .foregroundStyle(Color.pantomina.muted)
+                                        .listRowInsets(EdgeInsets(top: 4, leading: 20, bottom: 12, trailing: 20))
+                                        .listRowSeparator(.hidden)
+                                        .listRowBackground(Color.pantomina.ground)
                                 }
                             } header: {
                                 Text("TBD")
+                                    .font(PantominaFont.caption.weight(.semibold))
+                                    .foregroundStyle(Color.pantomina.muted)
+                                    .textCase(nil)
                             }
                         }
 
@@ -119,7 +128,7 @@ struct ReceiptsView: View {
                             }
                         } else {
                             ForEach(grouped, id: \.key) { group in
-                                Section(DisplayLabels.displayDate(iso: group.key)) {
+                                Section {
                                     ForEach(group.rows, id: \.id) { tx in
                                         receiptRow(
                                             tx,
@@ -130,23 +139,24 @@ struct ReceiptsView: View {
                                             starkName: stark
                                         )
                                     }
+                                } header: {
+                                    Text(DisplayLabels.displayDate(iso: group.key))
+                                        .font(PantominaFont.caption.weight(.semibold))
+                                        .foregroundStyle(Color.pantomina.muted)
+                                        .textCase(nil)
                                 }
                             }
                         }
                     }
-                    .listStyle(.insetGrouped)
+                    .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
                 }
             }
             .background(Color.pantomina.ground)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    VStack(spacing: 2) {
-                        PetTitle("The Receipts")
-                        Text("Ledger")
-                            .font(PantominaFont.caption)
-                            .foregroundStyle(Color.pantomina.muted)
-                    }
+                    PetTitle("The Receipts")
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     NavigationLink(value: Route.statementDay) {
@@ -311,8 +321,11 @@ struct ReceiptsView: View {
                 }
             }
         }
-        .padding(.horizontal, Spacing.lg)
-        .padding(.vertical, Spacing.sm)
+        .padding(.horizontal, 20)
+        .padding(.vertical, 12)
+        .overlay(alignment: .bottom) {
+            Rectangle().fill(Color.pantomina.rule).frame(height: 1)
+        }
     }
 
     private var moreFiltersSheet: some View {
@@ -369,7 +382,7 @@ struct ReceiptsView: View {
                 Spacer()
                 if selected {
                     Image(systemName: "checkmark")
-                        .foregroundStyle(Color.pantomina.sage)
+                        .foregroundStyle(Color.pantomina.quietAccent)
                 }
             }
             .contentShape(Rectangle())
@@ -386,42 +399,32 @@ struct ReceiptsView: View {
     }
 
     private func filterChip(_ title: String, selected: Bool, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Text(title)
-                .font(PantominaFont.caption)
-                .lineLimit(1)
-                .padding(.horizontal, Spacing.md)
-                .frame(minHeight: 44)
-                .background(selected ? Color.pantomina.sage : Color.pantomina.hairline)
-                .foregroundStyle(selected ? Color.white : Color.pantomina.ink)
-                .clipShape(Capsule())
-                .contentShape(Capsule())
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel(title)
-        .accessibilityAddTraits(selected ? [.isSelected, .isButton] : .isButton)
+        QuietFilterChip(title: title, selected: selected, action: action)
     }
 
     private var empty: some View {
-        VStack(spacing: Spacing.md) {
+        VStack {
             Spacer()
-            Text(transactions.isEmpty
-                 ? "Nothing here yet. Rare quiet moment."
-                 : "Nothing matches these filters.")
-                .font(PantominaFont.body)
-                .foregroundStyle(Color.pantomina.muted)
-                .multilineTextAlignment(.center)
-            if filtersActive {
-                Button("Clear filters") {
-                    clearAllFilters()
-                }
-                .font(PantominaFont.body.weight(.semibold))
-                .foregroundStyle(Color.pantomina.sage)
+            if transactions.isEmpty {
+                QuietEmptyBlock(
+                    systemImage: "doc.text",
+                    title: "Nothing here yet.",
+                    message: "Rare quiet moment. Anything either of you spends shows up here."
+                )
+            } else {
+                QuietEmptyBlock(
+                    systemImage: "magnifyingglass",
+                    title: "Nothing matches these filters.",
+                    message: "Clear the chips or change Filters and try again.",
+                    actionTitle: filtersActive ? "Clear filters" : nil,
+                    filled: false,
+                    action: filtersActive ? { clearAllFilters() } : nil
+                )
             }
             Spacer()
         }
-        .padding(Spacing.lg)
         .frame(maxWidth: .infinity)
+        .padding(.bottom, 80)
     }
 
     private func receiptRow(
@@ -434,40 +437,25 @@ struct ReceiptsView: View {
     ) -> some View {
         let account = accountById[tx.accountId]
         let category = categoryById[tx.categoryId]
-        let label = account?.displayLabel(fernName: fernName, starkName: starkName) ?? "Account"
-        let amountColor: Color = {
-            switch category?.flow {
-            case .income: return Color.pantomina.sageDeep
-            case .expense: return Color.pantomina.terraDeep
-            default: return Color.pantomina.ink
-            }
-        }()
-        return VStack(alignment: .leading, spacing: 4) {
-            HStack {
-                Text(category?.displayName ?? "Category")
-                    .font(PantominaFont.body.weight(.medium))
-                Spacer()
-                Text(formatPeso(tx.amountC))
-                    .font(PantominaFont.body.monospacedDigit())
-                    .foregroundStyle(amountColor)
-            }
-            HStack {
-                Text(DisplayLabels.displayDate(iso: dateISO))
-                Text("·")
-                Text(label)
-                Spacer()
-                if let status = DisplayLabels.status(tx.realizedStatus) {
-                    Chip(
-                        label: status,
-                        tone: tx.realizedStatus == .pending ? .terra : .neutral
-                    )
-                }
-            }
-            .font(PantominaFont.caption)
-            .foregroundStyle(Color.pantomina.muted)
-        }
-        .opacity(tx.realizedStatus == .projected ? 0.72 : 1)
-        .listRowBackground(Color.pantomina.card)
+        let accountLabel = account?.displayLabel(fernName: fernName, starkName: starkName) ?? "Account"
+        return QuietLedgerRow(
+            title: category?.displayName ?? "Category",
+            amountC: tx.amountC,
+            amountColor: Color.pantomina.ledgerAmount(flow: category?.flow),
+            caption: DisplayLabels.ledgerMeta(
+                eventISO: dateISO,
+                scope: account?.scope ?? .household,
+                fernName: fernName,
+                starkName: starkName,
+                isAutomatic: tx.isJarEntry
+            ),
+            pendingLabel: DisplayLabels.status(tx.realizedStatus),
+            dimmed: tx.realizedStatus == .projected
+        )
+        .accessibilityValue(accountLabel)
+        .listRowInsets(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20))
+        .listRowSeparator(.hidden)
+        .listRowBackground(Color.pantomina.ground)
         .swipeActions(edge: .leading, allowsFullSwipe: false) {
             if tx.settlementRole == nil {
                 Button {

@@ -130,4 +130,69 @@ struct YearSoFarTests {
         #expect(fernPlusStark == 10_000_00)
         #expect(household.expenseTotalC == fernPlusStark)
     }
+
+    @Test("usualExpenseC averages prior months — excludes the latest")
+    func trailingAverage() {
+        let months = [
+            YearSoFar.MonthBucket(yearMonth: "2026-08", incomeC: 0, expenseC: 1_000_00),
+            YearSoFar.MonthBucket(yearMonth: "2026-09", incomeC: 0, expenseC: 2_000_00),
+            YearSoFar.MonthBucket(yearMonth: "2026-10", incomeC: 0, expenseC: 9_000_00),
+        ]
+        #expect(YearSoFar.usualExpenseC(months: months) == 1_500_00)
+        #expect(YearSoFar.trailingExpenseAverageC(months: months) == 1_500_00)
+
+        let sparse = [
+            YearSoFar.MonthBucket(yearMonth: "2026-01", incomeC: 500_00, expenseC: 0),
+            YearSoFar.MonthBucket(yearMonth: "2026-03", incomeC: 0, expenseC: 3_000_00),
+        ]
+        #expect(YearSoFar.usualExpenseC(months: sparse) == nil)
+        #expect(YearSoFar.usualExpenseC(months: []) == nil)
+    }
+
+    @Test("monthVsUsualInsight always compares latest to prior usual; spike at 1.5×")
+    func expenseSpike() {
+        let months = [
+            YearSoFar.MonthBucket(yearMonth: "2026-08", incomeC: 0, expenseC: 1_000_00),
+            YearSoFar.MonthBucket(yearMonth: "2026-09", incomeC: 0, expenseC: 2_000_00),
+            YearSoFar.MonthBucket(yearMonth: "2026-10", incomeC: 0, expenseC: 9_000_00),
+        ]
+        let vs = YearSoFar.monthVsUsualInsight(months: months)
+        #expect(vs?.yearMonth == "2026-10")
+        #expect(vs?.expenseC == 9_000_00)
+        #expect(vs?.usualC == 1_500_00)
+        #expect(vs?.multiple ?? 0 > 5.0)
+
+        let spike = YearSoFar.expenseSpikeInsight(months: months)
+        #expect(spike?.yearMonth == "2026-10")
+    }
+
+    @Test("savings flow sums into savingsC; not expense")
+    func savingsBucket() {
+        let cats = [
+            cat(id: "park", label: "Savings · Parked", flow: .savings),
+            cat(id: "rent", label: "House", flow: .expense, needWant: .need),
+        ]
+        let legs = [
+            leg(amountC: 5_000_00, date: "2026-04-10", categoryId: "park"),
+            leg(amountC: 2_000_00, date: "2026-04-11", categoryId: "rent"),
+        ]
+        let r = YearSoFar.report(year: 2026, personId: .fern, lens: .justMine, legs: legs, categories: cats)
+        #expect(r.savingsC == 5_000_00)
+        #expect(r.expenseTotalC == 2_000_00)
+        #expect(r.needsC == 2_000_00)
+    }
+
+    @Test("demoRows cover all 12 months with realized-style dates")
+    func demoRowsTwelveMonths() {
+        let rows = YearSoFar.demoRows(year: 2026)
+        let months = Set(rows.map { String($0.isoDate.prefix(7)) })
+        #expect(months.count == 12)
+        for m in 1...12 {
+            #expect(months.contains(String(format: "2026-%02d", m)))
+        }
+        #expect(rows.contains { $0.group == "Income" && $0.item == "Salary" })
+        #expect(rows.contains { $0.group == "Rent" })
+        // October spike travel row
+        #expect(rows.contains { $0.isoDate.hasPrefix("2026-10") && $0.group == "Travels" })
+    }
 }

@@ -132,7 +132,17 @@ struct BalanceDayView: View {
                         .fontWeight(.semibold)
                 }
             }
-            .onAppear { seedDraftsIfNeeded() }
+            .onAppear {
+                try? SeedCatalog.seedDemoExternalsIfNeeded(into: modelContext)
+                try? modelContext.save()
+                seedDraftsIfNeeded()
+            }
+            .onChange(of: personalExternals.map(\.id)) { _, _ in
+                seedDraftsIfNeeded()
+            }
+            .onChange(of: sharedExternals.map(\.id)) { _, _ in
+                seedDraftsIfNeeded()
+            }
             .sheet(item: $activeDrift) { prompt in
                 InterestDriftSheet(
                     prompt: prompt,
@@ -194,8 +204,7 @@ struct BalanceDayView: View {
     }
 
     private func seedDraftsIfNeeded() {
-        guard drafts.isEmpty else { return }
-        for account in allEditable {
+        for account in allEditable where drafts[account.id] == nil {
             drafts[account.id] = defaultDraft(for: account)
         }
     }

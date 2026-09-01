@@ -151,3 +151,178 @@ struct Seg: View {
         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
     }
 }
+
+// MARK: - Quiet ledger
+
+struct QuietLedgerRow: View {
+    var title: String
+    var amountC: Int
+    var amountColor: Color
+    var caption: String
+    var pendingLabel: String? = nil
+    var dimmed: Bool = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: pendingLabel == nil ? 3 : 5) {
+            HStack(alignment: .firstTextBaseline, spacing: 10) {
+                Text(title)
+                    .font(PantominaFont.body.weight(.medium))
+                    .foregroundStyle(Color.pantomina.ink)
+                Spacer(minLength: 8)
+                Text(formatPeso(amountC))
+                    .font(PantominaFont.body.weight(.medium).monospacedDigit())
+                    .foregroundStyle(amountColor)
+            }
+            HStack(spacing: 8) {
+                Text(caption)
+                    .font(PantominaFont.caption)
+                    .foregroundStyle(Color.pantomina.muted)
+                if let pendingLabel {
+                    Text(pendingLabel)
+                        .font(PantominaFont.caption.weight(.medium))
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(Color.pantomina.terra.opacity(0.18))
+                        .foregroundStyle(Color.pantomina.ink)
+                        .clipShape(Capsule())
+                }
+            }
+        }
+        .padding(.vertical, 11)
+        .opacity(dimmed ? 0.72 : 1)
+        .overlay(alignment: .top) {
+            Rectangle()
+                .fill(Color(hex: "#EDEAE3"))
+                .frame(height: 1)
+        }
+        .accessibilityElement(children: .combine)
+    }
+}
+
+struct QuietEmptyBlock: View {
+    var systemImage: String
+    var title: String
+    var message: String
+    var actionTitle: String? = nil
+    var filled: Bool = false
+    var action: (() -> Void)? = nil
+
+    var body: some View {
+        VStack(spacing: 8) {
+            Image(systemName: systemImage)
+                .font(.system(size: 28, weight: .regular))
+                .foregroundStyle(Color.pantomina.hairline)
+                .accessibilityHidden(true)
+            Text(title)
+                .font(PantominaFont.body.weight(.medium))
+                .foregroundStyle(Color.pantomina.ink)
+                .multilineTextAlignment(.center)
+            Text(message)
+                .font(PantominaFont.caption)
+                .foregroundStyle(Color.pantomina.muted)
+                .multilineTextAlignment(.center)
+            if let actionTitle, let action {
+                Button(action: action) {
+                    Text(actionTitle)
+                        .font(PantominaFont.body.weight(.semibold))
+                        .frame(minHeight: 44)
+                        .padding(.horizontal, 18)
+                        .background(filled ? Color.pantomina.quietAccent : Color.clear)
+                        .foregroundStyle(filled ? Color.white : Color.pantomina.quietAccent)
+                        .overlay {
+                            if !filled {
+                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                    .stroke(Color.pantomina.quietAccent, lineWidth: 1)
+                            }
+                        }
+                        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                }
+                .buttonStyle(SageButtonStyle())
+                .padding(.top, 4)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 40)
+    }
+}
+
+struct QuietPrimaryButton: View {
+    var title: String
+    var action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(PantominaFont.body.weight(.semibold))
+                .frame(maxWidth: .infinity)
+                .frame(minHeight: 48)
+                .background(Color.pantomina.quietAccent)
+                .foregroundStyle(.white)
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        }
+        .buttonStyle(SageButtonStyle())
+    }
+}
+
+struct QuietScopeTabs<Tab: Hashable>: View {
+    let tabs: [(title: String, value: Tab)]
+    @Binding var selection: Tab
+
+    var body: some View {
+        HStack(spacing: 24) {
+            ForEach(tabs, id: \.value) { item in
+                let selected = selection == item.value
+                Button {
+                    selection = item.value
+                } label: {
+                    Text(item.title)
+                        .font(PantominaFont.body.weight(selected ? .semibold : .regular))
+                        .foregroundStyle(selected ? Color.pantomina.ink : Color.pantomina.muted)
+                        .padding(.vertical, 10)
+                        .overlay(alignment: .bottom) {
+                            Rectangle()
+                                .fill(selected ? Color.pantomina.ink : Color.clear)
+                                .frame(height: 2)
+                        }
+                }
+                .buttonStyle(.plain)
+                .accessibilityAddTraits(selected ? [.isSelected, .isButton] : .isButton)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 4)
+        .overlay(alignment: .bottom) {
+            Rectangle()
+                .fill(Color.pantomina.rule)
+                .frame(height: 1)
+        }
+    }
+}
+
+struct QuietFilterChip: View {
+    var title: String
+    var selected: Bool
+    var action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(PantominaFont.caption.weight(selected ? .semibold : .regular))
+                .lineLimit(1)
+                .padding(.horizontal, 14)
+                .frame(minHeight: 44)
+                .background(selected ? Color.pantomina.quietAccent : Color.clear)
+                .foregroundStyle(selected ? Color.white : Color.pantomina.ink)
+                .overlay {
+                    Capsule()
+                        .stroke(selected ? Color.clear : Color.pantomina.rule, lineWidth: 1)
+                }
+                .clipShape(Capsule())
+                .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(title)
+        .accessibilityAddTraits(selected ? [.isSelected, .isButton] : .isButton)
+    }
+}

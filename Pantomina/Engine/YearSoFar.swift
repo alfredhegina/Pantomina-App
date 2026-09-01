@@ -58,6 +58,8 @@ enum YearSoFar {
         var categoryExpenses: [CategorySlice]
         var needsC: Int
         var wantsC: Int
+        /// Attributed `.savings` + `.sinking` flows for the year/scope.
+        var savingsC: Int
     }
 
     /// True when the leg should appear in YTD income/expense totals.
@@ -82,7 +84,8 @@ enum YearSoFar {
         switch categoryFlow {
         case .income: return .income
         case .expense: return .expense
-        case .transfer, .savings, .sinking, .none:
+        case .savings, .sinking: return categoryFlow
+        case .transfer, .none:
             return nil
         }
     }
@@ -135,6 +138,7 @@ enum YearSoFar {
         var wantsC = 0
         var incomeTotal = 0
         var expenseTotal = 0
+        var savingsTotal = 0
 
         for leg in legs {
             guard countsTowardYTD(leg) else { continue }
@@ -158,7 +162,9 @@ enum YearSoFar {
                 case .want: wantsC += amount
                 case .none: break
                 }
-            case .transfer, .savings, .sinking:
+            case .savings, .sinking:
+                savingsTotal += amount
+            case .transfer:
                 break
             }
         }
@@ -189,7 +195,198 @@ enum YearSoFar {
             expenseTotalC: expenseTotal,
             categoryExpenses: categoryExpenses,
             needsC: needsC,
-            wantsC: wantsC
+            wantsC: wantsC,
+            savingsC: savingsTotal
         )
+    }
+
+    /// Mean of up to `window` spend months **before** the latest spend month (“usual”).
+    static func usualExpenseC(months: [MonthBucket], window: Int = 3) -> Int? {
+        precondition(window > 0)
+        let withSpend = months.filter { $0.expenseC > 0 }.sorted { $0.yearMonth < $1.yearMonth }
+        guard withSpend.count >= 2 else { return nil }
+        let prior = Array(withSpend.dropLast().suffix(window))
+        guard !prior.isEmpty else { return nil }
+        let sum = prior.reduce(0) { $0 + $1.expenseC }
+        return sum / prior.count
+    }
+
+    /// Legacy name — same as `usualExpenseC` (prior months only, not including latest).
+    static func trailingExpenseAverageC(months: [MonthBucket], window: Int = 3) -> Int? {
+        usualExpenseC(months: months, window: window)
+    }
+
+    struct ExpenseSpikeInsight: Equatable, Sendable {
+        var yearMonth: String
+        var expenseC: Int
+        var usualC: Int
+        /// expenseC / usualC (usual > 0).
+        var multiple: Double
+    }
+
+    /// Latest spend month vs usual (prior up-to-3). Always when both exist.
+    static func monthVsUsualInsight(
+        months: [MonthBucket],
+        window: Int = 3
+    ) -> ExpenseSpikeInsight? {
+        guard let usual = usualExpenseC(months: months, window: window), usual > 0 else {
+            return nil
+        }
+        guard let latest = months.filter({ $0.expenseC > 0 }).sorted(by: { $0.yearMonth < $1.yearMonth }).last
+        else { return nil }
+        let multiple = Double(latest.expenseC) / Double(usual)
+        return ExpenseSpikeInsight(
+            yearMonth: latest.yearMonth,
+            expenseC: latest.expenseC,
+            usualC: usual,
+            multiple: multiple
+        )
+    }
+
+    /// Latest spend month vs trailing average; only when ≥ 1.5× usual.
+    static func expenseSpikeInsight(
+        months: [MonthBucket],
+        window: Int = 3,
+        threshold: Double = 1.5
+    ) -> ExpenseSpikeInsight? {
+        guard let insight = monthVsUsualInsight(months: months, window: window),
+              insight.multiple >= threshold
+        else { return nil }
+        return insight
+    }
+
+    // MARK: - Demo seed (12-month YTD smoke)
+
+    static let demoNoteMarker = "YTD demo"
+    static let demoIdPrefix = "ytd-demo-v2-"
+
+    struct DemoRow: Equatable, Sendable {
+        var isoDate: String
+        var amountC: Int
+        var group: String
+        var item: String
+        var paidBy: PersonId
+        var allocFernC: Int
+        var allocStarkC: Int
+    }
+
+    /// Deterministic 12-month ledger for Quiet ledger smoke (income + spend + one spike month).
+    static func demoRows(year: Int) -> [DemoRow] {
+        var rows: [DemoRow] = []
+        for month in 1...12 {
+            let yyyymm = String(format: "%04d-%02d", year, month)
+            // Salary — Fern only
+            rows.append(
+                DemoRow(
+                    isoDate: "\(yyyymm)-15",
+                    amountC: 50_000_00,
+                    group: "Income",
+                    item: "Salary",
+                    paidBy: .fern,
+                    allocFernC: 50_000_00,
+                    allocStarkC: 0
+                )
+            )
+            // Rent — shared
+            rows.append(
+                DemoRow(
+                    isoDate: "\(yyyymm)-01",
+                    amountC: 20_000_00,
+                    group: "Rent",
+                    item: "House",
+                    paidBy: .fern,
+                    allocFernC: 10_000_00,
+                    allocStarkC: 10_000_00
+                )
+            )
+            // Internet — shared
+            rows.append(
+                DemoRow(
+                    isoDate: "\(yyyymm)-15",
+                    amountC: 1_799_00,
+                    group: "Utilities",
+                    item: "Internet PLDT",
+                    paidBy: .fern,
+                    allocFernC: 900_00,
+                    allocStarkC: 899_00
+                )
+            )
+            // Electricity — varies
+            let power = 2_200_00 + (month * 180_00)
+            rows.append(
+                DemoRow(
+                    isoDate: "\(yyyymm)-20",
+                    amountC: power,
+                    group: "Utilities",
+                    item: "Electricity",
+                    paidBy: .fern,
+                    allocFernC: power / 2,
+                    allocStarkC: power - power / 2
+                )
+            )
+            // Groceries — Fern or Stark alternate
+            let grocery = 3_500_00 + (month % 4) * 900_00
+            let groceryBy: PersonId = month % 2 == 0 ? .stark : .fern
+            rows.append(
+                DemoRow(
+                    isoDate: "\(yyyymm)-08",
+                    amountC: grocery,
+                    group: "Groceries",
+                    item: "Household",
+                    paidBy: groceryBy,
+                    allocFernC: groceryBy == .fern ? grocery : grocery / 2,
+                    allocStarkC: groceryBy == .stark ? grocery : grocery / 2
+                )
+            )
+            // Spotify — want, Fern
+            rows.append(
+                DemoRow(
+                    isoDate: "\(yyyymm)-05",
+                    amountC: 149_00,
+                    group: "Subscription",
+                    item: "Spotify",
+                    paidBy: .fern,
+                    allocFernC: 149_00,
+                    allocStarkC: 0
+                )
+            )
+            // Parked savings — Fern
+            rows.append(
+                DemoRow(
+                    isoDate: "\(yyyymm)-25",
+                    amountC: 5_000_00,
+                    group: "Savings",
+                    item: "Parked",
+                    paidBy: .fern,
+                    allocFernC: 5_000_00,
+                    allocStarkC: 0
+                )
+            )
+        }
+        // October spike — travel (makes “vs usual” pop)
+        rows.append(
+            DemoRow(
+                isoDate: String(format: "%04d-10-12", year),
+                amountC: 18_500_00,
+                group: "Travels",
+                item: "Accommodation",
+                paidBy: .fern,
+                allocFernC: 9_250_00,
+                allocStarkC: 9_250_00
+            )
+        )
+        // Mid-year side hustle
+        rows.append(
+            DemoRow(
+                isoDate: String(format: "%04d-06-28", year),
+                amountC: 8_000_00,
+                group: "Income",
+                item: "Side hustle",
+                paidBy: .fern,
+                allocFernC: 8_000_00,
+                allocStarkC: 0
+            )
+        )
+        return rows
     }
 }

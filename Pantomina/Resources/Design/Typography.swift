@@ -16,6 +16,17 @@ enum PantominaFont {
     static let body = Font.custom("DM Sans", size: 16, relativeTo: .body)
     static let amount = Font.custom("DM Sans", size: 28, relativeTo: .title).weight(.semibold).monospacedDigit()
     static let caption = Font.custom("DM Sans", size: 13, relativeTo: .caption)
+
+    /// Quiet ledger hero — 40pt through hundreds of thousands; steps down at millions.
+    static func heroAmount(centavos: Int) -> Font {
+        let pesos = abs(centavos) / 100
+        let size: CGFloat
+        if pesos >= 100_000_000 { size = 26 }
+        else if pesos >= 10_000_000 { size = 30 }
+        else if pesos >= 1_000_000 { size = 34 }
+        else { size = 40 }
+        return Font.custom("DM Sans", size: size, relativeTo: .largeTitle).weight(.semibold)
+    }
 }
 
 enum PantominaMotion {

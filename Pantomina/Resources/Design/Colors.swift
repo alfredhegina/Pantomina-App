@@ -17,6 +17,12 @@ struct PantominaColors {
     let blush = Color(hex: "#F6DCE1")
     let rose = Color(hex: "#B8405E")
 
+    /// Quiet ledger accent (1c) — AA-friendlier green for chrome / Earned.
+    let quietAccent = Color(hex: "#2F6B52")
+    /// Chart expense fill only (not amount text) — 1c warm clay.
+    let expenseBar = Color(hex: "#C98A6B")
+    let rule = Color(hex: "#E4E1DA")
+
     /// Where it Went expense slices — amount-rank palette (tweak here; not Charts auto hues).
     let categoryAmber = Color(hex: "#D9A066")
     let categoryOlive = Color(hex: "#7A8F6E")
@@ -26,13 +32,18 @@ struct PantominaColors {
     /// Rank 0…4 then muted for Other / overflow. Stable for later aesthetic retunes.
     func categorySlice(rank: Int) -> Color {
         switch rank {
-        case 0: return terra
+        case 0: return expenseBar
         case 1: return categoryAmber
         case 2: return categoryOlive
         case 3: return categorySlateTeal
         case 4: return categoryCocoa
         default: return muted
         }
+    }
+
+    /// Quiet ledger: amounts are ink; only income is green.
+    func ledgerAmount(flow: FlowType?) -> Color {
+        flow == .income ? quietAccent : ink
     }
 }
 
