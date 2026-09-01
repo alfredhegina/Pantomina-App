@@ -76,8 +76,10 @@ struct EmpireView: View {
         switch scope {
         case .fern:
             let lines = fernMetricLines
-            guard !lines.isEmpty || metricsOnlySnapshot(personId: PersonId.fern.rawValue) != nil else { return nil }
-            if fernPockets.isEmpty, let snap = metricsOnlySnapshot(personId: PersonId.fern.rawValue) {
+            let demoSnap = metricsOnlySnapshot(personId: PersonId.fern.rawValue)
+            guard !lines.isEmpty || demoSnap != nil else { return nil }
+            // Spec smoke: metrics-only Portfolio-Fern demo wins on its cycle even when pockets exist.
+            if let snap = demoSnap, snap.cycleAnchorISO == activeAnchor {
                 return snap.metrics
             }
             return Snapshot.metrics(
@@ -129,6 +131,10 @@ struct EmpireView: View {
         let date = DisplayLabels.displayDate(iso: activeAnchor)
         switch scope {
         case .fern:
+            if let demo = metricsOnlySnapshot(personId: PersonId.fern.rawValue),
+               demo.cycleAnchorISO == activeAnchor {
+                return "As of \(date) · Spec demo (Portfolio-Fern)"
+            }
             if snapshotForCycle(personId: PersonId.fern.rawValue, cycleISO: activeAnchor) != nil {
                 return "As of \(date) · check-in"
             }
@@ -182,7 +188,7 @@ struct EmpireView: View {
                         }
                         .foregroundStyle(Color.pantomina.sageDeep)
                     } footer: {
-                        Text("Spec golden for smoke — live pockets stay preferred when present.")
+                        Text("Loads Spec golden metrics for Aug 20. Pick that cycle to see them; other cycles stay live from the ledger.")
                             .font(PantominaFont.caption)
                     }
                 }
