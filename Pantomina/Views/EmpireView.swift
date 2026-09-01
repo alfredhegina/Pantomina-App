@@ -33,6 +33,8 @@ struct EmpireView: View {
     @State private var selectedAnchor: String?
     @State private var showMetricDetails = false
     @State private var selectedYear: Int = Calendar.current.component(.year, from: Date())
+    @State private var showCycleWheel = false
+    @State private var wheelDraftAnchor = ""
 
     private var fernName: String { people.first { $0.id == .fern }?.name ?? "Fern" }
     private var starkName: String { people.first { $0.id == .stark }?.name ?? "Stark" }
@@ -72,25 +74,20 @@ struct EmpireView: View {
         return set.sorted()
     }
 
-    private var yearOptions: [Int] {
-        var years = Set(allCycleAnchors.compactMap { Int($0.prefix(4)) })
-        years.insert(selectedYear)
-        years.insert(Calendar.current.component(.year, from: Date()))
-        return years.sorted(by: >)
-    }
-
-    /// Cycle Menu: anchors in the selected year only (≤ ~24).
-    private var cycleAnchors: [String] {
-        var inYear = Cycle.anchors(inYear: selectedYear, from: allCycleAnchors)
-        if inYear.isEmpty {
-            inYear = Cycle.recentAnchors(from: allCycleAnchors, aroundISO: activeAnchor, limit: 24)
+    /// Cycle wheel — only 15th / month-end anchors; capped when history is large.
+    private var wheelCycleAnchors: [String] {
+        let all = allCycleAnchors
+        var list: [String]
+        if all.count <= 48 {
+            list = all
+        } else {
+            list = Cycle.recentAnchors(from: all, aroundISO: activeAnchor, limit: 48)
         }
-        if !inYear.contains(activeAnchor),
-           activeAnchor.hasPrefix(String(format: "%04d-", selectedYear)) {
-            inYear.append(activeAnchor)
-            inYear.sort()
+        if !list.contains(activeAnchor) {
+            list.append(activeAnchor)
+            list.sort()
         }
-        return inYear
+        return list
     }
 
     private var fernPockets: [PocketRow] { livePockets(for: .fern) }
@@ -266,52 +263,30 @@ struct EmpireView: View {
                 PetTitle("Our Little Empire")
             }
             ToolbarItem(placement: .topBarTrailing) {
-                HStack(spacing: 12) {
-                    Menu {
-                        ForEach(yearOptions, id: \.self) { y in
-                            Button(String(y)) {
-                                selectedYear = y
-                                let inYear = Cycle.anchors(inYear: y, from: allCycleAnchors)
-                                if !activeAnchor.hasPrefix(String(format: "%04d-", y)) {
-                                    selectedAnchor = inYear.last
-                                }
-                            }
-                        }
-                    } label: {
-                        HStack(spacing: 4) {
-                            Text(String(selectedYear))
-                                .font(PantominaFont.body.weight(.medium))
-                            Image(systemName: "chevron.down")
-                                .font(.system(size: 10, weight: .semibold))
-                        }
-                        .foregroundStyle(Color.pantomina.quietAccent)
+                Button {
+                    wheelDraftAnchor = activeAnchor
+                    showCycleWheel = true
+                } label: {
+                    HStack(spacing: 4) {
+                        Text(DisplayLabels.displayDate(iso: activeAnchor))
+                            .font(PantominaFont.body.weight(.medium))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.85)
+                        Image(systemName: "chevron.down")
+                            .font(.system(size: 10, weight: .semibold))
                     }
-                    .accessibilityLabel("Year")
-
-                    Menu {
-                        ForEach(cycleAnchors.reversed(), id: \.self) { anchor in
-                            Button(DisplayLabels.displayDate(iso: anchor)) {
-                                selectedAnchor = anchor
-                                if let y = Int(anchor.prefix(4)) { selectedYear = y }
-                            }
-                        }
-                    } label: {
-                        HStack(spacing: 4) {
-                            Text(DisplayLabels.displayDateShort(iso: activeAnchor))
-                                .font(PantominaFont.body.weight(.medium))
-                            Image(systemName: "chevron.down")
-                                .font(.system(size: 10, weight: .semibold))
-                        }
-                        .foregroundStyle(Color.pantomina.quietAccent)
-                    }
-                    .accessibilityLabel("Cycle")
+                    .foregroundStyle(Color.pantomina.quietAccent)
                 }
+                .accessibilityLabel("Cycle")
             }
         }
         .onAppear {
             if let y = Int(activeAnchor.prefix(4)) { selectedYear = y }
             try? SeedCatalog.seedDemoExternalsIfNeeded(into: modelContext)
             try? modelContext.save()
+        }
+        .sheet(isPresented: $showCycleWheel) {
+            cycleWheelSheet
         }
         .sheet(isPresented: $showBalanceDay) {
             BalanceDayView(personId: balanceDayPerson, cycleISO: activeAnchor) {
@@ -327,6 +302,45 @@ struct EmpireView: View {
                 cycleAnchorISO: activeAnchor,
                 onDone: { miniReport = nil }
             )
+        }
+    }
+
+    private var cycleWheelSheet: some View {
+        NavigationStack {
+            Picker("Cycle", selection: $wheelDraftAnchor) {
+                ForEach(wheelCycleAnchors, id: \.self) { anchor in
+                    Text(DisplayLabels.displayDate(iso: anchor))
+                        .tag(anchor)
+                }
+            }
+            .pickerStyle(.wheel)
+            .labelsHidden()
+            .frame(maxHeight: 220)
+            .padding(.horizontal, 20)
+            .navigationTitle("Cycle")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { showCycleWheel = false }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") {
+                        applyCycleSelection(wheelDraftAnchor)
+                        showCycleWheel = false
+                    }
+                    .fontWeight(.semibold)
+                }
+            }
+        }
+        .presentationDetents([.medium])
+        .presentationDragIndicator(.visible)
+        .presentationBackground(Color.pantomina.ground)
+    }
+
+    private func applyCycleSelection(_ anchor: String) {
+        selectedAnchor = anchor
+        if let y = Int(anchor.prefix(4)) {
+            selectedYear = y
         }
     }
 
