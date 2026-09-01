@@ -299,6 +299,8 @@ struct EmpireView: View {
         }
         .onAppear {
             if let y = Int(activeAnchor.prefix(4)) { selectedYear = y }
+            try? SeedCatalog.seedDemoExternalsIfNeeded(into: modelContext)
+            try? modelContext.save()
         }
         .sheet(isPresented: $showBalanceDay) {
             BalanceDayView(personId: balanceDayPerson, cycleISO: activeAnchor) {

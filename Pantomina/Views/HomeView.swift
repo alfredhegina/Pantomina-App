@@ -60,6 +60,8 @@ struct HomeView: View {
                 .padding(Spacing.lg)
             }
             .background(Color.pantomina.ground.ignoresSafeArea())
+            .toolbarBackground(Color.pantomina.ground, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {

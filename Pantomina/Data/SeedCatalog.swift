@@ -44,6 +44,7 @@ enum SeedCatalog {
         .init(group: "Travels", item: "Accommodation", flow: .expense, needWant: .want, fixedVariable: .variable),
         .init(group: "Income", item: "Salary", flow: .income, needWant: nil, fixedVariable: .fixed),
         .init(group: "Income", item: "Side hustle", flow: .income, needWant: nil, fixedVariable: .variable),
+        .init(group: "Savings", item: "Parked", flow: .savings, needWant: nil, fixedVariable: .variable),
         .init(group: "Child Support", item: "Birthday", flow: .expense, needWant: .want, fixedVariable: .variable),
         .init(group: "Siblings", item: "Birthday", flow: .expense, needWant: .need, fixedVariable: .variable),
         .init(group: "Loan", item: "BPI Credit to Cash", flow: .expense, needWant: .want, fixedVariable: .fixed),
@@ -106,13 +107,171 @@ enum SeedCatalog {
                 )
             )
         }
+        if !(try context.fetch(FetchDescriptor<CategoryRecord>()))
+            .contains(where: { $0.group == "Savings" && $0.item == "Parked" }) {
+            context.insert(
+                CategoryRecord(
+                    group: "Savings",
+                    item: "Parked",
+                    flow: .savings,
+                    needWant: nil,
+                    fixedVariable: .variable,
+                    system: false
+                )
+            )
+        }
 
         try seedDemoRulesIfNeeded(into: context)
         try seedDemoFundingIfNeeded(into: context)
         try seedDemoJarIfNeeded(into: context)
         try seedDemoLoansIfNeeded(into: context)
         try seedDemoFundsIfNeeded(into: context)
+        try seedDemoExternalsIfNeeded(into: context)
+        try seedDemoYearSoFarIfNeeded(into: context)
         try context.save()
+    }
+
+    /// Spec-named external pockets for Balance Day (prefilled tier). Additive.
+    @MainActor
+    static func seedDemoExternalsIfNeeded(into context: ModelContext) throws {
+        struct ExternalSeed {
+            var id: String
+            var baseName: String
+            var owner: String
+            var scope: Scope
+            var kind: AccountKind
+            var lastConfirmedBalanceC: Int
+        }
+
+        let seeds: [ExternalSeed] = [
+            .init(
+                id: "acct-ext-prulife",
+                baseName: "PruLife",
+                owner: "fern",
+                scope: .fern,
+                kind: .savingsAsset,
+                lastConfirmedBalanceC: 185_000_00
+            ),
+            .init(
+                id: "acct-ext-philstocks",
+                baseName: "Philstocks",
+                owner: "fern",
+                scope: .fern,
+                kind: .investment,
+                lastConfirmedBalanceC: 42_500_00
+            ),
+            .init(
+                id: "acct-ext-gotrade",
+                baseName: "GoTrade",
+                owner: "fern",
+                scope: .fern,
+                kind: .investment,
+                lastConfirmedBalanceC: 18_250_00
+            ),
+            .init(
+                id: "acct-ext-coinsph",
+                baseName: "CoinsPH",
+                owner: "fern",
+                scope: .fern,
+                kind: .investment,
+                lastConfirmedBalanceC: 6_800_00
+            ),
+            .init(
+                id: "acct-ext-pagibig",
+                baseName: "Pag-IBIG MP2",
+                owner: "fern",
+                scope: .fern,
+                kind: .govMandated,
+                lastConfirmedBalanceC: 95_000_00
+            ),
+            .init(
+                id: "acct-ext-stark-maya-invest",
+                baseName: "Maya Invest",
+                owner: "stark",
+                scope: .stark,
+                kind: .investment,
+                lastConfirmedBalanceC: 12_000_00
+            ),
+        ]
+
+        let existing = try context.fetch(FetchDescriptor<AccountRecord>())
+        let byId = Set(existing.map(\.id))
+        let byNameScope = Set(existing.map { "\($0.baseName)|\($0.scopeRaw)" })
+
+        for seed in seeds {
+            if byId.contains(seed.id) { continue }
+            if byNameScope.contains("\(seed.baseName)|\(seed.scope.rawValue)") { continue }
+            context.insert(
+                AccountRecord(
+                    id: seed.id,
+                    baseName: seed.baseName,
+                    owner: seed.owner,
+                    scope: seed.scope,
+                    kind: seed.kind,
+                    settlement: .instant,
+                    lastConfirmedBalanceC: seed.lastConfirmedBalanceC,
+                    lastConfirmedCycleISO: nil
+                )
+            )
+        }
+    }
+
+    /// Twelve months of realized legs for Our Year So Far Quiet ledger smoke. Additive; idempotent per year.
+    /// Returns `true` when this year already had the demo or rows were inserted.
+    @MainActor
+    @discardableResult
+    static func seedDemoYearSoFarIfNeeded(into context: ModelContext, year: Int? = nil) throws -> Bool {
+        let year = year ?? Calendar.current.component(.year, from: Date())
+        let prefix = "\(YearSoFar.demoIdPrefix)\(year)-"
+        let existing = try context.fetch(FetchDescriptor<TransactionRecord>())
+        if existing.contains(where: { $0.id.hasPrefix(prefix) }) { return true }
+
+        let accounts = try context.fetch(FetchDescriptor<AccountRecord>())
+        guard
+            let cash = accounts.first(where: { $0.baseName == "House cash box" && $0.scope == .household })
+                ?? accounts.first(where: { $0.scope == .fern && $0.kind == .cash })
+                ?? accounts.first
+        else { return false }
+
+        let categories = try context.fetch(FetchDescriptor<CategoryRecord>())
+        if !categories.contains(where: { $0.group == "Savings" && $0.item == "Parked" }) {
+            context.insert(
+                CategoryRecord(
+                    group: "Savings",
+                    item: "Parked",
+                    flow: .savings,
+                    needWant: nil,
+                    fixedVariable: .variable,
+                    system: false
+                )
+            )
+        }
+        let cats = try context.fetch(FetchDescriptor<CategoryRecord>())
+
+        func categoryId(group: String, item: String) -> String? {
+            cats.first { $0.group == group && $0.item == item }?.id
+        }
+
+        var inserted = 0
+        for (index, row) in YearSoFar.demoRows(year: year).enumerated() {
+            guard let catId = categoryId(group: row.group, item: row.item) else { continue }
+            context.insert(
+                TransactionRecord(
+                    id: "\(prefix)\(index)",
+                    purchaseDate: row.isoDate,
+                    realizedDate: row.isoDate,
+                    realizedStatus: .realized,
+                    amountC: row.amountC,
+                    accountId: cash.id,
+                    categoryId: catId,
+                    paidBy: row.paidBy,
+                    allocation: Allocation(fern: row.allocFernC, stark: row.allocStarkC),
+                    note: YearSoFar.demoNoteMarker
+                )
+            )
+            inserted += 1
+        }
+        return inserted > 0
     }
 
     /// Demo War Chest funds (Fern personal). Additive.

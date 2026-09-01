@@ -563,4 +563,26 @@ Skills: Operate / Humanizer / Emil; Spec cheese quarantine.
 | History | Year-window Cycle Menu + chart series; `Cycle.anchors(inYear:)` / `recentAnchors` | Unbounded flat Cycle lists |
 | Where it Went | Rank palette tokens + center Spend; top 5 + Other | Charts auto hues; purple/hatch refs |
 
-**Phase 6 complete** (A+B+C + Seg/history polish). **Next:** Phase 7 (chat Add / backup / polish) when asked. Palette aesthetics may retune later via `Colors.categorySlice` only.
+### Quiet ledger 1c on YTD (2026-09-01)
+
+| Lock | Choice |
+|---|---|
+| Layout | Flat hairlines; year trailing Menu; underline peer tabs; lens mini-toggle on hero |
+| Amounts | Spent / lists / Needs = **ink**; **Earned** = `#2F6B52` only |
+| Chart fills | Income bar = quietAccent; expense bar = clay `#C98A6B` (not amount chroma) |
+| Insight | Trailing 3‑mo expense average RuleMark + spike caption when ≥1.5× |
+| Donut | Side-by-side list; center = top category % |
+| Keep | Fraunces “Our Year So Far”; Needs & wants |
+
+### Quiet ledger polish (2026-09-01)
+
+| Item | Done |
+|---|---|
+| Million-scale hero | Digit-based font size + `minimumScaleFactor` |
+| Donut | `innerRadius` 0.78 (thinner ring) |
+| Needs · Wants · Savings | Same row; savings = `savings`/`sinking` flows |
+| Lens | Charts/totals keyed to Split / Just mine / scope |
+| Usual line | Prior up-to-3 months only; always caption vs latest |
+| Paper | `#FAF8F5` tab bar + nav + table/collection appearance |
+
+**Phase 6 complete** (A+B+C + Quiet ledger YTD). **Next:** Phase 7 when asked.
