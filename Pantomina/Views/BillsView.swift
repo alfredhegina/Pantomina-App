@@ -172,19 +172,22 @@ struct BillsView: View {
         let summary = Checklist.summary(tasks: tasks)
         NavigationStack {
             VStack(spacing: 0) {
-                Seg(
-                    options: ["Split", "Forecast", "Checklist", "Love Tab"],
-                    selection: $pane
+                QuietScopeTabs(
+                    tabs: [
+                        ("Split", 0),
+                        ("Forecast", 1),
+                        ("Checklist", 2),
+                        ("Love Tab", 3),
+                    ],
+                    selection: $pane,
+                    spacing: 20
                 )
-                .padding(.horizontal, Spacing.lg)
-                .padding(.vertical, Spacing.sm)
 
                 switch pane {
                 case 1:
                     BillsForecastPane(
                         cycleISO: activeAnchor,
                         forecast: forecast,
-                        onPickCycle: { AnyView(cycleMenu) },
                         onCoverShortfall: {
                             showForecastRaid = true
                         },
@@ -201,7 +204,6 @@ struct BillsView: View {
                             ($0.id, $0.displayLabel(fernName: fern, starkName: stark))
                         }),
                         pendingTaskId: countIt?.task.id,
-                        onPickCycle: { AnyView(cycleMenu) },
                         onToggle: handleChecklistToggle,
                         onOpenStatement: { statementRoute = $0 }
                     )
@@ -212,15 +214,21 @@ struct BillsView: View {
                 }
             }
             .background(Color.pantomina.ground)
+            .tint(Color.pantomina.quietAccent)
+            .toolbarBackground(Color.pantomina.ground, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     VStack(spacing: 2) {
                         PetTitle("Whose Turn Is It")
-                        Text("Bills due · \(DisplayLabels.displayDate(iso: activeAnchor))")
+                        Text("Cycle of \(DisplayLabels.displayDate(iso: activeAnchor))")
                             .font(PantominaFont.caption)
                             .foregroundStyle(Color.pantomina.muted)
                     }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    cycleMenu
                 }
             }
             .navigationDestination(isPresented: Binding(
@@ -297,15 +305,26 @@ struct BillsView: View {
     private var cycleMenu: some View {
         Group {
             if !anchors.isEmpty {
-                Picker("Cycle", selection: Binding(
-                    get: { activeAnchor },
-                    set: { selectedAnchor = $0 }
-                )) {
-                    ForEach(anchors.reversed(), id: \.self) { anchor in
-                        Text(DisplayLabels.displayDate(iso: anchor)).tag(anchor)
+                Menu {
+                    Picker("Cycle", selection: Binding(
+                        get: { activeAnchor },
+                        set: { selectedAnchor = $0 }
+                    )) {
+                        ForEach(anchors.reversed(), id: \.self) { anchor in
+                            Text(DisplayLabels.displayDate(iso: anchor)).tag(anchor)
+                        }
                     }
+                } label: {
+                    HStack(spacing: 4) {
+                        Text(DisplayLabels.displayDateShort(iso: activeAnchor))
+                            .font(PantominaFont.body.weight(.medium))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.85)
+                        Image(systemName: "chevron.down")
+                            .font(.system(size: 10, weight: .semibold))
+                    }
+                    .foregroundStyle(Color.pantomina.quietAccent)
                 }
-                .pickerStyle(.menu)
                 .accessibilityLabel("Cycle")
             }
         }
@@ -706,150 +725,138 @@ struct BillsView: View {
         let result = snap?.result
         let shares = cycleShares
         ScrollView {
-            VStack(alignment: .leading, spacing: Spacing.lg) {
-                if !anchors.isEmpty {
-                    Picker("Cycle", selection: Binding(
-                        get: { activeAnchor },
-                        set: { selectedAnchor = $0 }
-                    )) {
-                        ForEach(anchors.reversed(), id: \.self) { anchor in
-                            Text(DisplayLabels.displayDate(iso: anchor)).tag(anchor)
-                        }
-                    }
-                    .pickerStyle(.menu)
-                    .accessibilityLabel("Cycle")
-                }
-
+            VStack(alignment: .leading, spacing: 0) {
                 if let result {
-                    Card {
-                        VStack(alignment: .leading, spacing: Spacing.md) {
-                            HStack {
-                                Eyebrow("Settle this cycle")
-                                Spacer()
-                                Chip(
-                                    label: result.dueC == 0 && shares.pendingCount > 0
-                                        ? "Nothing counted yet"
-                                        : DisplayLabels.settlementStatus(result.status),
-                                    tone: result.dueC == 0 && shares.pendingCount > 0
-                                        ? .terra
-                                        : (result.status == .partial ? .terra : .sage)
-                                )
-                            }
-
-                            metricRow("\(starkName)'s share", result.dueC)
-                            metricRow("Sent over", result.contributedC)
-                            metricRow(
-                                "Still open",
-                                result.remainingC,
-                                emphasize: result.remainingC > 0
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack(alignment: .center, spacing: 10) {
+                            Text("Settle this cycle")
+                                .font(PantominaFont.body.weight(.semibold))
+                                .foregroundStyle(Color.pantomina.ink)
+                            Spacer()
+                            QuietStatusChip(
+                                label: result.dueC == 0 && shares.pendingCount > 0
+                                    ? "Nothing counted yet"
+                                    : DisplayLabels.settlementStatus(result.status),
+                                tone: result.dueC == 0 && shares.pendingCount > 0
+                                    ? .terra
+                                    : (result.status == .partial ? .terra : .sage)
                             )
-
-                            GeometryReader { geo in
-                                let pct = result.dueC == 0
-                                    ? 0.0
-                                    : min(1.0, Double(result.contributedC + result.carriedCreditC) / Double(result.dueC))
-                                ZStack(alignment: .leading) {
-                                    Capsule().fill(Color.pantomina.hairline)
-                                    Capsule()
-                                        .fill(Color.pantomina.sage)
-                                        .frame(width: pct == 0 ? 0 : max(8, geo.size.width * pct))
-                                }
+                        }
+                        VStack(alignment: .leading, spacing: 5) {
+                            Text("Still open")
+                                .font(PantominaFont.caption.weight(.medium))
+                                .foregroundStyle(Color.pantomina.muted)
+                            Text(formatPeso(result.remainingC))
+                                .font(PantominaFont.heroAmount(centavos: result.remainingC))
+                                .foregroundStyle(Color.pantomina.ink)
+                                .monospacedDigit()
+                                .minimumScaleFactor(0.7)
+                                .lineLimit(1)
+                        }
+                        GeometryReader { geo in
+                            let pct = result.dueC == 0
+                                ? 0.0
+                                : min(1.0, Double(result.contributedC + result.carriedCreditC) / Double(result.dueC))
+                            ZStack(alignment: .leading) {
+                                Capsule().fill(Color.pantomina.rule)
+                                Capsule()
+                                    .fill(Color.pantomina.quietAccent)
+                                    .frame(width: pct == 0 ? 0 : max(8, geo.size.width * pct))
                             }
-                            .frame(height: 8)
-                            .accessibilityLabel("Contribution progress")
+                        }
+                        .frame(height: 8)
+                        .accessibilityLabel("Contribution progress")
 
-                            if result.carriedCreditC > 0 {
-                                Text("Includes \(formatPeso(result.carriedCreditC)) credit from last cycle.")
-                                    .font(PantominaFont.caption)
-                                    .foregroundStyle(Color.pantomina.muted)
-                            }
+                        VStack(spacing: 0) {
+                            quietMetricRow("\(starkName)’s share", result.dueC)
+                            quietMetricRow("Sent over", result.contributedC, ruled: true)
+                        }
 
-                            if result.dueC == 0 && shares.fernC == 0 && shares.starkC == 0 {
-                                Text("Shared spends land here once counted. Use House cash box, or count the card on Statement day.")
-                                    .font(PantominaFont.caption)
-                                    .foregroundStyle(Color.pantomina.muted)
-                            } else {
-                                Text("\(starkName) sent \(formatPeso(result.contributedC)) of \(formatPeso(result.dueC)) this cycle.")
-                                    .font(PantominaFont.caption)
-                                    .foregroundStyle(Color.pantomina.muted)
-                            }
+                        if result.carriedCreditC > 0 {
+                            Text("Includes \(formatPeso(result.carriedCreditC)) credit from last cycle.")
+                                .font(PantominaFont.caption)
+                                .foregroundStyle(Color.pantomina.muted)
+                        }
+
+                        if result.dueC == 0 && shares.fernC == 0 && shares.starkC == 0 {
+                            Text("Shared spends land here once counted. Use House cash box, or count the card on Statement day.")
+                                .font(PantominaFont.caption)
+                                .foregroundStyle(Color.pantomina.muted)
+                        } else {
+                            Text("\(starkName) sent \(formatPeso(result.contributedC)) of \(formatPeso(result.dueC)) this cycle.")
+                                .font(PantominaFont.caption)
+                                .foregroundStyle(Color.pantomina.muted)
                         }
                     }
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 18)
+                    .overlay(alignment: .bottom) {
+                        Rectangle().fill(Color.pantomina.rule).frame(height: 1)
+                    }
 
-                    VStack(alignment: .leading, spacing: Spacing.md) {
-                        if shares.fernC > 0 || shares.starkC > 0 {
-                            fernShareCard(shares, fernName: fernName, starkName: starkName)
-                        }
+                    if shares.fernC > 0 || shares.starkC > 0 {
+                        fernShareBlock(shares, fernName: fernName, starkName: starkName)
+                    }
 
-                        Button {
+                    VStack(spacing: 10) {
+                        QuietPrimaryButton(title: "Log a contribution") {
                             contributionText = ""
                             contributionError = nil
                             showLogContribution = true
-                        } label: {
-                            Text("Log a contribution")
-                                .font(PantominaFont.body.weight(.semibold))
-                                .frame(maxWidth: .infinity)
-                                .frame(minHeight: 48)
-                                .background(Color.pantomina.sage)
-                                .foregroundStyle(.white)
-                                .clipShape(RoundedRectangle(cornerRadius: Spacing.radius, style: .continuous))
                         }
-                        .buttonStyle(SageButtonStyle())
-
                         if result.remainingC > 0 {
-                            Button {
+                            QuietOutlineButton(title: "Post remaining to Love Tab") {
                                 postReceivable(remainingC: result.remainingC, anchor: activeAnchor)
-                            } label: {
-                                Text("Post remaining to Love Tab")
-                                    .font(PantominaFont.body.weight(.semibold))
-                                    .frame(maxWidth: .infinity)
-                                    .frame(minHeight: 48)
-                                    .background(Color.pantomina.terra.opacity(0.2))
-                                    .foregroundStyle(Color.pantomina.terraDeep)
-                                    .clipShape(RoundedRectangle(cornerRadius: Spacing.radius, style: .continuous))
                             }
-                            .buttonStyle(.plain)
                         }
                     }
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 16)
                 } else {
                     Text("Nothing settled in this cycle yet.")
                         .font(PantominaFont.body)
                         .foregroundStyle(Color.pantomina.muted)
+                        .padding(20)
                 }
             }
-            .padding(Spacing.lg)
         }
     }
 
-    private func fernShareCard(
+    private func fernShareBlock(
         _ shares: Settlement.HouseholdShares,
         fernName: String,
         starkName: String
     ) -> some View {
-        Card {
-            VStack(alignment: .leading, spacing: Spacing.md) {
-                Eyebrow(shares.pendingCount > 0 ? "On the statement" : "Shared spends")
-                HStack {
-                    Text("\(fernName)'s share")
-                        .font(PantominaFont.body)
-                        .foregroundStyle(Color.pantomina.muted)
-                    Spacer()
-                    Text(formatPeso(shares.fernC))
-                        .font(PantominaFont.body.weight(.medium).monospacedDigit())
-                        .foregroundStyle(Color.pantomina.sageDeep)
-                }
-                if shares.pendingCount > 0 {
-                    Text(
-                        "\(shares.pendingCount) card swipe\(shares.pendingCount == 1 ? "" : "s") still waiting. \(starkName)'s half on those (\(formatPeso(shares.starkC))) won’t add to what she owes above."
-                    )
+        VStack(alignment: .leading, spacing: 9) {
+            Text(shares.pendingCount > 0 ? "On the statement" : "Shared spends")
+                .font(PantominaFont.body.weight(.semibold))
+                .foregroundStyle(Color.pantomina.ink)
+            HStack {
+                Text("\(fernName)’s share")
+                    .font(PantominaFont.body)
+                    .foregroundStyle(Color.pantomina.muted)
+                Spacer()
+                Text(formatPeso(shares.fernC))
+                    .font(PantominaFont.body.weight(.medium).monospacedDigit())
+                    .foregroundStyle(Color.pantomina.ink)
+            }
+            if shares.pendingCount > 0 {
+                Text(
+                    "\(shares.pendingCount) card swipe\(shares.pendingCount == 1 ? "" : "s") still waiting. \(starkName)’s half on those (\(formatPeso(shares.starkC))) won’t add to what she owes above."
+                )
+                .font(PantominaFont.caption)
+                .foregroundStyle(Color.pantomina.muted)
+            } else {
+                Text("\(fernName)’s half of shared spends this cycle — for planning the bills, not a tab the other way.")
                     .font(PantominaFont.caption)
                     .foregroundStyle(Color.pantomina.muted)
-                } else {
-                    Text("\(fernName)'s half of shared spends this cycle — for planning the bills, not a tab the other way.")
-                        .font(PantominaFont.caption)
-                        .foregroundStyle(Color.pantomina.muted)
-                }
             }
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .overlay(alignment: .bottom) {
+            Rectangle().fill(Color.pantomina.rule).frame(height: 1)
         }
     }
 
@@ -859,52 +866,71 @@ struct BillsView: View {
             ?? 0
         let credit = history.last?.result.creditOutC ?? 0
         return ScrollView {
-            VStack(alignment: .leading, spacing: Spacing.lg) {
-                Card {
-                    VStack(alignment: .leading, spacing: Spacing.sm) {
-                        Eyebrow("The Love Tab")
-                        Text(formatPeso(balance))
-                            .font(PantominaFont.amount)
-                            .monospacedDigit()
-                            .foregroundStyle(Color.pantomina.ink)
-                        Text("\(fernName)'s asset · \(starkName)'s open balance. Stays at ₱0 or above.")
+            VStack(alignment: .leading, spacing: 0) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("The Love Tab")
+                        .font(PantominaFont.body.weight(.semibold))
+                        .foregroundStyle(Color.pantomina.ink)
+                    Text(formatPeso(balance))
+                        .font(PantominaFont.heroAmount(centavos: balance))
+                        .foregroundStyle(Color.pantomina.ink)
+                        .monospacedDigit()
+                        .minimumScaleFactor(0.7)
+                        .lineLimit(1)
+                    Text("\(fernName)’s asset · \(starkName)’s open balance. Stays at ₱0 or above.")
+                        .font(PantominaFont.caption)
+                        .foregroundStyle(Color.pantomina.muted)
+                    if credit > 0 {
+                        Text("Credit for next cycle: \(formatPeso(credit))")
                             .font(PantominaFont.caption)
-                            .foregroundStyle(Color.pantomina.muted)
-                        if credit > 0 {
-                            Text("Credit for next cycle: \(formatPeso(credit))")
-                                .font(PantominaFont.caption)
-                                .foregroundStyle(Color.pantomina.sageDeep)
-                        }
+                            .foregroundStyle(Color.pantomina.quietAccent)
                     }
+                }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 18)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .overlay(alignment: .bottom) {
+                    Rectangle().fill(Color.pantomina.rule).frame(height: 1)
                 }
 
                 if history.isEmpty {
                     Text("No cycles on the tab yet.")
                         .font(PantominaFont.body)
                         .foregroundStyle(Color.pantomina.muted)
+                        .padding(20)
                 } else {
-                    Eyebrow("Cycle history")
-                    ForEach(history.reversed(), id: \.anchorISO) { snap in
-                        Card {
-                            HStack {
+                    Text("Cycle history")
+                        .font(PantominaFont.body.weight(.semibold))
+                        .foregroundStyle(Color.pantomina.ink)
+                        .padding(.horizontal, 20)
+                        .padding(.top, 16)
+                        .padding(.bottom, 4)
+                    VStack(spacing: 0) {
+                        ForEach(history.reversed(), id: \.anchorISO) { snap in
+                            HStack(alignment: .center, spacing: 10) {
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(DisplayLabels.displayDate(iso: snap.anchorISO))
                                         .font(PantominaFont.body.weight(.medium))
+                                        .foregroundStyle(Color.pantomina.ink)
                                     Text("due \(formatPeso(snap.result.dueC)) · sent \(formatPeso(snap.result.contributedC))")
-                                        .font(PantominaFont.caption)
+                                        .font(PantominaFont.caption.monospacedDigit())
                                         .foregroundStyle(Color.pantomina.muted)
                                 }
-                                Spacer()
-                                Chip(
+                                Spacer(minLength: 8)
+                                QuietStatusChip(
                                     label: DisplayLabels.settlementStatus(snap.result.status),
                                     tone: snap.result.status == .partial ? .terra : .sage
                                 )
                             }
+                            .padding(.vertical, 12)
+                            .overlay(alignment: .top) {
+                                Rectangle().fill(Color.pantomina.innerRule).frame(height: 1)
+                            }
                         }
                     }
+                    .padding(.horizontal, 20)
                 }
             }
-            .padding(Spacing.lg)
         }
     }
 
@@ -941,19 +967,21 @@ struct BillsView: View {
         .presentationDragIndicator(.visible)
     }
 
-    private func metricRow(_ label: String, _ cents: Int, emphasize: Bool = false) -> some View {
+    private func quietMetricRow(_ label: String, _ cents: Int, ruled: Bool = false) -> some View {
         HStack {
             Text(label)
                 .font(PantominaFont.body)
                 .foregroundStyle(Color.pantomina.muted)
             Spacer()
             Text(formatPeso(cents))
-                .font(
-                    emphasize
-                        ? PantominaFont.body.weight(.semibold).monospacedDigit()
-                        : PantominaFont.body.monospacedDigit()
-                )
+                .font(PantominaFont.body.weight(.medium).monospacedDigit())
                 .foregroundStyle(Color.pantomina.ink)
+        }
+        .frame(minHeight: 34)
+        .overlay(alignment: .top) {
+            if ruled {
+                Rectangle().fill(Color.pantomina.innerRule).frame(height: 1)
+            }
         }
     }
 

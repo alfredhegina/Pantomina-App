@@ -2,7 +2,7 @@ import Foundation
 
 /// §4.13 Cookie Jar — pure. UI never reimplements running balance or who’s-paid.
 enum CookieJar {
-    enum Kind: String, Equatable, Sendable, Codable {
+    enum Kind: String, Equatable, Hashable, Sendable, Codable {
         case income
         case spend
         case borrow

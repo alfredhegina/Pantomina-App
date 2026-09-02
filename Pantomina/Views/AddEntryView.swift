@@ -90,27 +90,47 @@ struct AddEntryView: View {
         return f + s == total
     }
 
+    private var canSave: Bool {
+        guard amountCentavos() != nil, selectedAccountId != nil else { return false }
+        if cookieJarOn {
+            if jarKind == .income, jarSourceId == nil { return false }
+            return pettyCashCategory != nil
+        }
+        guard selectedCategoryId != nil else { return false }
+        if splitMode == 2 { return customSplitSumOK == true }
+        return true
+    }
+
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: Spacing.lg) {
+                VStack(alignment: .leading, spacing: 0) {
                     heroAmount
-                    detailsCard
-                    splitCard
-                    dateCard
-                    jarCard
+                    detailsSection
+                    splitSection
+                    dateSection
+                    jarSection
                     if let error {
                         Text(error)
                             .font(PantominaFont.caption)
-                            .foregroundStyle(Color.pantomina.rose)
+                            .foregroundStyle(Color.pantomina.terraDeep)
+                            .padding(.horizontal, 20)
+                            .padding(.top, 12)
                     }
                 }
-                .padding(Spacing.lg)
             }
             .scrollDismissesKeyboard(.interactively)
             .background(Color.pantomina.ground.ignoresSafeArea())
+            .tint(Color.pantomina.quietAccent)
+            .toolbarBackground(Color.pantomina.ground, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                if presentsAsSheet {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Cancel") { dismiss() }
+                    }
+                }
                 ToolbarItem(placement: .principal) {
                     VStack(spacing: 2) {
                         PetTitle(isEditing ? "Edit the pile" : "Add to the pile")
@@ -192,158 +212,253 @@ struct AddEntryView: View {
     }
 
     private var heroAmount: some View {
-        Card {
-            VStack(alignment: .leading, spacing: Spacing.sm) {
-                Eyebrow("Amount")
-                HStack(alignment: .firstTextBaseline, spacing: 4) {
-                    Text("₱")
-                        .font(PantominaFont.amount)
-                        .foregroundStyle(Color.pantomina.muted)
-                    TextField("0.00", text: $amountText)
-                        .font(PantominaFont.amount)
-                        .keyboardType(.decimalPad)
-                        .focused($focusedField, equals: .amount)
-                        .monospacedDigit()
-                        .foregroundStyle(Color.pantomina.ink)
-                        .accessibilityLabel("Amount")
-                }
+        VStack(alignment: .leading, spacing: 5) {
+            Text("Amount")
+                .font(PantominaFont.caption)
+                .foregroundStyle(Color.pantomina.muted)
+            HStack(alignment: .firstTextBaseline, spacing: 5) {
+                Text("₱")
+                    .font(PantominaFont.heroAmount(centavos: amountCentavos() ?? 0))
+                    .foregroundStyle(Color.pantomina.muted)
+                TextField("0.00", text: $amountText)
+                    .font(PantominaFont.heroAmount(centavos: amountCentavos() ?? 0))
+                    .keyboardType(.decimalPad)
+                    .focused($focusedField, equals: .amount)
+                    .monospacedDigit()
+                    .foregroundStyle(amountText.isEmpty ? Color(hex: "#C6C2BA") : Color.pantomina.ink)
+                    .accessibilityLabel("Amount")
             }
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 14)
+        .padding(.bottom, 16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .overlay(alignment: .top) {
+            Rectangle().fill(Color.pantomina.rule).frame(height: 1)
         }
     }
 
-    private var detailsCard: some View {
-        Card {
-            VStack(alignment: .leading, spacing: Spacing.md) {
-                if cookieJarOn {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Category")
-                                .font(PantominaFont.caption)
-                                .foregroundStyle(Color.pantomina.muted)
-                            Text(pettyCashCategory?.displayName ?? "Petty Cash")
-                                .font(PantominaFont.body)
-                                .foregroundStyle(Color.pantomina.ink)
-                        }
-                        Spacer()
-                    }
-                    Text("Jar rows stay on Petty Cash — a system tag, not a second utility bill.")
+    private var detailsSection: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            if cookieJarOn {
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("Category")
                         .font(PantominaFont.caption)
                         .foregroundStyle(Color.pantomina.muted)
-                } else {
-                    pickRow(title: "Category", value: selectedCategory?.displayName ?? "Choose") {
-                        showCategoryPicker = true
-                    }
+                    Text(pettyCashCategory?.displayName ?? "Petty Cash")
+                        .font(PantominaFont.body)
+                        .foregroundStyle(Color.pantomina.ink)
                 }
-                Divider().overlay(Color.pantomina.hairline)
-                pickRow(title: "Payment method", value: selectedAccount.map {
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.vertical, 12)
+                Text("Jar rows stay on Petty Cash — a system tag, not a second utility bill.")
+                    .font(PantominaFont.caption)
+                    .foregroundStyle(Color.pantomina.muted)
+                    .padding(.bottom, 8)
+            } else {
+                pickRow(
+                    title: "Category",
+                    value: selectedCategory?.displayName ?? "Choose",
+                    placeholder: selectedCategory == nil,
+                    showRule: false
+                ) {
+                    showCategoryPicker = true
+                }
+            }
+            pickRow(
+                title: "Payment method",
+                value: selectedAccount.map {
                     $0.displayLabel(fernName: fernName, starkName: starkName)
-                } ?? "Choose") {
-                    showAccountPicker = true
-                }
-                if !realizationHint.isEmpty {
-                    Text(realizationHint)
-                        .font(PantominaFont.caption)
-                        .foregroundStyle(Color.pantomina.muted)
-                }
-                Divider().overlay(Color.pantomina.hairline)
+                } ?? "Choose",
+                placeholder: selectedAccount == nil
+            ) {
+                showAccountPicker = true
+            }
+            if !realizationHint.isEmpty {
+                Text(realizationHint)
+                    .font(PantominaFont.caption)
+                    .foregroundStyle(Color.pantomina.muted)
+                    .padding(.vertical, 2)
+            }
+            VStack(alignment: .leading, spacing: 8) {
                 Text("Paid by")
                     .font(PantominaFont.caption)
                     .foregroundStyle(Color.pantomina.muted)
-                Picker("Paid by", selection: $paidBy) {
-                    Text(fernName).tag(PersonId.fern)
-                    Text(starkName).tag(PersonId.stark)
-                }
-                .pickerStyle(.segmented)
-                .disabled(cookieJarOn)
+                QuietSegmented(
+                    options: [
+                        (fernName, PersonId.fern),
+                        (starkName, PersonId.stark),
+                    ],
+                    selection: $paidBy,
+                    enabled: !cookieJarOn
+                )
             }
+            .padding(.top, 10)
+            .padding(.bottom, 2)
+            .overlay(alignment: .top) {
+                Rectangle().fill(Color.pantomina.innerRule).frame(height: 1)
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 4)
+        .padding(.bottom, 14)
+        .overlay(alignment: .top) {
+            Rectangle().fill(Color.pantomina.rule).frame(height: 1)
         }
     }
 
-    private var splitCard: some View {
-        Card {
-            VStack(alignment: .leading, spacing: Spacing.md) {
-                Text("Split")
+    private var splitSection: some View {
+        VStack(alignment: .leading, spacing: 9) {
+            Text("Split")
+                .font(PantominaFont.caption)
+                .foregroundStyle(Color.pantomina.muted)
+            if cookieJarOn {
+                Text("Just mine")
+                    .font(PantominaFont.body)
+                    .foregroundStyle(Color.pantomina.ink)
+                Text("Jar cash doesn’t add to Stark’s bill due. Keep unit shares off The split.")
                     .font(PantominaFont.caption)
                     .foregroundStyle(Color.pantomina.muted)
-                if cookieJarOn {
-                    Text("Just mine")
-                        .font(PantominaFont.body)
-                        .foregroundStyle(Color.pantomina.ink)
-                    Text("Jar cash doesn’t add to Stark’s bill due. Keep unit shares off The split.")
-                        .font(PantominaFont.caption)
-                        .foregroundStyle(Color.pantomina.muted)
-                } else {
-                    Picker("Split", selection: $splitMode) {
-                        Text("Just mine").tag(0)
-                        Text("50·50").tag(1)
-                        Text("Custom").tag(2)
-                    }
-                    .pickerStyle(.segmented)
-                    if splitMode == 2 {
-                        TextField("\(fernName) ₱", text: $customFern)
-                            .keyboardType(.decimalPad)
-                            .focused($focusedField, equals: .customFern)
-                            .onChange(of: customFern) { _, new in autofill(fromFern: true, text: new) }
-                        TextField("\(starkName) ₱", text: $customStark)
-                            .keyboardType(.decimalPad)
-                            .focused($focusedField, equals: .customStark)
-                            .onChange(of: customStark) { _, new in autofill(fromFern: false, text: new) }
-                        if let ok = customSplitSumOK {
-                            Text(ok ? "Splits add up." : "Splits must add up to the amount.")
-                                .font(PantominaFont.caption)
-                                .foregroundStyle(ok ? Color.pantomina.sageDeep : Color.pantomina.rose)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private var dateCard: some View {
-        Card {
-            VStack(alignment: .leading, spacing: Spacing.md) {
-                DatePicker(
-                    "When it happened",
-                    selection: $purchaseDate,
-                    displayedComponents: .date
+            } else {
+                QuietSegmented(
+                    options: [
+                        ("Just mine", 0),
+                        ("50·50", 1),
+                        ("Custom", 2),
+                    ],
+                    selection: $splitMode
                 )
-                .datePickerStyle(.compact)
-                TextField("Note", text: $note)
-                    .focused($focusedField, equals: .note)
-                    .onChange(of: note) { _, new in
-                        let clamped = InputBounds.clampNote(new)
-                        if clamped != new { note = clamped }
+                if splitMode == 2 {
+                    HStack(spacing: 10) {
+                        customSplitField(
+                            name: fernName,
+                            text: $customFern,
+                            field: .customFern,
+                            fromFern: true,
+                            invalid: customSplitSumOK == false
+                        )
+                        customSplitField(
+                            name: starkName,
+                            text: $customStark,
+                            field: .customStark,
+                            fromFern: false,
+                            invalid: customSplitSumOK == false
+                        )
                     }
+                    if let ok = customSplitSumOK {
+                        Text(ok ? "Splits add up." : "Splits must add up to the amount.")
+                            .font(PantominaFont.caption.weight(ok ? .regular : .medium))
+                            .foregroundStyle(ok ? Color.pantomina.quietAccent : Color(hex: "#8A4C2A"))
+                    }
+                }
             }
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .overlay(alignment: .top) {
+            Rectangle().fill(Color.pantomina.rule).frame(height: 1)
         }
     }
 
-    private var jarCard: some View {
-        Card {
-            VStack(alignment: .leading, spacing: Spacing.md) {
-                Toggle("Cookie Jar", isOn: $cookieJarOn)
-                    .onChange(of: cookieJarOn) { _, on in
-                        if on { applyJarDefaults() }
-                    }
-                if cookieJarOn {
-                    Picker("Jar kind", selection: $jarKind) {
-                        Text("In").tag(CookieJar.Kind.income)
-                        Text("Spend").tag(CookieJar.Kind.spend)
-                        Text("Borrow").tag(CookieJar.Kind.borrow)
-                    }
-                    .pickerStyle(.segmented)
-                    pickRow(
-                        title: "Source",
-                        value: jarSources.first { $0.id == jarSourceId }?.label
-                            ?? (jarKind == .income ? "Choose" : "Optional")
-                    ) {
-                        showJarSourcePicker = true
-                    }
-                    Text(jarKindFooter)
-                        .font(PantominaFont.caption)
-                        .foregroundStyle(Color.pantomina.muted)
+    private func customSplitField(
+        name: String,
+        text: Binding<String>,
+        field: Field,
+        fromFern: Bool,
+        invalid: Bool
+    ) -> some View {
+        HStack {
+            Text("\(name) ₱")
+                .font(PantominaFont.caption)
+                .foregroundStyle(Color.pantomina.muted)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+            Spacer(minLength: 6)
+            TextField("0.00", text: text)
+                .keyboardType(.decimalPad)
+                .focused($focusedField, equals: field)
+                .multilineTextAlignment(.trailing)
+                .font(PantominaFont.body.weight(.medium).monospacedDigit())
+                .foregroundStyle(Color.pantomina.ink)
+                .onChange(of: text.wrappedValue) { _, new in
+                    autofill(fromFern: fromFern, text: new)
                 }
+        }
+        .padding(.horizontal, 12)
+        .frame(minHeight: 44)
+        .background(Color.pantomina.card)
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .stroke(invalid ? Color(hex: "#8A4C2A") : Color.pantomina.rule, lineWidth: 1)
+        )
+    }
+
+    private var dateSection: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            DatePicker(
+                "When it happened",
+                selection: $purchaseDate,
+                displayedComponents: .date
+            )
+            .datePickerStyle(.compact)
+            .font(PantominaFont.body)
+            .frame(minHeight: 44)
+            TextField("Note", text: $note)
+                .font(PantominaFont.body)
+                .focused($focusedField, equals: .note)
+                .frame(minHeight: 44)
+                .overlay(alignment: .top) {
+                    Rectangle().fill(Color.pantomina.innerRule).frame(height: 1)
+                }
+                .onChange(of: note) { _, new in
+                    let clamped = InputBounds.clampNote(new)
+                    if clamped != new { note = clamped }
+                }
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 4)
+        .overlay(alignment: .top) {
+            Rectangle().fill(Color.pantomina.rule).frame(height: 1)
+        }
+    }
+
+    private var jarSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Toggle("Cookie Jar", isOn: $cookieJarOn)
+                .font(PantominaFont.body)
+                .tint(Color.pantomina.quietAccent)
+                .frame(minHeight: 44)
+                .onChange(of: cookieJarOn) { _, on in
+                    if on { applyJarDefaults() }
+                }
+            if cookieJarOn {
+                QuietSegmented(
+                    options: [
+                        ("In", CookieJar.Kind.income),
+                        ("Spend", CookieJar.Kind.spend),
+                        ("Borrow", CookieJar.Kind.borrow),
+                    ],
+                    selection: $jarKind
+                )
+                pickRow(
+                    title: "Source",
+                    value: jarSources.first { $0.id == jarSourceId }?.label
+                        ?? (jarKind == .income ? "Choose" : "Optional"),
+                    placeholder: jarSourceId == nil
+                ) {
+                    showJarSourcePicker = true
+                }
+                Text(jarKindFooter)
+                    .font(PantominaFont.caption)
+                    .foregroundStyle(Color.pantomina.muted)
             }
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 6)
+        .overlay(alignment: .top) {
+            Rectangle().fill(Color.pantomina.rule).frame(height: 1)
         }
     }
 
@@ -360,43 +475,46 @@ struct AddEntryView: View {
 
     private var stickySave: some View {
         VStack(spacing: 0) {
-            Divider().overlay(Color.pantomina.hairline)
-            Button(action: save) {
-                Text("Save")
-                    .font(PantominaFont.body.weight(.semibold))
-                    .frame(maxWidth: .infinity)
-                    .frame(minHeight: 48)
-                    .background(Color.pantomina.sage)
-                    .foregroundStyle(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: Spacing.radius, style: .continuous))
-            }
-            .buttonStyle(SageButtonStyle())
-            .padding(.horizontal, Spacing.lg)
-            .padding(.top, Spacing.sm)
-            .padding(.bottom, Spacing.sm)
-            .background(Color.pantomina.ground)
+            Rectangle().fill(Color.pantomina.rule).frame(height: 1)
+            QuietPrimaryButton(title: "Save", enabled: canSave, action: save)
+                .padding(.horizontal, 20)
+                .padding(.top, 10)
+                .padding(.bottom, 10)
         }
+        .background(Color.pantomina.ground)
     }
 
-    private func pickRow(title: String, value: String, action: @escaping () -> Void) -> some View {
+    private func pickRow(
+        title: String,
+        value: String,
+        placeholder: Bool = false,
+        showRule: Bool = true,
+        action: @escaping () -> Void
+    ) -> some View {
         Button(action: action) {
-            HStack {
-                VStack(alignment: .leading, spacing: 2) {
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 1) {
                     Text(title)
                         .font(PantominaFont.caption)
                         .foregroundStyle(Color.pantomina.muted)
                     Text(value)
                         .font(PantominaFont.body)
-                        .foregroundStyle(Color.pantomina.ink)
+                        .foregroundStyle(placeholder ? Color(hex: "#9A9691") : Color.pantomina.ink)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 Image(systemName: "chevron.up.chevron.down")
                     .font(PantominaFont.caption)
-                    .foregroundStyle(Color.pantomina.sage)
+                    .foregroundStyle(Color.pantomina.quietAccent)
             }
+            .frame(minHeight: 44)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .overlay(alignment: .top) {
+            if showRule {
+                Rectangle().fill(Color.pantomina.innerRule).frame(height: 1)
+            }
+        }
     }
 
     private var categoryPickItems: [SearchablePickItem] {
