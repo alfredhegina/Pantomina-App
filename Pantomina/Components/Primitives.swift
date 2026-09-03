@@ -454,3 +454,63 @@ struct QuietFilterChip: View {
         .accessibilityAddTraits(selected ? [.isSelected, .isButton] : .isButton)
     }
 }
+
+/// Trailing nav control that opens a wheel sheet (Empire / Bills cycle, YTD year).
+struct QuietWheelTrigger: View {
+    var label: String
+    var accessibilityName: String
+    var action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 4) {
+                Text(label)
+                    .font(PantominaFont.body.weight(.medium))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.85)
+                Image(systemName: "chevron.down")
+                    .font(.system(size: 10, weight: .semibold))
+            }
+            .foregroundStyle(Color.pantomina.quietAccent)
+        }
+        .accessibilityLabel(accessibilityName)
+    }
+}
+
+/// Cancel / Done wheel sheet. Spinning does not commit until Done.
+struct QuietWheelSheet<Value: Hashable>: View {
+    var title: String
+    var options: [Value]
+    var optionTitle: (Value) -> String
+    @Binding var draft: Value
+    var onCancel: () -> Void
+    var onDone: () -> Void
+
+    var body: some View {
+        NavigationStack {
+            Picker(title, selection: $draft) {
+                ForEach(options, id: \.self) { value in
+                    Text(optionTitle(value)).tag(value)
+                }
+            }
+            .pickerStyle(.wheel)
+            .labelsHidden()
+            .frame(maxHeight: 220)
+            .padding(.horizontal, 20)
+            .navigationTitle(title)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel", action: onCancel)
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done", action: onDone)
+                        .fontWeight(.semibold)
+                }
+            }
+        }
+        .presentationDetents([.medium])
+        .presentationDragIndicator(.visible)
+        .presentationBackground(Color.pantomina.ground)
+    }
+}

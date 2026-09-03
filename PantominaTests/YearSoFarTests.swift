@@ -195,4 +195,12 @@ struct YearSoFarTests {
         // October spike travel row
         #expect(rows.contains { $0.isoDate.hasPrefix("2026-10") && $0.group == "Travels" })
     }
+
+    @Test("demo years for the year wheel are current and prior")
+    func demoYearsCurrentAndPrior() {
+        #expect(YearSoFar.demoYears(relativeTo: 2026) == [2026, 2025])
+        let rows = YearSoFar.demoRows(year: 2025)
+        #expect(rows.allSatisfy { $0.isoDate.hasPrefix("2025-") })
+        #expect(Set(rows.map { String($0.isoDate.prefix(7)) }).count == 12)
+    }
 }

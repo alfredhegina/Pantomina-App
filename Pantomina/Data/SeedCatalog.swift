@@ -127,7 +127,9 @@ enum SeedCatalog {
         try seedDemoLoansIfNeeded(into: context)
         try seedDemoFundsIfNeeded(into: context)
         try seedDemoExternalsIfNeeded(into: context)
-        try seedDemoYearSoFarIfNeeded(into: context)
+        for y in YearSoFar.demoYears() {
+            try seedDemoYearSoFarIfNeeded(into: context, year: y)
+        }
         try context.save()
     }
 
