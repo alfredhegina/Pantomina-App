@@ -260,6 +260,11 @@ enum YearSoFar {
     static let demoNoteMarker = "YTD demo"
     static let demoIdPrefix = "ytd-demo-v2-"
 
+    /// Years the YTD demo (and year wheel) covers — this year plus last year.
+    static func demoYears(relativeTo current: Int = Calendar.current.component(.year, from: Date())) -> [Int] {
+        [current, current - 1]
+    }
+
     struct DemoRow: Equatable, Sendable {
         var isoDate: String
         var amountC: Int

@@ -263,21 +263,13 @@ struct EmpireView: View {
                 PetTitle("Our Little Empire")
             }
             ToolbarItem(placement: .topBarTrailing) {
-                Button {
+                QuietWheelTrigger(
+                    label: DisplayLabels.displayDate(iso: activeAnchor),
+                    accessibilityName: "Cycle"
+                ) {
                     wheelDraftAnchor = activeAnchor
                     showCycleWheel = true
-                } label: {
-                    HStack(spacing: 4) {
-                        Text(DisplayLabels.displayDate(iso: activeAnchor))
-                            .font(PantominaFont.body.weight(.medium))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.85)
-                        Image(systemName: "chevron.down")
-                            .font(.system(size: 10, weight: .semibold))
-                    }
-                    .foregroundStyle(Color.pantomina.quietAccent)
                 }
-                .accessibilityLabel("Cycle")
             }
         }
         .onAppear {
@@ -286,7 +278,17 @@ struct EmpireView: View {
             try? modelContext.save()
         }
         .sheet(isPresented: $showCycleWheel) {
-            cycleWheelSheet
+            QuietWheelSheet(
+                title: "Cycle",
+                options: wheelCycleAnchors,
+                optionTitle: { DisplayLabels.displayDate(iso: $0) },
+                draft: $wheelDraftAnchor,
+                onCancel: { showCycleWheel = false },
+                onDone: {
+                    applyCycleSelection(wheelDraftAnchor)
+                    showCycleWheel = false
+                }
+            )
         }
         .sheet(isPresented: $showBalanceDay) {
             BalanceDayView(personId: balanceDayPerson, cycleISO: activeAnchor) {
@@ -303,38 +305,6 @@ struct EmpireView: View {
                 onDone: { miniReport = nil }
             )
         }
-    }
-
-    private var cycleWheelSheet: some View {
-        NavigationStack {
-            Picker("Cycle", selection: $wheelDraftAnchor) {
-                ForEach(wheelCycleAnchors, id: \.self) { anchor in
-                    Text(DisplayLabels.displayDate(iso: anchor))
-                        .tag(anchor)
-                }
-            }
-            .pickerStyle(.wheel)
-            .labelsHidden()
-            .frame(maxHeight: 220)
-            .padding(.horizontal, 20)
-            .navigationTitle("Cycle")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { showCycleWheel = false }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") {
-                        applyCycleSelection(wheelDraftAnchor)
-                        showCycleWheel = false
-                    }
-                    .fontWeight(.semibold)
-                }
-            }
-        }
-        .presentationDetents([.medium])
-        .presentationDragIndicator(.visible)
-        .presentationBackground(Color.pantomina.ground)
     }
 
     private func applyCycleSelection(_ anchor: String) {

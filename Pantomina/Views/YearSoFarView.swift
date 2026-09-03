@@ -20,6 +20,8 @@ struct YearSoFarView: View {
     @State private var year: Int = Calendar.current.component(.year, from: Date())
     @State private var chartsRevealed = false
     @State private var seedToast: String?
+    @State private var showYearWheel = false
+    @State private var wheelDraftYear = Calendar.current.component(.year, from: Date())
 
     private var fernName: String { people.first { $0.id == .fern }?.name ?? "Fern" }
     private var starkName: String { people.first { $0.id == .stark }?.name ?? "Stark" }
@@ -80,8 +82,8 @@ struct YearSoFarView: View {
     private var yearOptions: [Int] {
         var years = Set(legs.compactMap { Int($0.effectiveDate.prefix(4)) })
         years.insert(year)
-        years.insert(Calendar.current.component(.year, from: Date()))
-        return years.sorted(by: >)
+        for y in YearSoFar.demoYears() { years.insert(y) }
+        return years.sorted()
     }
 
     private var usualExpenseC: Int? {
@@ -162,20 +164,13 @@ struct YearSoFarView: View {
                 PetTitle("Our Year So Far")
             }
             ToolbarItem(placement: .topBarTrailing) {
-                Menu {
-                    ForEach(yearOptions, id: \.self) { y in
-                        Button(String(y)) { year = y }
-                    }
-                } label: {
-                    HStack(spacing: 4) {
-                        Text(String(year))
-                            .font(PantominaFont.body.weight(.medium))
-                        Image(systemName: "chevron.down")
-                            .font(.system(size: 10, weight: .semibold))
-                    }
-                    .foregroundStyle(Color.pantomina.quietAccent)
+                QuietWheelTrigger(
+                    label: String(year),
+                    accessibilityName: "Year"
+                ) {
+                    wheelDraftYear = year
+                    showYearWheel = true
                 }
-                .accessibilityLabel("Year")
             }
         }
         .overlay(alignment: .bottom) {
@@ -191,13 +186,29 @@ struct YearSoFarView: View {
             }
         }
         .onAppear {
-            try? SeedCatalog.seedDemoYearSoFarIfNeeded(into: modelContext, year: year)
+            for y in YearSoFar.demoYears() {
+                try? SeedCatalog.seedDemoYearSoFarIfNeeded(into: modelContext, year: y)
+            }
+            try? modelContext.save()
             revealCharts()
         }
         .onChange(of: year) { _, newYear in
             chartsRevealed = false
             try? SeedCatalog.seedDemoYearSoFarIfNeeded(into: modelContext, year: newYear)
             revealCharts()
+        }
+        .sheet(isPresented: $showYearWheel) {
+            QuietWheelSheet(
+                title: "Year",
+                options: yearOptions,
+                optionTitle: { String($0) },
+                draft: $wheelDraftYear,
+                onCancel: { showYearWheel = false },
+                onDone: {
+                    year = wheelDraftYear
+                    showYearWheel = false
+                }
+            )
         }
     }
 

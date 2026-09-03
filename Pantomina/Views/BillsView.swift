@@ -24,6 +24,8 @@ struct BillsView: View {
     @State private var statementRoute: String?
     @State private var showForecastRaid = false
     @State private var showForecastSweep = false
+    @State private var showCycleWheel = false
+    @State private var wheelDraftAnchor = ""
     @AppStorage("checklistDoneIds") private var checklistDoneRaw = ""
 
     private var checklistDoneIds: Set<String> {
@@ -228,7 +230,15 @@ struct BillsView: View {
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    cycleMenu
+                    if !wheelCycleAnchors.isEmpty {
+                        QuietWheelTrigger(
+                            label: DisplayLabels.displayDateShort(iso: activeAnchor),
+                            accessibilityName: "Cycle"
+                        ) {
+                            wheelDraftAnchor = activeAnchor
+                            showCycleWheel = true
+                        }
+                    }
                 }
             }
             .navigationDestination(isPresented: Binding(
@@ -280,6 +290,19 @@ struct BillsView: View {
                     }
                 }
             }
+            .sheet(isPresented: $showCycleWheel) {
+                QuietWheelSheet(
+                    title: "Cycle",
+                    options: wheelCycleAnchors,
+                    optionTitle: { DisplayLabels.displayDate(iso: $0) },
+                    draft: $wheelDraftAnchor,
+                    onCancel: { showCycleWheel = false },
+                    onDone: {
+                        selectedAnchor = wheelDraftAnchor
+                        showCycleWheel = false
+                    }
+                )
+            }
             .overlay(alignment: .bottom) {
                 if let toast {
                     Text(toast)
@@ -302,32 +325,20 @@ struct BillsView: View {
         }
     }
 
-    private var cycleMenu: some View {
-        Group {
-            if !anchors.isEmpty {
-                Menu {
-                    Picker("Cycle", selection: Binding(
-                        get: { activeAnchor },
-                        set: { selectedAnchor = $0 }
-                    )) {
-                        ForEach(anchors.reversed(), id: \.self) { anchor in
-                            Text(DisplayLabels.displayDate(iso: anchor)).tag(anchor)
-                        }
-                    }
-                } label: {
-                    HStack(spacing: 4) {
-                        Text(DisplayLabels.displayDateShort(iso: activeAnchor))
-                            .font(PantominaFont.body.weight(.medium))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.85)
-                        Image(systemName: "chevron.down")
-                            .font(.system(size: 10, weight: .semibold))
-                    }
-                    .foregroundStyle(Color.pantomina.quietAccent)
-                }
-                .accessibilityLabel("Cycle")
-            }
+    /// Cycle wheel — chronological 15th / month-end; capped like Empire when history is large.
+    private var wheelCycleAnchors: [String] {
+        let all = anchors.sorted()
+        var list: [String]
+        if all.count <= 48 {
+            list = all
+        } else {
+            list = Cycle.recentAnchors(from: all, aroundISO: activeAnchor, limit: 48)
         }
+        if !list.contains(activeAnchor) {
+            list.append(activeAnchor)
+            list.sort()
+        }
+        return list
     }
 
     private func handleChecklistToggle(_ task: Checklist.Task) {
