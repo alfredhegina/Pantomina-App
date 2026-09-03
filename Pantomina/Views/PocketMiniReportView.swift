@@ -76,7 +76,7 @@ struct PocketMiniReportView: View {
                                 .monospacedDigit()
                         }
                     } footer: {
-                        Text("Spoken for is War Chest money parked on this pocket — not a second asset.")
+                        Text("Spoken for is War Chest money parked on this pocket, not a second asset.")
                             .font(PantominaFont.caption)
                     }
                 }
@@ -116,7 +116,7 @@ struct PocketMiniReportView: View {
                 } header: {
                     Text("This cycle")
                 } footer: {
-                    Text("Open Receipts for the full list. Edits happen there — not here.")
+                    Text("Open Receipts for the full list. Edits happen there, not here.")
                         .font(PantominaFont.caption)
                 }
             }

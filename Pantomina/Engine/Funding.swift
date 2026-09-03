@@ -1,6 +1,6 @@
 import Foundation
 
-/// §4.9 funding plans — pure. UI never reimplements status or tranche math.
+/// §4.9 funding plans: pure. UI never reimplements status or tranche math.
 enum Funding {
     enum Status: Equatable, Sendable {
         case funded(done: Int, total: Int)

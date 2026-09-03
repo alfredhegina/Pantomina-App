@@ -3,7 +3,7 @@ import SwiftUI
 import SwiftData
 
 struct YearSoFarView: View {
-    /// Peer scope matches Empire — Household is not nested under a person.
+    /// Peer scope matches Empire: Household is not nested under a person.
     private enum ScopeTab: String, CaseIterable, Identifiable {
         case fern, stark, household
         var id: String { rawValue }
@@ -233,9 +233,9 @@ struct YearSoFarView: View {
             try modelContext.save()
             seedToast = ok
                 ? "12-month demo ready for \(year)."
-                : "Couldn’t seed — check categories/accounts."
+                : "Couldn't seed. Check categories and accounts."
         } catch {
-            seedToast = "Couldn’t save demo."
+            seedToast = "Couldn't save demo."
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.2) {
             PantominaMotion.run(reduceMotion) { seedToast = nil }
@@ -336,9 +336,9 @@ struct YearSoFarView: View {
 
     private var heroFooter: String {
         if scopeTab == .household {
-            return "\(fernName) and \(starkName) are personal books. Household is shared — not under either person."
+            return "\(fernName) and \(starkName) are personal books. Household is shared, not under either person."
         }
-        return "Split is each person’s share. Just mine is what \(activePersonName) paid. Counted by when it became real."
+        return "Split is each person's share. Just mine is what \(activePersonName) paid. Counted by when it became real."
     }
 
     private var emptyBlock: some View {
@@ -433,21 +433,21 @@ struct YearSoFarView: View {
         let name = monthFull(insight.yearMonth)
         let spent = formatPeso(insight.expenseC)
         if insight.multiple >= 2.8 {
-            return "\(name) spent \(spent) — nearly three times a usual month."
+            return "\(name) spent \(spent), nearly three times a usual month."
         }
         if insight.multiple >= 1.9 {
-            return "\(name) spent \(spent) — about twice a usual month."
+            return "\(name) spent \(spent), about twice a usual month."
         }
         if insight.multiple >= 1.5 {
-            return "\(name) spent \(spent) — well above a usual month."
+            return "\(name) spent \(spent), well above a usual month."
         }
         if insight.multiple >= 0.85 {
-            return "\(name) spent \(spent) — about a usual month."
+            return "\(name) spent \(spent), about a usual month."
         }
         if insight.multiple >= 0.5 {
-            return "\(name) spent \(spent) — under a usual month."
+            return "\(name) spent \(spent), under a usual month."
         }
-        return "\(name) spent \(spent) — a quiet month versus usual."
+        return "\(name) spent \(spent), a quiet month versus usual."
     }
 
     // MARK: - Where it went
@@ -574,7 +574,7 @@ struct YearSoFarView: View {
 
     // MARK: - Helpers
 
-    /// Whole pesos ≥ 1,000,000 — only then shrink type.
+    /// Whole pesos ≥ 1,000,000: only then shrink type.
     private func isMillionPesos(_ centavos: Int) -> Bool {
         abs(centavos) / 100 >= 1_000_000
     }
@@ -647,7 +647,7 @@ struct YearSoFarView: View {
         return label
     }
 
-    /// Whole pesos when cents are zero — quieter list density (1c).
+    /// Whole pesos when cents are zero: quieter list density (1c).
     private func formatPesoCompact(_ amountC: Int) -> String {
         if amountC % 100 == 0 {
             return formatPeso(amountC, fractionDigits: 0)

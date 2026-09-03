@@ -10,6 +10,12 @@ struct InputBoundsTests {
         #expect(InputBounds.clampDisplayName("  Fern  ") == "Fern")
     }
 
+    @Test("name counter appears before the 40 grapheme clamp")
+    func displayNameCounterReveal() {
+        #expect(InputBounds.displayNameCounterRevealLength == 32)
+        #expect(InputBounds.displayNameCounterRevealLength < InputBounds.maxDisplayNameLength)
+    }
+
     @Test("clamps pet name to 24 graphemes")
     func petNameClamp() {
         let long = String(repeating: "b", count: 30)

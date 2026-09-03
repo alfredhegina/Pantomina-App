@@ -56,14 +56,14 @@ struct Allocation: Equatable, Sendable {
     var total: Int { fern + stark }
 }
 
-/// Pure display helper — never store the returned string.
+/// Pure display helper: never store the returned string.
 enum AccountLabels {
     static func display(baseName: String, scope: Scope, personName: String) -> String {
         switch scope {
         case .household, .business:
             return baseName
         case .fern, .stark:
-            return "\(baseName) — \(personName)"
+            return "\(baseName) · \(personName)"
         }
     }
 

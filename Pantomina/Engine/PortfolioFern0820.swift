@@ -1,15 +1,15 @@
 import Foundation
 
-/// Spec §6 Phase 6 accept — Portfolio-Fern personal column for cycle anchor 2026-08-20.
+/// Spec §6 Phase 6 accept: Portfolio-Fern personal column for cycle anchor 2026-08-20.
 /// Source: spreadsheet final NW table (SS3). Line inventory from the same sheet does not sum to these
 /// totals (manual recording mess); do not invent bridging formulas. Balance Day will produce
 /// consistent columns going forward.
 public enum PortfolioFern0820 {
     public static let cycleAnchorISO = "2026-08-20"
-    /// Stable person id (`fern` payer). Not `PersonId` — that type is app-internal.
+    /// Stable person id (`fern` payer). Not `PersonId`: that type is app-internal.
     public static let personId = "fern"
 
-    /// Seven Empire metrics (centavos). Sheet “Savings Rate” = pesos → `savingsAssetsC`.
+    /// Seven Empire metrics (centavos). Sheet "Savings Rate" = pesos → `savingsAssetsC`.
     public struct Metrics: Equatable, Sendable {
         public var assetsC: Int
         public var liabilitiesC: Int

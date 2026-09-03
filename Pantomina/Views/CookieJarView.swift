@@ -69,7 +69,7 @@ struct CookieJarView: View {
                                         filterSourceId = chip.sourceId
                                     }
                                 } label: {
-                                    Text("\(chip.label) \(chip.paid ? "✓" : "—")")
+                                    Text("\(chip.label) \(chip.paid ? "✓" : "-")")
                                         .font(PantominaFont.caption.weight(.medium))
                                         .padding(.horizontal, 12)
                                         .padding(.vertical, 8)
@@ -93,7 +93,7 @@ struct CookieJarView: View {
                         .padding(.vertical, 2)
                     }
                 } header: {
-                    Text("Who’s paid")
+                    Text("Who's paid")
                 } footer: {
                     Text("Tap a unit to filter; tap again to show all.")
                         .font(PantominaFont.caption)
@@ -158,7 +158,7 @@ struct CookieJarView: View {
             } header: {
                 Text("Statement")
             } footer: {
-                Text("Balance after each line. Borrows still out show in parentheses. Full internet/water stays on Receipts — unit shares come In here.")
+                Text("Balance after each line. Borrows still out show in parentheses. Full internet/water stays on Receipts. Unit shares come In here.")
                     .font(PantominaFont.caption)
             }
         }
@@ -196,7 +196,7 @@ struct CookieJarView: View {
             )
         }
         .alert(
-            pendingReturn.map { "Mark “\($0.note ?? sourceLabel($0.sourceId) ?? "borrow")” returned?" }
+            pendingReturn.map { "Mark \"\($0.note ?? sourceLabel($0.sourceId) ?? "borrow")\" returned?" }
                 ?? "Mark returned?",
             isPresented: Binding(
                 get: { pendingReturn != nil },

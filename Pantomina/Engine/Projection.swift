@@ -1,6 +1,6 @@
 import Foundation
 
-/// §4.5 — projected rows from recurring rules. Pure; UI never reimplements.
+/// §4.5: projected rows from recurring rules. Pure; UI never reimplements.
 enum Projection {
     enum Cadence: String, Sendable {
         case biweekly
@@ -60,7 +60,7 @@ enum Projection {
         var status: RealizedStatus
     }
 
-    /// Sum of realized amounts only — projected/pending never count as actuals.
+    /// Sum of realized amounts only: projected/pending never count as actuals.
     static func actualTotalCentavos(_ lines: [AmountLine]) -> Int {
         lines.filter { $0.status == .realized }.reduce(0) { $0 + $1.amountC }
     }

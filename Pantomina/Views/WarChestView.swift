@@ -32,7 +32,7 @@ struct WarChestView: View {
         accounts.filter { !$0.archived && $0.scope == .fern }
     }
 
-    /// Cash / bank / e-wallet / digital bank — fund homes and raid destinations (not CC / loan).
+    /// Cash / bank / e-wallet / digital bank: fund homes and raid destinations (not CC / loan).
     private var fernAssetPockets: [AccountRecord] {
         fernPersonalAccounts.filter {
             Fund.isSpendPocket(kind: $0.kind, scope: $0.scope)
@@ -280,7 +280,7 @@ struct WarChestView: View {
                 .minimumScaleFactor(0.7)
                 .lineLimit(1)
                 .accessibilityLabel("Owed back \(formatPeso(totalOwedC))")
-            Text("Visible IOUs — repay when you can. No nagging.")
+            Text("Visible IOUs. Repay when you can.")
                 .font(PantominaFont.caption)
                 .foregroundStyle(Color.pantomina.muted)
 
@@ -299,7 +299,7 @@ struct WarChestView: View {
                     Text("Loan payoff covers the next payment · \(top.description)")
                         .font(PantominaFont.body)
                         .foregroundStyle(Color.pantomina.ink)
-                    Text("When it’s due: Bills → Checklist → Count it.")
+                    Text("When it's due: Bills → Checklist → Count it.")
                         .font(PantominaFont.caption)
                         .foregroundStyle(Color.pantomina.muted)
                 }
@@ -313,7 +313,7 @@ struct WarChestView: View {
             }
             .accessibilityLabel("Sweep leftover toward IOUs then loan payoff")
 
-            Text("Order is yours — not auto smallest-first. Sweep leftover pays the chest back before parking more.")
+            Text("Order is yours, not smallest-first. Sweep leftover pays the chest back before parking more.")
                 .font(PantominaFont.caption)
                 .foregroundStyle(Color.pantomina.muted)
         }
@@ -406,7 +406,7 @@ struct WarChestView: View {
     }
 
     private func snowballMetaLabel(_ snap: Loan.Snapshot) -> String {
-        let order = snap.snowballOrder.map(String.init) ?? "—"
+        let order = snap.snowballOrder.map(String.init) ?? "-"
         var parts = ["Pay next · #\(order)"]
         if showBatchInMeta {
             parts.append("Batch \(snap.snowballBatch.map(String.init) ?? "1")")
@@ -561,7 +561,7 @@ struct WarChestView: View {
         dateISO: String
     ) {
         guard let catId = fundMoveCategoryId() else {
-            flashToast("Couldn't post — Fund Move category missing.")
+            flashToast("Couldn't post. Fund Move category missing.")
             return
         }
         let record = FundRecord(
@@ -591,7 +591,7 @@ struct WarChestView: View {
         guard let catId = fundMoveCategoryId(),
               let updated = Fund.topUp(to: fund.engineFund, amountC: amountC)
         else {
-            flashToast("Couldn't top up — try again.")
+            flashToast("Couldn't top up. Try again.")
             return
         }
         fund.apply(updated)
@@ -638,7 +638,7 @@ struct WarChestView: View {
               ),
               let catId = fundMoveCategoryId()
         else {
-            flashToast("Couldn't borrow — try again.")
+            flashToast("Couldn't borrow. Try again.")
             return
         }
 
@@ -743,7 +743,7 @@ struct WarChestView: View {
         guard let amountC = InputBounds.centavos(fromPesosText: repayAmountText), amountC > 0,
               let updated = Fund.repayOldest(in: record.engineFund, amountC: amountC, restoreBalance: true)
         else {
-            flashToast("Couldn't repay — try again.")
+            flashToast("Couldn't repay. Try again.")
             return
         }
         record.apply(updated)
@@ -760,7 +760,7 @@ struct WarChestView: View {
                 loanPayoffFundId: loanPayoffFund?.id
               )
         else {
-            flashToast("Couldn't sweep — check amount and loan-payoff fund.")
+            flashToast("Couldn't sweep. Check the amount and loan-payoff fund.")
             return false
         }
 
@@ -768,7 +768,7 @@ struct WarChestView: View {
             guard let fund = funds.first(where: { $0.id == repay.fundId }),
                   let updated = Fund.repayOldest(in: fund.engineFund, amountC: repay.amountC, restoreBalance: true)
             else {
-                flashToast("Couldn't repay an IOU — try again.")
+                flashToast("Couldn't repay an IOU. Try again.")
                 return false
             }
             fund.apply(updated)
@@ -832,7 +832,7 @@ struct WarChestView: View {
         guard let catId = fundMoveCategoryId(),
               let updated = Fund.topUp(to: payoff.engineFund, amountC: amountC)
         else {
-            flashToast("Couldn't park — try again.")
+            flashToast("Couldn't park. Try again.")
             return false
         }
         payoff.apply(updated)
@@ -932,7 +932,7 @@ private struct AddFundSheet: View {
                     )
                     .datePickerStyle(.compact)
                 } footer: {
-                    Text("Home is cash, bank, e-wallet, or digital bank — not a credit card. Opening posts a Fund Move and fills In the bank. Target is a peso goal (e.g. 80000), not a date. When it happened dates the opening Fund Move when you set an opening amount.")
+                    Text("Home is cash, bank, e-wallet, or digital bank, not a credit card. Opening posts a Fund Move and fills In the bank. Target is a peso goal (e.g. 80000), not a date. When it happened dates the opening Fund Move when you set an opening amount.")
                         .font(PantominaFont.caption)
                 }
             }
@@ -1118,14 +1118,14 @@ private struct RaidSheet: View {
                     )
                     .datePickerStyle(.compact)
                     if selected?.purpose == .emergency {
-                        Text("Careful — this is the emergency fund.")
+                        Text("Careful. This is the emergency fund.")
                             .font(PantominaFont.caption)
                             .foregroundStyle(Color.pantomina.terraDeep)
                     }
                 } header: {
                     Text("Borrow to cover bills")
                 } footer: {
-                    Text("Dates the Fund Move and the IOU. Household owes this fund — payer absorbs.")
+                    Text("Dates the Fund Move and the IOU. Household owes this fund; the payer absorbs it.")
                         .font(PantominaFont.caption)
                 }
                 Section {
@@ -1136,7 +1136,7 @@ private struct RaidSheet: View {
                             if clamped != new { note = clamped }
                         }
                 } footer: {
-                    Text("Usually settling bills — say so if it’s something else.")
+                    Text("Usually settling bills. Say so if it's something else.")
                         .font(PantominaFont.caption)
                 }
             }
@@ -1426,8 +1426,8 @@ private struct EditSnowballSheet: View {
                 } footer: {
                     Text(
                         batchVisible
-                            ? "1 = first in this batch. Custom — not smallest balance first."
-                            : "1 = first to pay. Custom — not smallest balance first."
+                            ? "1 = first in this batch. Custom order, not smallest balance first."
+                            : "1 = first to pay. Custom order, not smallest balance first."
                     )
                     .font(PantominaFont.caption)
                 }
@@ -1452,7 +1452,7 @@ private struct EditSnowballSheet: View {
                         }
                         .foregroundStyle(Color.pantomina.sageDeep)
                     } footer: {
-                        Text("Optional — most people stay in one wave.")
+                        Text("Optional. Most people stay in one wave.")
                             .font(PantominaFont.caption)
                     }
                 }

@@ -1,6 +1,6 @@
 import Foundation
 
-/// Our Year So Far — pure. UI charts these totals; does not re-sum the ledger.
+/// Our Year So Far: pure. UI charts these totals; does not re-sum the ledger.
 enum YearSoFar {
     enum Lens: String, Sendable, Equatable {
         /// Person's allocation share (Fern/Stark cents on the row).
@@ -200,7 +200,7 @@ enum YearSoFar {
         )
     }
 
-    /// Mean of up to `window` spend months **before** the latest spend month (“usual”).
+    /// Mean of up to `window` spend months **before** the latest spend month ("usual").
     static func usualExpenseC(months: [MonthBucket], window: Int = 3) -> Int? {
         precondition(window > 0)
         let withSpend = months.filter { $0.expenseC > 0 }.sorted { $0.yearMonth < $1.yearMonth }
@@ -211,7 +211,7 @@ enum YearSoFar {
         return sum / prior.count
     }
 
-    /// Legacy name — same as `usualExpenseC` (prior months only, not including latest).
+    /// Legacy name: same as `usualExpenseC` (prior months only, not including latest).
     static func trailingExpenseAverageC(months: [MonthBucket], window: Int = 3) -> Int? {
         usualExpenseC(months: months, window: window)
     }
@@ -260,7 +260,7 @@ enum YearSoFar {
     static let demoNoteMarker = "YTD demo"
     static let demoIdPrefix = "ytd-demo-v2-"
 
-    /// Years the YTD demo (and year wheel) covers — this year plus last year.
+    /// Years the YTD demo (and year wheel) covers: this year plus last year.
     static func demoYears(relativeTo current: Int = Calendar.current.component(.year, from: Date())) -> [Int] {
         [current, current - 1]
     }
@@ -280,7 +280,7 @@ enum YearSoFar {
         var rows: [DemoRow] = []
         for month in 1...12 {
             let yyyymm = String(format: "%04d-%02d", year, month)
-            // Salary — Fern only
+            // Salary: Fern only
             rows.append(
                 DemoRow(
                     isoDate: "\(yyyymm)-15",
@@ -292,7 +292,7 @@ enum YearSoFar {
                     allocStarkC: 0
                 )
             )
-            // Rent — shared
+            // Rent: shared
             rows.append(
                 DemoRow(
                     isoDate: "\(yyyymm)-01",
@@ -304,7 +304,7 @@ enum YearSoFar {
                     allocStarkC: 10_000_00
                 )
             )
-            // Internet — shared
+            // Internet: shared
             rows.append(
                 DemoRow(
                     isoDate: "\(yyyymm)-15",
@@ -316,7 +316,7 @@ enum YearSoFar {
                     allocStarkC: 899_00
                 )
             )
-            // Electricity — varies
+            // Electricity: varies
             let power = 2_200_00 + (month * 180_00)
             rows.append(
                 DemoRow(
@@ -329,7 +329,7 @@ enum YearSoFar {
                     allocStarkC: power - power / 2
                 )
             )
-            // Groceries — Fern or Stark alternate
+            // Groceries: Fern or Stark alternate
             let grocery = 3_500_00 + (month % 4) * 900_00
             let groceryBy: PersonId = month % 2 == 0 ? .stark : .fern
             rows.append(
@@ -343,7 +343,7 @@ enum YearSoFar {
                     allocStarkC: groceryBy == .stark ? grocery : grocery / 2
                 )
             )
-            // Spotify — want, Fern
+            // Spotify: want, Fern
             rows.append(
                 DemoRow(
                     isoDate: "\(yyyymm)-05",
@@ -355,7 +355,7 @@ enum YearSoFar {
                     allocStarkC: 0
                 )
             )
-            // Parked savings — Fern
+            // Parked savings: Fern
             rows.append(
                 DemoRow(
                     isoDate: "\(yyyymm)-25",
@@ -368,7 +368,7 @@ enum YearSoFar {
                 )
             )
         }
-        // October spike — travel (makes “vs usual” pop)
+        // October spike: travel (makes "vs usual" pop)
         rows.append(
             DemoRow(
                 isoDate: String(format: "%04d-10-12", year),

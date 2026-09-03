@@ -39,7 +39,7 @@ struct ReceiptsView: View {
     }
 
     var body: some View {
-        // One snapshot per body pass — never re-enter @Query from nested helpers during the same update.
+        // One snapshot per body pass: never re-enter @Query from nested helpers during the same update.
         let accountById = Dictionary(uniqueKeysWithValues: accounts.map { ($0.id, $0) })
         let categoryById = Dictionary(uniqueKeysWithValues: categories.map { ($0.id, $0) })
         let fern = people.first { $0.id == .fern }?.name ?? "Fern"
@@ -227,7 +227,7 @@ struct ReceiptsView: View {
         }
     }
 
-    /// Opening Fund Move that created a War Chest fund — ledger-only delete leaves In the bank wrong.
+    /// Opening Fund Move that created a War Chest fund: ledger-only delete leaves In the bank wrong.
     private var pendingOpeningFund: FundRecord? {
         guard let tx = pendingDelete,
               tx.settlementRole == .fundMove,

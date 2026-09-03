@@ -1,6 +1,6 @@
 import Foundation
 
-/// §4.6 Balance Day / Empire metrics — pure. UI never recomputes net worth.
+/// §4.6 Balance Day / Empire metrics: pure. UI never recomputes net worth.
 enum Snapshot {
     enum LineSource: String, Codable, Sendable, Equatable {
         case derived
@@ -26,7 +26,7 @@ enum Snapshot {
         var source: LineSource
         var isLiability: Bool
         var countsTowardSavingsAssets: Bool
-        /// Love Tab receivable / fund IOU — netted out on household lens.
+        /// Love Tab receivable / fund IOU: netted out on household lens.
         var isInternalDebt: Bool
 
         init(

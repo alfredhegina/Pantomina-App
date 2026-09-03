@@ -1,7 +1,7 @@
 import Charts
 import SwiftUI
 
-/// Empire history charts — hero NW line (above fold), or assets/liabilities below.
+/// Empire history charts: hero NW line (above fold), or assets/liabilities below.
 struct EmpireChartsSection: View {
     enum Style {
         /// Full-width NW line + area for the Empire hero.
@@ -51,7 +51,7 @@ struct EmpireChartsSection: View {
     @ViewBuilder
     private var heroBody: some View {
         if series.isEmpty {
-            Text("Confirm a cycle’s balances—the empire line starts here.")
+            Text("Confirm a cycle's balances. The empire line starts here.")
                 .font(PantominaFont.caption)
                 .foregroundStyle(Color.pantomina.muted)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -81,7 +81,7 @@ struct EmpireChartsSection: View {
     @ViewBuilder
     private var assetsLiabilitiesBody: some View {
         if series.isEmpty {
-            Text("Confirm a cycle’s balances—the empire line starts here.")
+            Text("Confirm a cycle's balances. The empire line starts here.")
                 .font(PantominaFont.caption)
                 .foregroundStyle(Color.pantomina.muted)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -319,7 +319,7 @@ struct EmpireChartsSection: View {
     }
 }
 
-/// Spec §1 micro-moment — rose heart pulse when net worth gained; static under Reduce Motion.
+/// Spec §1 micro-moment: rose heart pulse when net worth gained; static under Reduce Motion.
 struct EmpireGainHeart: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var pulse = false

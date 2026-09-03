@@ -14,7 +14,7 @@ enum SettlementStatus: String, Codable, Sendable {
     case overpaid
 }
 
-/// §4.2 — store allocations after asymmetric routing for household instruments.
+/// §4.2: store allocations after asymmetric routing for household instruments.
 enum AllocationRouting {
     /// Applies contributor-pays asymmetry: when Stark pays a household (or business) item,
     /// only Fern's share is stored (`stark = 0`). Personal scopes pass through unchanged.
@@ -35,7 +35,7 @@ enum AllocationRouting {
     }
 }
 
-/// §4.1 — pure cycle settlement and Love Tab math.
+/// §4.1: pure cycle settlement and Love Tab math.
 enum Settlement {
     struct LedgerRow: Equatable, Sendable {
         var realizedDate: String?

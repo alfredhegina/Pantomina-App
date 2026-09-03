@@ -1,7 +1,7 @@
 import SwiftUI
 import SwiftData
 
-/// Where the Money Sleeps — account map by scope; spoken-for from envelopes. Not Empire NW.
+/// Where the Money Sleeps: account map by scope; spoken-for from envelopes. Not Empire NW.
 struct MoneySleepsView: View {
     @Query private var people: [PersonRecord]
     @Query(sort: \AccountRecord.baseName) private var accounts: [AccountRecord]
@@ -117,7 +117,7 @@ struct MoneySleepsView: View {
             }
         }
         .safeAreaInset(edge: .bottom) {
-            Text("Spoken for is earmarked in funds — not a second pile. Edit pockets on Receipts.")
+            Text("Spoken for is earmarked in funds, not a second pile. Edit pockets on Receipts.")
                 .font(PantominaFont.caption)
                 .foregroundStyle(Color.pantomina.muted)
                 .padding(.horizontal, 20)
@@ -132,7 +132,7 @@ struct MoneySleepsView: View {
 
     private var emptyState: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("No pockets yet. Add accounts in The Fine Print when you’re ready.")
+            Text("No pockets yet. Add accounts in The Fine Print when you're ready.")
                 .font(PantominaFont.body)
                 .foregroundStyle(Color.pantomina.muted)
             NavigationLink {
@@ -187,7 +187,7 @@ struct MoneySleepsView: View {
                     .font(PantominaFont.body)
                     .foregroundStyle(Color.pantomina.ink)
                 if pocket.source == .unknown {
-                    Text("Needs a check-in — confirm on Balance Day")
+                    Text("Needs a check-in. Confirm on Balance Day")
                         .font(PantominaFont.caption)
                         .foregroundStyle(Color.pantomina.muted)
                 }
@@ -199,7 +199,7 @@ struct MoneySleepsView: View {
             }
             Spacer(minLength: 8)
             if pocket.source == .unknown {
-                Text("—")
+                Text("-")
                     .font(PantominaFont.body)
                     .foregroundStyle(Color.pantomina.muted)
             } else {

@@ -1,6 +1,6 @@
 import Foundation
 
-/// Interest drift on a fund home pocket — pure. UI must confirm before booking.
+/// Interest drift on a fund home pocket: pure. UI must confirm before booking.
 enum InterestDrift {
     struct Prompt: Equatable, Sendable, Identifiable {
         var id: String { homeAccountId }

@@ -113,7 +113,7 @@ struct ThingsWeKeepDoingView: View {
             }
         }
         .alert(
-            pendingDelete.map { "Stop keeping “\($0.title)”?" } ?? "Stop keeping this?",
+            pendingDelete.map { "Stop keeping \"\($0.title)\"?" } ?? "Stop keeping this?",
             isPresented: Binding(
                 get: { pendingDelete != nil },
                 set: { if !$0 { pendingDelete = nil } }
@@ -129,7 +129,7 @@ struct ThingsWeKeepDoingView: View {
                 pendingDelete = nil
             }
         } message: {
-            Text("Past receipts stay. Checklist won’t ask for it again.")
+            Text("Past receipts stay. Checklist won't ask for it again.")
         }
         .onAppear {
             try? SeedCatalog.seedDemoFundingIfNeeded(into: modelContext)
@@ -415,7 +415,7 @@ private struct AddRecurringRuleSheet: View {
                 } header: {
                     Text("Who & how")
                 } footer: {
-                    Text("We’ll use this account on Checklist. You can change it for one cycle.")
+                    Text("We'll use this account on Checklist. You can change it for one cycle.")
                 }
                 Section {
                     Toggle("Set aside across 2 cycles", isOn: $splitAcrossTwo)
@@ -424,7 +424,7 @@ private struct AddRecurringRuleSheet: View {
                     if fundingHasReserved {
                         Text("Set-asides already counted stay as they are.")
                     } else {
-                        Text("Splits the amount in half across this cycle and the next. Checklist posts each half — not the full bill twice.")
+                        Text("Splits the amount in half across this cycle and the next. Checklist posts each half, not the full bill twice.")
                     }
                 }
             }

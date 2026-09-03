@@ -1,6 +1,6 @@
 import Foundation
 
-/// §4.8 checklist generation — pure. Tick = mark done; UI realizes linked ledger.
+/// §4.8 checklist generation: pure. Tick = mark done; UI realizes linked ledger.
 enum Checklist {
     enum Kind: String, Sendable {
         case bill
