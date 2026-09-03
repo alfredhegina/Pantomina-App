@@ -21,6 +21,20 @@ struct MoneySleepsView: View {
         accounts.filter { !$0.archived }
     }
 
+    private var totalSpokenForC: Int {
+        visibleAccounts.reduce(0) { $0 + spokenForC(accountId: $1.id) }
+    }
+
+    private var sleepsSubtitle: String {
+        let n = visibleAccounts.count
+        if n == 0 { return "No pockets yet" }
+        let pocketWord = n == 1 ? "pocket" : "pockets"
+        if totalSpokenForC > 0 {
+            return "\(n) \(pocketWord) · spoken for \(formatPeso(totalSpokenForC))"
+        }
+        return "\(n) \(pocketWord)"
+    }
+
     private func spokenForC(accountId: String) -> Int {
         funds
             .filter { $0.homeAccountId == accountId }
@@ -72,72 +86,137 @@ struct MoneySleepsView: View {
     }
 
     var body: some View {
-        List {
-            if visibleAccounts.isEmpty {
-                Section {
-                    Text("No pockets yet. Add accounts in The Fine Print when you’re ready.")
-                        .foregroundStyle(Color.pantomina.muted)
-                }
-            } else {
-                ForEach(Scope.allCases, id: \.rawValue) { scope in
-                    let rows = visibleAccounts.filter { $0.scope == scope }
-                    if !rows.isEmpty {
-                        Section {
-                            ForEach(rows, id: \.id) { account in
-                                let pocket = pocketResult(for: account)
-                                HStack(alignment: .top) {
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text(account.displayLabel(fernName: fernName, starkName: starkName))
-                                            .foregroundStyle(Color.pantomina.ink)
-                                        if pocket.spokenForC > 0 {
-                                            Text("Spoken for \(formatPeso(pocket.spokenForC))")
-                                                .font(PantominaFont.caption)
-                                                .foregroundStyle(Color.pantomina.muted)
-                                        }
-                                    }
-                                    Spacer()
-                                    if pocket.source == .unknown {
-                                        Text("—")
-                                            .foregroundStyle(Color.pantomina.muted)
-                                    } else {
-                                        Text(formatPeso(pocket.balanceC))
-                                            .font(PantominaFont.body.weight(.semibold))
-                                            .monospacedDigit()
-                                            .foregroundStyle(Color.pantomina.ink)
-                                    }
-                                }
-                            }
-                        } header: {
-                            Text(scopeHeader(scope))
+        ScrollView {
+            VStack(alignment: .leading, spacing: 0) {
+                if visibleAccounts.isEmpty {
+                    emptyState
+                } else {
+                    ForEach(Scope.allCases, id: \.rawValue) { scope in
+                        let rows = visibleAccounts.filter { $0.scope == scope }
+                        if !rows.isEmpty {
+                            scopeSection(scope, rows: rows)
                         }
                     }
                 }
             }
         }
-        .scrollContentBackground(.hidden)
         .background(Color.pantomina.ground)
+        .toolbarBackground(Color.pantomina.ground, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                PetTitle("Where the Money Sleeps")
+                VStack(spacing: 2) {
+                    PetTitle("Where the Money Sleeps")
+                    Text(sleepsSubtitle)
+                        .font(PantominaFont.caption)
+                        .foregroundStyle(Color.pantomina.muted)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                }
             }
         }
         .safeAreaInset(edge: .bottom) {
             Text("Spoken for is earmarked in funds — not a second pile. Edit pockets on Receipts.")
                 .font(PantominaFont.caption)
                 .foregroundStyle(Color.pantomina.muted)
-                .padding()
-                .frame(maxWidth: .infinity)
-                .background(Color.pantomina.ground.opacity(0.95))
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.pantomina.ground)
+                .overlay(alignment: .top) {
+                    Rectangle().fill(Color.pantomina.rule).frame(height: 1)
+                }
         }
     }
 
-    private func scopeHeader(_ scope: Scope) -> String {
-        switch scope {
-        case .household: return "Shared"
-        case .fern: return fernName
-        case .stark: return starkName
-        case .business: return "Business"
+    private var emptyState: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text("No pockets yet. Add accounts in The Fine Print when you’re ready.")
+                .font(PantominaFont.body)
+                .foregroundStyle(Color.pantomina.muted)
+            NavigationLink {
+                SettingsView()
+            } label: {
+                Text("Open The Fine Print")
+                    .font(PantominaFont.body.weight(.semibold))
+                    .padding(.horizontal, 16)
+                    .frame(minHeight: 44)
+                    .foregroundStyle(Color.pantomina.quietAccent)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .stroke(Color(hex: "#C6CFC9"), lineWidth: 1)
+                    )
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Open The Fine Print")
         }
+        .padding(.horizontal, 20)
+        .padding(.top, 22)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .overlay(alignment: .top) {
+            Rectangle().fill(Color.pantomina.rule).frame(height: 1)
+        }
+    }
+
+    private func scopeSection(_ scope: Scope, rows: [AccountRecord]) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text(scopeHeader(scope))
+                .font(PantominaFont.caption.weight(.semibold))
+                .foregroundStyle(Color.pantomina.muted)
+                .padding(.horizontal, 20)
+                .padding(.top, 14)
+                .padding(.bottom, 6)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .accessibilityAddTraits(.isHeader)
+                .overlay(alignment: .top) {
+                    Rectangle().fill(Color.pantomina.rule).frame(height: 1)
+                }
+
+            ForEach(rows, id: \.id) { account in
+                pocketRow(account)
+            }
+        }
+    }
+
+    private func pocketRow(_ account: AccountRecord) -> some View {
+        let pocket = pocketResult(for: account)
+        return HStack(alignment: .top, spacing: 12) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(account.displayLabel(fernName: fernName, starkName: starkName))
+                    .font(PantominaFont.body)
+                    .foregroundStyle(Color.pantomina.ink)
+                if pocket.source == .unknown {
+                    Text("Needs a check-in — confirm on Balance Day")
+                        .font(PantominaFont.caption)
+                        .foregroundStyle(Color.pantomina.muted)
+                }
+                if pocket.spokenForC > 0 {
+                    Text("Spoken for \(formatPeso(pocket.spokenForC))")
+                        .font(PantominaFont.caption)
+                        .foregroundStyle(Color.pantomina.muted)
+                }
+            }
+            Spacer(minLength: 8)
+            if pocket.source == .unknown {
+                Text("—")
+                    .font(PantominaFont.body)
+                    .foregroundStyle(Color.pantomina.muted)
+            } else {
+                Text(formatPeso(pocket.balanceC))
+                    .font(PantominaFont.body.weight(.semibold).monospacedDigit())
+                    .foregroundStyle(Color.pantomina.ink)
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 11)
+        .overlay(alignment: .top) {
+            Rectangle().fill(Color.pantomina.innerRule).frame(height: 1)
+        }
+        .accessibilityElement(children: .combine)
+    }
+
+    private func scopeHeader(_ scope: Scope) -> String {
+        DisplayLabels.scope(scope, fernName: fernName, starkName: starkName)
     }
 }
