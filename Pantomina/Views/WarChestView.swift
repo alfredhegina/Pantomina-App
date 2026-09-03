@@ -55,7 +55,7 @@ struct WarChestView: View {
     }
 
     private var totalOwedC: Int {
-        funds.reduce(0) { $0 + $1.iousC }
+        funds.reduce(0) { $0 + Fund.owedBackC($1.engineFund) }
     }
 
     private var accountById: [String: AccountRecord] {
@@ -67,91 +67,38 @@ struct WarChestView: View {
         return Snowball.isReadyToPay(loanPayoffBalanceC: payoff.balanceC, loans: loans.map(\.engineLoan))
     }
 
+    private var envelopeSubtitle: String {
+        let n = orderedFunds.count
+        if n == 0 { return "No envelopes" }
+        if n == 1 { return "One envelope" }
+        return "\(n) envelopes"
+    }
+
     var body: some View {
-        List {
-            if totalOwedC > 0 {
-                Section {
-                    HStack {
-                        Text("Household owes the chest")
-                            .foregroundStyle(Color.pantomina.muted)
-                        Spacer()
-                        Text(formatPeso(totalOwedC))
-                            .font(PantominaFont.amount)
-                            .monospacedDigit()
-                            .foregroundStyle(Color.pantomina.terraDeep)
-                    }
-                } footer: {
-                    Text("Visible IOUs — repay when you can. No nagging.")
-                        .font(PantominaFont.caption)
-                }
-            }
-
-            Section {
-                if snowballQueue.isEmpty {
-                    Text("No active loans in the current batch. Baggage holds the register.")
-                        .font(PantominaFont.body)
-                        .foregroundStyle(Color.pantomina.muted)
-                } else {
-                    if readyToPay, let top = snowballQueue.first {
-                        Text("Loan payoff covers the next payment · \(top.description)")
-                            .font(PantominaFont.caption.weight(.medium))
-                            .foregroundStyle(Color.pantomina.sageDeep)
-                        Text("When it’s due: Bills → Checklist → Count it.")
-                            .font(PantominaFont.caption)
-                            .foregroundStyle(Color.pantomina.muted)
-                    }
-                    ForEach(snowballQueue, id: \.id) { snap in
-                        snowballRow(snap)
-                    }
-                }
-                Button {
-                    showSweep = true
-                } label: {
-                    Text("Sweep leftover")
-                        .font(PantominaFont.body.weight(.medium))
-                        .foregroundStyle(Color.pantomina.sageDeep)
-                }
-                .accessibilityLabel("Sweep leftover toward IOUs then loan payoff")
-            } header: {
-                Text("Snowball")
-            } footer: {
-                Text("Order is yours — not auto smallest-first. Sweep leftover pays the chest back before parking more.")
-                    .font(PantominaFont.caption)
-            }
-
-            Section("Funds") {
-                if orderedFunds.isEmpty {
-                    Text("No funds yet. Start one below, or keep the demo seed after relaunch.")
-                        .font(PantominaFont.body)
-                        .foregroundStyle(Color.pantomina.muted)
-                }
-                ForEach(orderedFunds, id: \.id) { fund in
-                    fundCard(fund)
-                }
-                Button {
-                    showAddFund = true
-                } label: {
-                    Label("Start a fund", systemImage: "plus.circle")
-                        .font(PantominaFont.body.weight(.medium))
-                        .foregroundStyle(Color.pantomina.sageDeep)
-                }
-                .accessibilityLabel("Start a fund")
+        ScrollView {
+            VStack(alignment: .leading, spacing: 0) {
+                owedHero
+                fundsSection
             }
         }
-        .scrollContentBackground(.hidden)
         .background(Color.pantomina.ground)
+        .toolbarBackground(Color.pantomina.ground, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
                 VStack(spacing: 2) {
                     PetTitle("The War Chest")
-                    Text("Funds · snowball")
+                    Text(envelopeSubtitle)
                         .font(PantominaFont.caption)
                         .foregroundStyle(Color.pantomina.muted)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                 }
             }
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Borrow") { showRaid = true }
+                    .foregroundStyle(Color.pantomina.quietAccent)
                     .accessibilityLabel("Borrow to cover bills")
             }
         }
@@ -321,44 +268,137 @@ struct WarChestView: View {
         }
     }
 
+    private var owedHero: some View {
+        VStack(alignment: .leading, spacing: 11) {
+            Text("Owed back")
+                .font(PantominaFont.caption.weight(.medium))
+                .foregroundStyle(Color.pantomina.muted)
+            Text(formatPeso(totalOwedC))
+                .font(PantominaFont.heroAmount(centavos: totalOwedC))
+                .foregroundStyle(Color.pantomina.ink)
+                .monospacedDigit()
+                .minimumScaleFactor(0.7)
+                .lineLimit(1)
+                .accessibilityLabel("Owed back \(formatPeso(totalOwedC))")
+            Text("Visible IOUs — repay when you can. No nagging.")
+                .font(PantominaFont.caption)
+                .foregroundStyle(Color.pantomina.muted)
+
+            Text("Snowball")
+                .font(PantominaFont.body.weight(.semibold))
+                .foregroundStyle(Color.pantomina.ink)
+                .padding(.top, 4)
+                .accessibilityAddTraits(.isHeader)
+
+            if snowballQueue.isEmpty {
+                Text("No active loans in the current batch. Baggage holds the register.")
+                    .font(PantominaFont.body)
+                    .foregroundStyle(Color.pantomina.muted)
+            } else {
+                if readyToPay, let top = snowballQueue.first {
+                    Text("Loan payoff covers the next payment · \(top.description)")
+                        .font(PantominaFont.body)
+                        .foregroundStyle(Color.pantomina.ink)
+                    Text("When it’s due: Bills → Checklist → Count it.")
+                        .font(PantominaFont.caption)
+                        .foregroundStyle(Color.pantomina.muted)
+                }
+                ForEach(snowballQueue, id: \.id) { snap in
+                    snowballRow(snap)
+                }
+            }
+
+            QuietPrimaryButton(title: "Sweep leftover", fillsWidth: false) {
+                showSweep = true
+            }
+            .accessibilityLabel("Sweep leftover toward IOUs then loan payoff")
+
+            Text("Order is yours — not auto smallest-first. Sweep leftover pays the chest back before parking more.")
+                .font(PantominaFont.caption)
+                .foregroundStyle(Color.pantomina.muted)
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 16)
+        .padding(.bottom, 18)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .overlay(alignment: .top) {
+            Rectangle().fill(Color.pantomina.rule).frame(height: 1)
+        }
+        .overlay(alignment: .bottom) {
+            Rectangle().fill(Color.pantomina.rule).frame(height: 1)
+        }
+    }
+
+    private var fundsSection: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(alignment: .center, spacing: 10) {
+                Text("Funds")
+                    .font(PantominaFont.body.weight(.semibold))
+                    .foregroundStyle(Color.pantomina.ink)
+                Spacer()
+                Button("Start a fund") { showAddFund = true }
+                    .font(PantominaFont.body.weight(.medium))
+                    .foregroundStyle(Color.pantomina.quietAccent)
+                    .frame(minHeight: 44)
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Start a fund")
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 14)
+            .padding(.bottom, 4)
+
+            if orderedFunds.isEmpty {
+                Text("No funds yet. Start one, or keep the demo seed after relaunch.")
+                    .font(PantominaFont.body)
+                    .foregroundStyle(Color.pantomina.muted)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 12)
+                    .overlay(alignment: .top) {
+                        Rectangle().fill(Color.pantomina.innerRule).frame(height: 1)
+                    }
+            } else {
+                ForEach(orderedFunds, id: \.id) { fund in
+                    fundCard(fund)
+                }
+            }
+        }
+    }
+
     private func snowballRow(_ snap: Loan.Snapshot) -> some View {
-        let record = loans.first { $0.id == snap.id }
-        return VStack(alignment: .leading, spacing: Spacing.sm) {
-            HStack {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .firstTextBaseline, spacing: 12) {
                 Text(snap.description)
                     .font(PantominaFont.body.weight(.semibold))
-                Spacer()
+                    .foregroundStyle(Color.pantomina.ink)
+                Spacer(minLength: 8)
                 Text(formatPeso(Loan.derivedBalanceC(
                     totalLoanC: snap.totalLoanC,
                     paidMonths: snap.paidMonths,
                     monthlyC: snap.monthlyC
                 )))
-                .font(PantominaFont.amount)
-                .monospacedDigit()
+                .font(PantominaFont.body.weight(.semibold).monospacedDigit())
+                .foregroundStyle(Color.pantomina.ink)
             }
             Text(snowballMetaLabel(snap))
                 .font(PantominaFont.caption)
                 .foregroundStyle(Color.pantomina.muted)
-            HStack(spacing: Spacing.md) {
-                Button("Edit queue") { editLoanId = snap.id }
-                    .font(PantominaFont.caption.weight(.medium))
-                    .foregroundStyle(Color.pantomina.sageDeep)
-                    .buttonStyle(.borderless)
-                    .accessibilityLabel("Edit payoff order")
+            wrappingChips {
+                QuietOutlineButton(title: "Edit queue", fillsWidth: false, tone: .sage) {
+                    editLoanId = snap.id
+                }
+                .accessibilityLabel("Edit payoff order")
                 if let parkC = Snowball.parkAnotherMonthAmountC(loan: snap),
                    loanPayoffFund != nil {
-                    Button("Park another month") { parkLoanId = snap.id }
-                        .font(PantominaFont.caption.weight(.medium))
-                        .foregroundStyle(Color.pantomina.sageDeep)
-                        .buttonStyle(.borderless)
-                        .accessibilityLabel("Park another month \(formatPeso(parkC))")
+                    QuietOutlineButton(title: "Park another month", fillsWidth: false, tone: .sage) {
+                        parkLoanId = snap.id
+                    }
+                    .accessibilityLabel("Park another month \(formatPeso(parkC))")
                 }
             }
-            if record == nil {
-                EmptyView()
-            }
         }
-        .padding(.vertical, 4)
+        .padding(.top, 4)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityElement(children: .contain)
     }
 
     private var showBatchInMeta: Bool {
@@ -381,62 +421,71 @@ struct WarChestView: View {
         let owed = Fund.owedBackC(snap)
         let homeLabel = accountById[snap.homeAccountId]?
             .displayLabel(fernName: fernName, starkName: starkName) ?? "Account"
-        return VStack(alignment: .leading, spacing: Spacing.sm) {
-            Text(snap.name)
-                .font(PantominaFont.body.weight(.semibold))
-            Text(homeLabel)
-                .font(PantominaFont.caption)
-                .foregroundStyle(Color.pantomina.muted)
-            HStack {
-                Text("In the bank")
-                    .font(PantominaFont.caption)
-                    .foregroundStyle(Color.pantomina.muted)
-                Spacer()
-                Text(formatPeso(snap.balanceC))
-                    .font(PantominaFont.amount)
-                    .monospacedDigit()
-            }
-            if owed > 0 {
-                HStack {
-                    Text("Owed back")
-                        .font(PantominaFont.caption)
-                        .foregroundStyle(Color.pantomina.terraDeep)
-                    Spacer()
-                    Text(formatPeso(owed))
-                        .font(PantominaFont.caption.monospacedDigit())
-                        .foregroundStyle(Color.pantomina.terraDeep)
-                }
-                if let whole = Fund.wholeAgainAtISO(
-                    fund: snap,
-                    monthlyRepayC: max(1, owed / 2),
-                    fromISO: Self.todayISO()
-                ) {
-                    Text("Whole again ~ \(DisplayLabels.displayDate(iso: whole))")
+        return VStack(alignment: .leading, spacing: 7) {
+            HStack(alignment: .firstTextBaseline, spacing: 12) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(snap.name)
+                        .font(PantominaFont.body.weight(.medium))
+                        .foregroundStyle(Color.pantomina.ink)
+                    Text("\(DisplayLabels.fundPurpose(snap.purpose)) · \(homeLabel)")
                         .font(PantominaFont.caption)
                         .foregroundStyle(Color.pantomina.muted)
                 }
+                Spacer(minLength: 8)
+                Text(formatPeso(snap.balanceC))
+                    .font(PantominaFont.body.weight(.semibold).monospacedDigit())
+                    .foregroundStyle(Color.pantomina.ink)
+                    .accessibilityLabel("In the bank \(formatPeso(snap.balanceC))")
             }
+
             if let target = snap.targetC, target > 0 {
                 fundTargetBar(balanceC: snap.balanceC, owedC: owed, targetC: target)
-                Text("Target \(formatPeso(target))")
+                HStack(alignment: .firstTextBaseline, spacing: 10) {
+                    Text("Target \(formatPeso(target))")
+                        .font(PantominaFont.caption.monospacedDigit())
+                        .foregroundStyle(Color.pantomina.muted)
+                    Spacer(minLength: 8)
+                    if owed > 0 {
+                        Text("Owed back \(formatPeso(owed))")
+                            .font(PantominaFont.caption.weight(.medium).monospacedDigit())
+                            .foregroundStyle(Color(hex: "#8A4C2A"))
+                    }
+                }
+            } else if owed > 0 {
+                Text("Owed back \(formatPeso(owed))")
+                    .font(PantominaFont.caption.weight(.medium).monospacedDigit())
+                    .foregroundStyle(Color(hex: "#8A4C2A"))
+            }
+
+            if owed > 0, let whole = Fund.wholeAgainAtISO(
+                fund: snap,
+                monthlyRepayC: max(1, owed / 2),
+                fromISO: Self.todayISO()
+            ) {
+                Text("Whole again ~ \(DisplayLabels.displayDate(iso: whole))")
                     .font(PantominaFont.caption)
                     .foregroundStyle(Color.pantomina.muted)
             }
-            HStack(spacing: Spacing.md) {
-                Button("Top up") { topUpFundId = record.id }
-                    .font(PantominaFont.caption.weight(.medium))
-                    .foregroundStyle(Color.pantomina.sageDeep)
+
+            wrappingChips {
+                QuietOutlineButton(title: "Top up", fillsWidth: false, tone: .sage) {
+                    topUpFundId = record.id
+                }
                 if owed > 0 {
-                    Button("Repay") {
+                    QuietOutlineButton(title: "Repay", fillsWidth: false, tone: .terra) {
                         repayAmountText = String(format: "%.2f", Double(owed) / 100)
                         repayFundId = record.id
                     }
-                    .font(PantominaFont.caption.weight(.medium))
-                    .foregroundStyle(Color.pantomina.sageDeep)
                 }
             }
+            .padding(.top, 2)
         }
-        .padding(.vertical, 4)
+        .padding(.horizontal, 20)
+        .padding(.vertical, 12)
+        .overlay(alignment: .top) {
+            Rectangle().fill(Color.pantomina.innerRule).frame(height: 1)
+        }
+        .accessibilityElement(children: .contain)
     }
 
     private func fundTargetBar(balanceC: Int, owedC: Int, targetC: Int) -> some View {
@@ -446,20 +495,27 @@ struct WarChestView: View {
         return GeometryReader { geo in
             ZStack(alignment: .leading) {
                 Capsule()
-                    .fill(Color.pantomina.ink.opacity(0.08))
+                    .fill(Color.pantomina.rule)
                 Capsule()
-                    .fill(Color.pantomina.sage.opacity(0.85))
+                    .fill(Color.pantomina.quietAccent)
                     .frame(width: max(4, geo.size.width * cash))
                 if owedC > 0 {
                     Capsule()
-                        .fill(Color.pantomina.terraDeep.opacity(0.55))
+                        .fill(Color(hex: "#C9A98F"))
                         .frame(width: max(3, geo.size.width * min(owedFrac, 1)))
                         .offset(x: max(0, geo.size.width * cash - geo.size.width * min(owedFrac, cash)))
                 }
             }
         }
         .frame(height: 8)
-        .accessibilityLabel("Target progress with owed sliver")
+        .accessibilityLabel("Target \(formatPeso(targetC)), in the bank \(formatPeso(balanceC)), owed back \(formatPeso(owedC))")
+    }
+
+    private func wrappingChips<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 8) { content() }
+            VStack(alignment: .leading, spacing: 8) { content() }
+        }
     }
 
     private func repaySheet(_ record: FundRecord) -> some View {
@@ -855,10 +911,10 @@ private struct AddFundSheet: View {
                             if limited != new { name = limited }
                         }
                     Picker("Purpose", selection: $purpose) {
-                        Text("Emergency").tag(Fund.Purpose.emergency)
-                        Text("Sinking").tag(Fund.Purpose.sinking)
-                        Text("Loan payoff").tag(Fund.Purpose.loanPayoff)
-                        Text("Goal").tag(Fund.Purpose.goal)
+                        Text(DisplayLabels.fundPurpose(.emergency)).tag(Fund.Purpose.emergency)
+                        Text(DisplayLabels.fundPurpose(.sinking)).tag(Fund.Purpose.sinking)
+                        Text(DisplayLabels.fundPurpose(.loanPayoff)).tag(Fund.Purpose.loanPayoff)
+                        Text(DisplayLabels.fundPurpose(.goal)).tag(Fund.Purpose.goal)
                     }
                     Picker("Home account", selection: $homeAccountId) {
                         ForEach(fernAccounts, id: \.id) { acct in

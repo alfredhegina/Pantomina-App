@@ -249,14 +249,16 @@ struct QuietEmptyBlock: View {
 struct QuietPrimaryButton: View {
     var title: String
     var enabled: Bool = true
+    var fillsWidth: Bool = true
     var action: () -> Void
 
     var body: some View {
         Button(action: action) {
             Text(title)
                 .font(PantominaFont.body.weight(.semibold))
-                .frame(maxWidth: .infinity)
-                .frame(minHeight: 48)
+                .padding(.horizontal, fillsWidth ? 0 : 16)
+                .frame(maxWidth: fillsWidth ? .infinity : nil)
+                .frame(minHeight: fillsWidth ? 48 : 44)
                 .background(enabled ? Color.pantomina.quietAccent : Color(hex: "#B9C7BF"))
                 .foregroundStyle(enabled ? Color.white : Color(hex: "#F4F7F5"))
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
@@ -266,23 +268,45 @@ struct QuietPrimaryButton: View {
     }
 }
 
+enum QuietOutlineTone {
+    case sage
+    case terra
+}
+
 struct QuietOutlineButton: View {
     var title: String
+    var fillsWidth: Bool = true
+    var tone: QuietOutlineTone = .terra
     var action: () -> Void
 
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(PantominaFont.body.weight(.semibold))
-                .frame(maxWidth: .infinity)
-                .frame(minHeight: 48)
-                .foregroundStyle(Color.pantomina.terraDeep)
+                .font(PantominaFont.body.weight(fillsWidth ? .semibold : .medium))
+                .padding(.horizontal, fillsWidth ? 0 : 14)
+                .frame(maxWidth: fillsWidth ? .infinity : nil)
+                .frame(minHeight: fillsWidth ? 48 : 44)
+                .foregroundStyle(foreground)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .stroke(Color(hex: "#C9A98F"), lineWidth: 1)
+                    RoundedRectangle(cornerRadius: fillsWidth ? 12 : 10, style: .continuous)
+                        .stroke(stroke, lineWidth: 1)
                 )
         }
         .buttonStyle(.plain)
+    }
+
+    private var foreground: Color {
+        switch tone {
+        case .sage: return Color.pantomina.quietAccent
+        case .terra: return Color.pantomina.terraDeep
+        }
+    }
+
+    private var stroke: Color {
+        switch tone {
+        case .sage: return Color(hex: "#C6CFC9")
+        case .terra: return Color(hex: "#C9A98F")
+        }
     }
 }
 
