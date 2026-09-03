@@ -89,6 +89,14 @@ struct DisplayLabelsTests {
         )
     }
 
+    @Test("fund purpose never shows engine raw values")
+    func fundPurposeLabels() {
+        #expect(DisplayLabels.fundPurpose(.emergency) == "Emergency")
+        #expect(DisplayLabels.fundPurpose(.sinking) == "Sinking")
+        #expect(DisplayLabels.fundPurpose(.loanPayoff) == "Loan payoff")
+        #expect(DisplayLabels.fundPurpose(.goal) == "Goal")
+    }
+
     @Test("loan strategy display never shows engine jargon")
     func loanStrategyLabels() {
         #expect(DisplayLabels.loanStrategy(.prepay) == "Stash extras")

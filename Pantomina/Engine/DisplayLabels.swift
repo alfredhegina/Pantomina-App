@@ -142,6 +142,15 @@ enum DisplayLabels {
         }
     }
 
+    static func fundPurpose(_ purpose: Fund.Purpose) -> String {
+        switch purpose {
+        case .emergency: return "Emergency"
+        case .sinking: return "Sinking"
+        case .loanPayoff: return "Loan payoff"
+        case .goal: return "Goal"
+        }
+    }
+
     /// Snowball strategy — plain names; engine still stores `prepay` / `park_to_maturity`.
     static func loanStrategy(_ strategy: Loan.Strategy?) -> String {
         switch strategy {
