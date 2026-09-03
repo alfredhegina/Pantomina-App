@@ -3,6 +3,8 @@ import Foundation
 /// Shared input bounds for names, notes, and money. UI clamps/rejects; does not invent rules.
 public enum InputBounds {
     public static let maxDisplayNameLength = 40
+    /// Show the name-length counter once the longest field reaches this grapheme count.
+    public static let displayNameCounterRevealLength = 32
     public static let maxPetNameLength = 24
     public static let maxNoteLength = 200
     public static let maxAmountPesos = 100_000_000

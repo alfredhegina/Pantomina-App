@@ -251,7 +251,7 @@ struct AddEntryView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.vertical, 12)
-                Text("Jar rows stay on Petty Cash — a system tag, not a second utility bill.")
+                Text("Jar rows stay on Petty Cash, a system tag rather than a second utility bill.")
                     .font(PantominaFont.caption)
                     .foregroundStyle(Color.pantomina.muted)
                     .padding(.bottom, 8)
@@ -316,7 +316,7 @@ struct AddEntryView: View {
                 Text("Just mine")
                     .font(PantominaFont.body)
                     .foregroundStyle(Color.pantomina.ink)
-                Text("Jar cash doesn’t add to Stark’s bill due. Keep unit shares off The split.")
+                Text("Jar cash doesn't add to \(starkName)'s bill due. Keep unit shares off The split.")
                     .font(PantominaFont.caption)
                     .foregroundStyle(Color.pantomina.muted)
             } else {

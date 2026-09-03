@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftData
 
 struct EmpireView: View {
-    /// Peer lenses — not nested under a person (Operate / Phase 6 lock).
+    /// Peer lenses: not nested under a person (Operate / Phase 6 lock).
     private enum ScopeTab: String, CaseIterable, Identifiable {
         case fern
         case stark
@@ -74,7 +74,7 @@ struct EmpireView: View {
         return set.sorted()
     }
 
-    /// Cycle wheel — only 15th / month-end anchors; capped when history is large.
+    /// Cycle wheel: only 15th / month-end anchors; capped when history is large.
     private var wheelCycleAnchors: [String] {
         let all = allCycleAnchors
         var list: [String]
@@ -247,7 +247,7 @@ struct EmpireView: View {
                     pocketListSection
                     balanceDaySection
                 } else if displayMetrics == nil {
-                    Text("Add pockets on Fern or \(starkName) — Household nets both live books.")
+                    Text("Add pockets on Fern or \(starkName). Household nets both live books.")
                         .font(PantominaFont.caption)
                         .foregroundStyle(Color.pantomina.muted)
                         .padding(20)
@@ -349,7 +349,7 @@ struct EmpireView: View {
                             }
                             Spacer()
                             if row.pocket.source == .unknown {
-                                Text("—")
+                                Text("-")
                                     .foregroundStyle(Color.pantomina.muted)
                             } else {
                                 Text(formatPeso(row.pocket.balanceC))
@@ -384,7 +384,7 @@ struct EmpireView: View {
             Text(
                 hasExternalsForBalanceDay
                     ? "External balances for \(balanceDayPerson == .fern ? fernName : starkName) as of \(DisplayLabels.displayDate(iso: activeAnchor)). Shared confirm is on Fern."
-                    : "No external pockets yet — confirm to store \(DisplayLabels.displayDate(iso: activeAnchor))’s live books."
+                    : "No external pockets yet. Confirm to store \(DisplayLabels.displayDate(iso: activeAnchor))'s live books."
             )
             .font(PantominaFont.caption)
             .foregroundStyle(Color.pantomina.muted)
@@ -406,7 +406,7 @@ struct EmpireView: View {
             systemImage: "building.columns",
             title: scope == .household
                 ? "Household needs live pockets on both \(fernName) and \(starkName)."
-                : "Nothing on \(name)’s book yet.",
+                : "Nothing on \(name)'s book yet.",
             message: scope == .household
                 ? "Rare quiet moment. Confirm a cycle snapshot on each book."
                 : "Rare quiet moment. Confirm a cycle snapshot and net worth starts tracking from there.",
@@ -635,7 +635,7 @@ struct EmpireView: View {
             .metrics
     }
 
-    /// Love Tab running balance as of cycle — asset + internal debt for household netting.
+    /// Love Tab running balance as of cycle: asset + internal debt for household netting.
     private func loveTabLine(asOf cycleISO: String) -> Snapshot.Line? {
         let rows: [Settlement.LedgerRow] = transactions.map { tx in
             let account = accounts.first { $0.id == tx.accountId }

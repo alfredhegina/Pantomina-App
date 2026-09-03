@@ -1,10 +1,10 @@
 import SwiftUI
 import SwiftData
 
-/// Thin Balance Day — external pockets only. Fern also confirms Shared once.
+/// Thin Balance Day: external pockets only. Fern also confirms Shared once.
 struct BalanceDayView: View {
     let personId: PersonId
-    /// Empire’s selected cycle — Confirm stamps this anchor.
+    /// Empire's selected cycle: Confirm stamps this anchor.
     let cycleISO: String
     let onDone: () -> Void
 
@@ -48,7 +48,7 @@ struct BalanceDayView: View {
             .sorted { $0.baseName.localizedCaseInsensitiveCompare($1.baseName) == .orderedAscending }
     }
 
-    /// Shared externals — Fern (payer) only.
+    /// Shared externals: Fern (payer) only.
     private var sharedExternals: [AccountRecord] {
         guard personId == .fern else { return [] }
         return accounts
@@ -85,7 +85,7 @@ struct BalanceDayView: View {
                     Text("Cycle \(DisplayLabels.displayDate(iso: cycleISO))")
                         .foregroundStyle(Color.pantomina.muted)
                 } footer: {
-                    Text("Cash and cards come from the ledger as of this cycle. Update what’s still outside — investments and mandated savings.")
+                    Text("Cash and cards come from the ledger as of this cycle. Update what's still outside: investments and mandated savings.")
                         .font(PantominaFont.caption)
                 }
 
@@ -115,7 +115,7 @@ struct BalanceDayView: View {
                         } header: {
                             Text("Shared")
                         } footer: {
-                            Text("Confirmed once here — not again on \(starkName)’s check-in.")
+                            Text("Confirmed once here, not again on \(starkName)'s check-in.")
                                 .font(PantominaFont.caption)
                         }
                     }
@@ -176,7 +176,7 @@ struct BalanceDayView: View {
             ))
             if !binding.wrappedValue.skipped {
                 TextField(
-                    "Today’s balance",
+                    "Today's balance",
                     text: Binding(
                         get: { binding.wrappedValue.balanceText },
                         set: { text in
@@ -193,7 +193,7 @@ struct BalanceDayView: View {
     }
 
     private func defaultDraft(for account: AccountRecord) -> DraftLine {
-        // Empty when unknown — never pretend 0.00 is confirmed.
+        // Empty when unknown: never pretend 0.00 is confirmed.
         let text: String
         if let last = account.lastConfirmedBalanceC {
             text = String(format: "%.2f", Double(last) / 100)
@@ -270,7 +270,7 @@ struct BalanceDayView: View {
             }
             let trimmed = draft.balanceText.trimmingCharacters(in: .whitespacesAndNewlines)
             if trimmed.isEmpty {
-                error = "Enter today’s balance on \(account.baseName), or skip it."
+                error = "Enter today's balance on \(account.baseName), or skip it."
                 return
             }
             guard let amountC = InputBounds.centavos(fromPesosText: trimmed),

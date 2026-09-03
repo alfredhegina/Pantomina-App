@@ -149,7 +149,7 @@ struct BillsChecklistPane: View {
     let tasks: [Checklist.Task]
     let summary: Checklist.Summary
     let accountLabels: [String: String]
-    /// Task id while Count it sheet is open — keeps toggle visually on until cancel/count.
+    /// Task id while Count it sheet is open: keeps toggle visually on until cancel/count.
     var pendingTaskId: String? = nil
     let onToggle: (Checklist.Task) -> Void
     let onOpenStatement: (String) -> Void
@@ -208,7 +208,7 @@ struct BillsChecklistPane: View {
                                 .font(PantominaFont.caption)
                                 .foregroundStyle(Color.pantomina.muted)
                             if task.pastCutoff {
-                                Text("Past cutoff — still waiting")
+                                Text("Past cutoff. Still waiting")
                                     .font(PantominaFont.caption)
                                     .foregroundStyle(Color.pantomina.terraDeep)
                             }
@@ -252,12 +252,12 @@ struct BillsChecklistPane: View {
                             .strikethrough(task.done)
                             .foregroundStyle(task.done ? Color(hex: "#9A9691") : Color.pantomina.muted)
                         if task.pastCutoff && !task.done {
-                            Text("Past cutoff — still waiting")
+                            Text("Past cutoff. Still waiting")
                                 .font(PantominaFont.caption)
                                 .foregroundStyle(Color.pantomina.terraDeep)
                         }
                         if task.amountBehavior == .estimate && !task.done {
-                            Text("Estimate — you’ll confirm the amount")
+                            Text("Estimate. You'll confirm the amount")
                                 .font(PantominaFont.caption)
                                 .foregroundStyle(Color.pantomina.muted)
                         }

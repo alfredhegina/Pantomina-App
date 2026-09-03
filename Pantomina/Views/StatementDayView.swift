@@ -121,7 +121,7 @@ struct StatementDayView: View {
                 }
             }
         } footer: {
-            Text("Tick what’s on this statement. The rest stay in the pile.")
+            Text("Tick what's on this statement. The rest stay in the pile.")
         }
     }
 
@@ -154,7 +154,7 @@ struct StatementDayView: View {
         } header: {
             Text("Still in the pile")
         } footer: {
-            Text("\(waiting) waiting · tick what’s on the \(when) statement")
+            Text("\(waiting) waiting · tick what's on the \(when) statement")
         }
     }
 

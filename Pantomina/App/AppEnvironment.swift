@@ -31,11 +31,11 @@ enum AppEnvironment: String, CaseIterable {
 
 enum AppVersion {
     static var marketing: String {
-        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—"
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "-"
     }
 
     static var build: String {
-        Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "—"
+        Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "-"
     }
 }
 

@@ -1,6 +1,6 @@
 import Foundation
 
-/// §4.10 funds, raids & IOUs — pure. UI never reimplements owed / effective / repay order.
+/// §4.10 funds, raids & IOUs: pure. UI never reimplements owed / effective / repay order.
 enum Fund {
     enum Purpose: String, Equatable, Sendable, Codable {
         case emergency
@@ -79,7 +79,7 @@ enum Fund {
         return next
     }
 
-    /// Fern personal cash / bank / e-wallet / digital bank — spend pockets for raid destination.
+    /// Fern personal cash / bank / e-wallet / digital bank: spend pockets for raid destination.
     static func isSpendPocket(kind: AccountKind, scope: Scope) -> Bool {
         guard scope == .fern else { return false }
         switch kind {
@@ -132,7 +132,7 @@ enum Fund {
         return next
     }
 
-    /// Rough “whole again” date: ceil(ious / monthly) half-month steps from `fromISO` cycle.
+    /// Rough "whole again" date: ceil(ious / monthly) half-month steps from `fromISO` cycle.
     static func wholeAgainAtISO(fund: Snapshot, monthlyRepayC: Int, fromISO: String) -> String? {
         guard fund.iousC > 0, monthlyRepayC > 0 else { return nil }
         let months = (fund.iousC + monthlyRepayC - 1) / monthlyRepayC

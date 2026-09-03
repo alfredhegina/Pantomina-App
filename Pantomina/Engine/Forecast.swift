@@ -1,6 +1,6 @@
 import Foundation
 
-/// §4.5 cycle forecast — pure math. UI never reimplements.
+/// §4.5 cycle forecast: pure math. UI never reimplements.
 enum Forecast {
     enum Reason: String, Sendable {
         case income
@@ -107,7 +107,7 @@ enum Forecast {
     }
 }
 
-/// Home “Due next” — next cycle’s committed bills. Display-only; no ledger legs.
+/// Home "Due next": next cycle's committed bills. Display-only; no ledger legs.
 enum HomeDueNext {
     struct Card: Equatable, Sendable {
         var id: String

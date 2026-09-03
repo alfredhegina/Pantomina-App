@@ -38,7 +38,7 @@ public struct Cycle: Equatable, Sendable {
         preconditionFailure("could not find next statement cycle")
     }
 
-    /// Cutoff-matching anchors around `aroundISO` for Statement day “Counts on” picker.
+    /// Cutoff-matching anchors around `aroundISO` for Statement day "Counts on" picker.
     public static func statementAnchorCandidates(
         aroundISO: String,
         cutoff: Int,

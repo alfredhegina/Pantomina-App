@@ -61,7 +61,7 @@ enum DisplayLabels {
         return out.string(from: date)
     }
 
-    /// Ledger row dates — year lives on the group header, not every row.
+    /// Ledger row dates: year lives on the group header, not every row.
     static func displayDateShort(iso: String) -> String {
         let parser = DateFormatter()
         parser.calendar = Calendar(identifier: .gregorian)
@@ -151,7 +151,7 @@ enum DisplayLabels {
         }
     }
 
-    /// Snowball strategy — plain names; engine still stores `prepay` / `park_to_maturity`.
+    /// Snowball strategy: plain names; engine still stores `prepay` / `park_to_maturity`.
     static func loanStrategy(_ strategy: Loan.Strategy?) -> String {
         switch strategy {
         case .parkToMaturity: return "On schedule only"
@@ -162,9 +162,9 @@ enum DisplayLabels {
     static func loanStrategyFooter(_ strategy: Loan.Strategy) -> String {
         switch strategy {
         case .parkToMaturity:
-            return "On schedule only — Checklist payments only; no extra stash into Loan payoff."
+            return "On schedule only. Checklist payments only; no extra stash into Loan payoff."
         case .prepay:
-            return "Stash extras — OK to put another month into Loan payoff."
+            return "Stash extras. OK to put another month into Loan payoff."
         }
     }
 }

@@ -1,6 +1,6 @@
 import Foundation
 
-/// Empire chart series — pure. UI plots these points; does not recompute NW.
+/// Empire chart series: pure. UI plots these points; does not recompute NW.
 enum EmpireCharts {
     struct Point: Equatable, Sendable {
         var cycleAnchorISO: String

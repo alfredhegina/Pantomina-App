@@ -325,7 +325,7 @@ struct BillsView: View {
         }
     }
 
-    /// Cycle wheel — chronological 15th / month-end; capped like Empire when history is large.
+    /// Cycle wheel: chronological 15th / month-end; capped like Empire when history is large.
     private var wheelCycleAnchors: [String] {
         let all = anchors.sorted()
         var list: [String]
@@ -419,7 +419,7 @@ struct BillsView: View {
         )
     }
 
-    /// Prefer the Checklist task’s source account, then the rule default, if still in CoA.
+    /// Prefer the Checklist task's source account, then the rule default, if still in CoA.
     private func resolvedAccountId(preferred: String, ruleAccountId: String) -> String {
         if accountById[preferred] != nil { return preferred }
         if accountById[ruleAccountId] != nil { return ruleAccountId }
@@ -779,7 +779,7 @@ struct BillsView: View {
                         .accessibilityLabel("Contribution progress")
 
                         VStack(spacing: 0) {
-                            quietMetricRow("\(starkName)’s share", result.dueC)
+                            quietMetricRow("\(starkName)'s share", result.dueC)
                             quietMetricRow("Sent over", result.contributedC, ruled: true)
                         }
 
@@ -843,7 +843,7 @@ struct BillsView: View {
                 .font(PantominaFont.body.weight(.semibold))
                 .foregroundStyle(Color.pantomina.ink)
             HStack {
-                Text("\(fernName)’s share")
+                Text("\(fernName)'s share")
                     .font(PantominaFont.body)
                     .foregroundStyle(Color.pantomina.muted)
                 Spacer()
@@ -853,12 +853,12 @@ struct BillsView: View {
             }
             if shares.pendingCount > 0 {
                 Text(
-                    "\(shares.pendingCount) card swipe\(shares.pendingCount == 1 ? "" : "s") still waiting. \(starkName)’s half on those (\(formatPeso(shares.starkC))) won’t add to what she owes above."
+                    "\(shares.pendingCount) card swipe\(shares.pendingCount == 1 ? "" : "s") still waiting. \(starkName)'s half on those (\(formatPeso(shares.starkC))) won't add to the amount due above."
                 )
                 .font(PantominaFont.caption)
                 .foregroundStyle(Color.pantomina.muted)
             } else {
-                Text("\(fernName)’s half of shared spends this cycle — for planning the bills, not a tab the other way.")
+                Text("\(fernName)'s half of shared spends this cycle, for planning the bills, not a tab the other way.")
                     .font(PantominaFont.caption)
                     .foregroundStyle(Color.pantomina.muted)
             }
@@ -888,7 +888,7 @@ struct BillsView: View {
                         .monospacedDigit()
                         .minimumScaleFactor(0.7)
                         .lineLimit(1)
-                    Text("\(fernName)’s asset · \(starkName)’s open balance. Stays at ₱0 or above.")
+                    Text("\(fernName)'s asset · \(starkName)'s open balance. Stays at ₱0 or above.")
                         .font(PantominaFont.caption)
                         .foregroundStyle(Color.pantomina.muted)
                     if credit > 0 {
@@ -1041,7 +1041,7 @@ struct BillsView: View {
         modelContext.insert(tx)
         do {
             try modelContext.save()
-            // Defer UI mutation — same AttributeGraph trap as Add save.
+            // Defer UI mutation: same AttributeGraph trap as Add save.
             Task { @MainActor in
                 showLogContribution = false
                 PantominaMotion.run(reduceMotion) { toast = "Contribution logged." }

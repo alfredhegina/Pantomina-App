@@ -1,6 +1,6 @@
 import Foundation
 
-/// §4.10 snowball — pure. Custom order/batches; IOU repay before park; no silent sweep.
+/// §4.10 snowball: pure. Custom order/batches; IOU repay before park; no silent sweep.
 enum Snowball {
     struct IOURepay: Equatable, Sendable {
         var fundId: String

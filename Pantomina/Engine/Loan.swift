@@ -1,6 +1,6 @@
 import Foundation
 
-/// §4.11 loan register — pure. Balance is derived; UI never hand-types it.
+/// §4.11 loan register: pure. Balance is derived; UI never hand-types it.
 enum Loan {
     enum Status: String, Equatable, Sendable, Codable {
         case active

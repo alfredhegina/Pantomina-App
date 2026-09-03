@@ -63,6 +63,39 @@ enum SeedCatalog {
         ("Utilities · Smart Postpaid", .smartPostpaidWant),
     ]
 
+    /// Computed pocket labels for onboarding preview: never stored.
+    static func starterAccountPreviewLabels(fernName: String, starkName: String) -> [String] {
+        starterAccounts.map { seed in
+            let person: String
+            switch seed.scope {
+            case .fern: person = fernName
+            case .stark: person = starkName
+            case .household, .business: person = ""
+            }
+            return AccountLabels.display(baseName: seed.baseName, scope: seed.scope, personName: person)
+        }
+    }
+
+    static var starterUserCategoryCount: Int {
+        starterCategories.filter { !$0.system }.count
+    }
+
+    /// First-seen group order for non-system starter categories.
+    static var starterUserCategoryGroups: [String] {
+        var seen = Set<String>()
+        var ordered: [String] = []
+        for seed in starterCategories where !seed.system {
+            if seen.insert(seed.group).inserted {
+                ordered.append(seed.group)
+            }
+        }
+        return ordered
+    }
+
+    static var systemCategoryItems: [String] {
+        starterCategories.filter(\.system).map(\.item)
+    }
+
     @MainActor
     static func seedStarterData(into context: ModelContext) throws {
         let existingAccounts = try context.fetch(FetchDescriptor<AccountRecord>())

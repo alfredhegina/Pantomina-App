@@ -25,7 +25,7 @@ struct RootView: View {
         }
     }
 
-    /// Warm paper across nav / lists — Spec ground `#FAF8F5`, not system grey.
+    /// Warm paper across nav / lists: Spec ground `#FAF8F5`, not system grey.
     private static func applyPaperChrome() {
         let ground = UIColor(Color.pantomina.ground)
         let appearance = UINavigationBarAppearance()

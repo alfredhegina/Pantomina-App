@@ -52,7 +52,7 @@ enum Bootstrap {
         seedStarters: Bool,
         context: ModelContext
     ) throws {
-        // Roles: fern id stays fern; if stark is payer we still keep ids stable —
+        // Roles: fern id stays fern; if stark is payer we still keep ids stable.
         // SPEC: fern=payer, stark=contributor fixed mapping for colors.
         // Onboarding assigns who fronts bills: we store fernIsPayer on meta;
         // PersonRecord.role follows fern=payer / stark=contributor always per DECISIONS.

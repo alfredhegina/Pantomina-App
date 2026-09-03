@@ -111,6 +111,8 @@ Living log of locked **Baseline** choices and parked **For later** work. The pro
 | 2026-09-02 | **Quiet ledger on Money Sleeps / War Chest:** same 1c paint. Pockets get a count + spoken-for subtitle, **no 40pt total** (would restate Empire NW and double-count envelopes). Funds hero is **Owed back** (`iousC` sum) at 40pt ink; per-fund cash stays on the row. **Titles stay cheese** (Fraunces *Where the Money Sleeps* / *The War Chest*). Snowball queue + Edit/Park stay; Borrow stays enabled; Sweep leftover stays on the chest. Empty pockets CTA opens The Fine Print. No new Fund Moves, no household funds, no add-to-due. | Redesign 4a–4b; spoken-for remains display-only. |
 | 2026-09-03 | Cycle / year pickers are **wheel sheets** (Cancel + Done): Empire, Bills, Our Year So Far. Shared `QuietWheelSheet`. Bills list capped at 48 like Empire. No live-apply while spinning. | Consistency; Menu dumped every half-month. |
 | 2026-09-03 | YTD demo years are **current + prior** (`YearSoFar.demoYears`). Seed and year wheel include both so the picker is not a single year. | Year wheel needs something to show. |
+| 2026-09-03 | **Quiet ledger onboarding 6a:** three steps (names + PHP chip, roles, starters). Pet title stays cheese (Fraunces *Shall we dance?*, 34pt on this screen only). Currency is display-only `PHP · ₱`, no picker. Continue stays enabled; names validate on tap. Starter preview is computed from `SeedCatalog` + live names. | Redesign 6a; For later *Currency other than PHP*. |
+| 2026-09-03 | **Copy humanizer:** user-facing strings drop em/en dashes and curly quotes. Personal account labels use ` · ` (same as DisplayLabels), still computed never stored. Empty placeholders use `-`. | Humanizer pass; productization law unchanged. |
 
 ## For later
 

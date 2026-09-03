@@ -1,6 +1,6 @@
 import Foundation
 
-/// Pocket truth for Empire dashboard — pure. Ledger-known kinds from legs; externals from last confirm.
+/// Pocket truth for Empire dashboard: pure. Ledger-known kinds from legs; externals from last confirm.
 enum PocketBalance {
     enum Source: String, Sendable, Equatable {
         case ledger
@@ -15,7 +15,7 @@ enum PocketBalance {
         var purchaseDate: String
         var realizedDate: String? = nil
         var note: String?
-        /// Settlement theater on a pocket (contribution / receivable / fund_move) — not cash truth.
+        /// Settlement theater on a pocket (contribution / receivable / fund_move): not cash truth.
         var settlementRole: SettlementRole? = nil
 
         /// Prefer realized date when present (statement-landed), else when it happened.

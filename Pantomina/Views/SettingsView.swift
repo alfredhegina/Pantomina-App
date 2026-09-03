@@ -51,7 +51,7 @@ struct SettingsView: View {
             } header: {
                 Text("The Fine Print")
             } footer: {
-                Text("Roles stay payer / contributor. Renaming updates every account label and greeting — nothing is stored with a name baked in.")
+                Text("Roles stay payer / contributor. Renaming updates every account label and greeting. Nothing is stored with a name baked in.")
             }
 
             Section("Where the money sleeps") {
@@ -94,8 +94,8 @@ struct SettingsView: View {
             }
 
             Section("Roles") {
-                LabeledContent("Payer", value: fern?.name ?? "—")
-                LabeledContent("Contributor", value: stark?.name ?? "—")
+                LabeledContent("Payer", value: fern?.name ?? "-")
+                LabeledContent("Contributor", value: stark?.name ?? "-")
                 Text("Not swappable in this version.")
                     .font(PantominaFont.caption)
                     .foregroundStyle(Color.pantomina.muted)
@@ -161,7 +161,7 @@ struct SettingsView: View {
 
     private func oddityCopy(_ oddity: CoAOddity) -> String {
         switch oddity {
-        case .loanMarkedWant: return "Tagged as Want — confirm that still feels right."
+        case .loanMarkedWant: return "Tagged as Want. Confirm that still feels right."
         case .childSupportBirthdayWant: return "Birthday under Child Support is Want; Siblings Birthday is Need."
         case .smartPostpaidWant: return "Only utility marked Want."
         }

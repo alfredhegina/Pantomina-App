@@ -1,6 +1,6 @@
 import Foundation
 
-/// §4.13 Cookie Jar — pure. UI never reimplements running balance or who’s-paid.
+/// §4.13 Cookie Jar: pure. UI never reimplements running balance or who's-paid.
 enum CookieJar {
     enum Kind: String, Equatable, Hashable, Sendable, Codable {
         case income
@@ -100,7 +100,7 @@ enum CookieJar {
         }
     }
 
-    /// Who’s-paid for sources with expected amounts. Monthly = any income in the calendar month of the cycle; biweekly = income in that cycle.
+    /// Who's-paid for sources with expected amounts. Monthly = any income in the calendar month of the cycle; biweekly = income in that cycle.
     static func whosPaid(cycleISO: String, sources: [Source], entries: [Entry]) -> [PaidChip] {
         let cycle = Cycle(anchorISO: cycleISO)
         return sources.map { source in

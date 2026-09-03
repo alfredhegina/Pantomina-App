@@ -46,7 +46,7 @@ struct BaggageView: View {
                 } header: {
                     Text("Baggage we put down")
                 } footer: {
-                    Text("Paid off — kept for the story, not the due.")
+                    Text("Paid off. Kept for the story, not the due.")
                         .font(PantominaFont.caption)
                 }
             }
@@ -141,7 +141,7 @@ struct BaggageView: View {
     }
 
     private func baggageSnowballChips(_ snap: Loan.Snapshot) -> String {
-        let order = snap.snowballOrder.map(String.init) ?? "—"
+        let order = snap.snowballOrder.map(String.init) ?? "-"
         var parts = ["Pay next · #\(order)"]
         if Snowball.showsBatchChrome(loans: loans.map(\.engineLoan)) {
             parts.append("Batch \(snap.snowballBatch.map(String.init) ?? "1")")
@@ -161,7 +161,7 @@ struct BaggageView: View {
                             if clamped != new { journalNote = clamped }
                         }
                 } footer: {
-                    Text("Notes stay on this loan — no balance edits here.")
+                    Text("Notes stay on this loan. No balance edits here.")
                         .font(PantominaFont.caption)
                 }
             }
