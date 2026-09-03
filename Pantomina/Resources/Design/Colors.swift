@@ -22,6 +22,10 @@ struct PantominaColors {
     /// Chart expense fill only (not amount text) — 1c warm clay.
     let expenseBar = Color(hex: "#C98A6B")
     let rule = Color(hex: "#E4E1DA")
+    /// Hairline between rows inside a quiet section.
+    let innerRule = Color(hex: "#EDEAE3")
+    /// Track behind quiet segmented pills.
+    let segmentTrack = Color(hex: "#EFEDE7")
 
     /// Where it Went expense slices — amount-rank palette (tweak here; not Charts auto hues).
     let categoryAmber = Color(hex: "#D9A066")

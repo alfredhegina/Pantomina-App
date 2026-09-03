@@ -192,7 +192,7 @@ struct QuietLedgerRow: View {
         .opacity(dimmed ? 0.72 : 1)
         .overlay(alignment: .top) {
             Rectangle()
-                .fill(Color(hex: "#EDEAE3"))
+                .fill(Color.pantomina.innerRule)
                 .frame(height: 1)
         }
         .accessibilityElement(children: .combine)
@@ -248,6 +248,7 @@ struct QuietEmptyBlock: View {
 
 struct QuietPrimaryButton: View {
     var title: String
+    var enabled: Bool = true
     var action: () -> Void
 
     var body: some View {
@@ -256,21 +257,121 @@ struct QuietPrimaryButton: View {
                 .font(PantominaFont.body.weight(.semibold))
                 .frame(maxWidth: .infinity)
                 .frame(minHeight: 48)
-                .background(Color.pantomina.quietAccent)
-                .foregroundStyle(.white)
+                .background(enabled ? Color.pantomina.quietAccent : Color(hex: "#B9C7BF"))
+                .foregroundStyle(enabled ? Color.white : Color(hex: "#F4F7F5"))
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
         .buttonStyle(SageButtonStyle())
+        .disabled(!enabled)
+    }
+}
+
+struct QuietOutlineButton: View {
+    var title: String
+    var action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(PantominaFont.body.weight(.semibold))
+                .frame(maxWidth: .infinity)
+                .frame(minHeight: 48)
+                .foregroundStyle(Color.pantomina.terraDeep)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .stroke(Color(hex: "#C9A98F"), lineWidth: 1)
+                )
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+struct QuietStatusChip: View {
+    var label: String
+    var tone: ChipTone = .neutral
+
+    var body: some View {
+        Text(label)
+            .font(.custom("DM Sans", size: 11, relativeTo: .caption2).weight(.medium))
+            .padding(.horizontal, 8)
+            .padding(.vertical, 3)
+            .background(background)
+            .foregroundStyle(foreground)
+            .clipShape(Capsule())
+            .accessibilityAddTraits(.isStaticText)
+    }
+
+    private var background: Color {
+        switch tone {
+        case .neutral: return Color.pantomina.hairline
+        case .blush: return Color.pantomina.blush
+        case .sage: return Color(hex: "#E4EEE7")
+        case .terra: return Color(hex: "#F0E3DA")
+        }
+    }
+
+    private var foreground: Color {
+        switch tone {
+        case .neutral: return Color.pantomina.ink
+        case .blush: return Color.pantomina.rose
+        case .sage: return Color.pantomina.quietAccent
+        case .terra: return Color(hex: "#8A4C2A")
+        }
+    }
+}
+
+/// 40pt-tall pill track used on Add (Paid by / Split / jar kind).
+struct QuietSegmented<Value: Hashable>: View {
+    let options: [(title: String, value: Value)]
+    @Binding var selection: Value
+    var enabled: Bool = true
+
+    var body: some View {
+        HStack(spacing: 0) {
+            ForEach(options.indices, id: \.self) { index in
+                let item = options[index]
+                let on = selection == item.value
+                Button {
+                    guard enabled else { return }
+                    selection = item.value
+                } label: {
+                    Text(item.title)
+                        .font(PantominaFont.caption.weight(on ? .semibold : .regular))
+                        .foregroundStyle(on ? Color.pantomina.ink : Color.pantomina.muted)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                        .frame(maxWidth: .infinity)
+                        .frame(minHeight: 40)
+                        .background {
+                            if on {
+                                RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                    .fill(Color.pantomina.card)
+                                    .shadow(color: .black.opacity(0.08), radius: 1, y: 1)
+                            }
+                        }
+                }
+                .buttonStyle(.plain)
+                .disabled(!enabled)
+                .accessibilityLabel(item.title)
+                .accessibilityAddTraits(on ? [.isSelected, .isButton] : .isButton)
+            }
+        }
+        .padding(2)
+        .background(Color.pantomina.segmentTrack)
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .opacity(enabled ? 1 : 0.5)
     }
 }
 
 struct QuietScopeTabs<Tab: Hashable>: View {
     let tabs: [(title: String, value: Tab)]
     @Binding var selection: Tab
+    var spacing: CGFloat = 24
 
     var body: some View {
-        HStack(spacing: 24) {
-            ForEach(tabs, id: \.value) { item in
+        HStack(spacing: spacing) {
+            ForEach(tabs.indices, id: \.self) { index in
+                let item = tabs[index]
                 let selected = selection == item.value
                 Button {
                     selection = item.value
@@ -278,7 +379,9 @@ struct QuietScopeTabs<Tab: Hashable>: View {
                     Text(item.title)
                         .font(PantominaFont.body.weight(selected ? .semibold : .regular))
                         .foregroundStyle(selected ? Color.pantomina.ink : Color.pantomina.muted)
-                        .padding(.vertical, 10)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.75)
+                        .frame(minHeight: 44)
                         .overlay(alignment: .bottom) {
                             Rectangle()
                                 .fill(selected ? Color.pantomina.ink : Color.clear)
@@ -286,6 +389,7 @@ struct QuietScopeTabs<Tab: Hashable>: View {
                         }
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel(item.title)
                 .accessibilityAddTraits(selected ? [.isSelected, .isButton] : .isButton)
             }
             Spacer(minLength: 0)

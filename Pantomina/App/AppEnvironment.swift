@@ -39,7 +39,7 @@ enum AppVersion {
     }
 }
 
-enum PersonId: String, CaseIterable, Sendable {
+enum PersonId: String, CaseIterable, Hashable, Sendable {
     case fern
     case stark
 
