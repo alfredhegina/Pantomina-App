@@ -167,4 +167,71 @@ enum DisplayLabels {
             return "Stash extras. OK to put another month into Loan payoff."
         }
     }
+
+    static func accountKind(_ kind: AccountKind) -> String {
+        switch kind {
+        case .cash: return "Cash"
+        case .ewallet: return "E-wallet"
+        case .bank: return "Bank"
+        case .digitalBank: return "Digital bank"
+        case .creditCard: return "Credit card"
+        case .savingsAsset: return "Savings"
+        case .investment: return "Investment"
+        case .govMandated: return "Gov-mandated"
+        case .receivable: return "Receivable"
+        case .loan: return "Loan"
+        }
+    }
+
+    static func flow(_ flow: FlowType) -> String {
+        switch flow {
+        case .income: return "Income"
+        case .expense: return "Expense"
+        case .transfer: return "Transfer"
+        case .savings: return "Savings"
+        case .sinking: return "Sinking"
+        }
+    }
+
+    static func needWant(_ value: NeedWant) -> String {
+        switch value {
+        case .need: return "Need"
+        case .want: return "Want"
+        }
+    }
+
+    static func fixedVariable(_ value: FixedVariable) -> String {
+        switch value {
+        case .fixed: return "Fixed"
+        case .variable: return "Variable"
+        }
+    }
+
+    static func statementCutoff(_ day: Int) -> String {
+        day == 15 ? "15th" : "Month-end"
+    }
+
+    static func catalogPocketIssue(_ issue: LedgerCatalog.PocketIssue) -> String {
+        switch issue {
+        case .emptyName: return "Couldn't save. Enter a name."
+        case .duplicate: return "Couldn't save. That name is already used."
+        case .shapeLocked: return "This pocket already has entries. You can rename it."
+        case .cutoffNeeded: return "Pick a statement day. 15th or month-end."
+        case .businessNotAllowed: return "Business pockets aren't available."
+        case .kindNotAllowed: return "That kind of pocket isn't available here."
+        }
+    }
+
+    static func catalogCategoryIssue(_ issue: LedgerCatalog.CategoryIssue) -> String {
+        switch issue {
+        case .emptyGroup: return "Couldn't save. Enter a group."
+        case .emptyItem: return "Couldn't save. Enter an item."
+        case .duplicate: return "Couldn't save. That name is already used."
+        case .tagsLocked: return "This category already has entries. You can rename it."
+        case .needWantNeeded: return "Pick Need or Want."
+        case .fixedVariableNeeded: return "Pick Fixed or Variable."
+        case .transferNotAllowed: return "That kind of category isn't available here."
+        case .systemNotAllowed: return "System categories stay locked."
+        }
+    }
 }

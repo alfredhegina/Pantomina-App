@@ -66,12 +66,12 @@ struct MoreView: View {
                 }
 
                 NavigationLink {
-                    MoneySleepsView()
+                    AccountsView()
                 } label: {
                     Label {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Where the Money Sleeps")
                             Text("Accounts")
+                            Text("Pockets and categories")
                                 .font(PantominaFont.caption)
                                 .foregroundStyle(Color.pantomina.muted)
                         }
@@ -143,7 +143,7 @@ struct MoreView: View {
                 Section {
                     EmptyView()
                 } footer: {
-                    Text("Empire, Year So Far, Money Sleeps, Cookie Jar, loans, funds, recurring, Statement day, and settings.")
+                    Text("Empire, Year So Far, Accounts, Cookie Jar, loans, funds, recurring, Statement day, and settings.")
                         .font(PantominaFont.caption)
                 }
             }

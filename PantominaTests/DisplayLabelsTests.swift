@@ -105,4 +105,33 @@ struct DisplayLabelsTests {
         #expect(DisplayLabels.loanStrategyFooter(.prepay).hasPrefix("Stash extras"))
         #expect(DisplayLabels.loanStrategyFooter(.parkToMaturity).hasPrefix("On schedule only"))
     }
+
+    @Test("account kind labels never leak engine raw values")
+    func accountKindLabels() {
+        #expect(DisplayLabels.accountKind(.cash) == "Cash")
+        #expect(DisplayLabels.accountKind(.bank) == "Bank")
+        #expect(DisplayLabels.accountKind(.ewallet) == "E-wallet")
+        #expect(DisplayLabels.accountKind(.digitalBank) == "Digital bank")
+        #expect(DisplayLabels.accountKind(.creditCard) == "Credit card")
+        #expect(DisplayLabels.accountKind(.savingsAsset) == "Savings")
+        #expect(DisplayLabels.accountKind(.investment) == "Investment")
+        #expect(DisplayLabels.accountKind(.govMandated) == "Gov-mandated")
+        #expect(!DisplayLabels.accountKind(.creditCard).contains("_"))
+    }
+
+    @Test("catalog save errors stay human")
+    func catalogIssues() {
+        #expect(DisplayLabels.catalogPocketIssue(.duplicate) == "Couldn't save. That name is already used.")
+        #expect(DisplayLabels.catalogPocketIssue(.cutoffNeeded) == "Pick a statement day. 15th or month-end.")
+        #expect(DisplayLabels.catalogPocketIssue(.shapeLocked) == "This pocket already has entries. You can rename it.")
+        #expect(DisplayLabels.catalogCategoryIssue(.duplicate) == "Couldn't save. That name is already used.")
+        #expect(DisplayLabels.catalogCategoryIssue(.tagsLocked) == "This category already has entries. You can rename it.")
+        #expect(DisplayLabels.catalogCategoryIssue(.needWantNeeded) == "Pick Need or Want.")
+        #expect(DisplayLabels.flow(.expense) == "Expense")
+        #expect(DisplayLabels.flow(.sinking) == "Sinking")
+        #expect(DisplayLabels.needWant(.need) == "Need")
+        #expect(DisplayLabels.fixedVariable(.variable) == "Variable")
+        #expect(DisplayLabels.statementCutoff(15) == "15th")
+        #expect(DisplayLabels.statementCutoff(30) == "Month-end")
+    }
 }

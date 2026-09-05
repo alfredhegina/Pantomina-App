@@ -113,6 +113,7 @@ Living log of locked **Baseline** choices and parked **For later** work. The pro
 | 2026-09-03 | YTD demo years are **current + prior** (`YearSoFar.demoYears`). Seed and year wheel include both so the picker is not a single year. | Year wheel needs something to show. |
 | 2026-09-03 | **Quiet ledger onboarding 6a:** three steps (names + PHP chip, roles, starters). Pet title stays cheese (Fraunces *Shall we dance?*, 34pt on this screen only). Currency is display-only `PHP · ₱`, no picker. Continue stays enabled; names validate on tap. Starter preview is computed from `SeedCatalog` + live names. | Redesign 6a; For later *Currency other than PHP*. |
 | 2026-09-03 | **Copy humanizer:** user-facing strings drop em/en dashes and curly quotes. Personal account labels use ` · ` (same as DisplayLabels), still computed never stored. Empty placeholders use `-`. | Humanizer pass; productization law unchanged. |
+| 2026-09-05 | **Accounts catalog:** More → **Accounts** (was *Where the Money Sleeps*) is pockets + **What it was for** create/edit. DM Sans title, not Fraunces. Keep live pocket map, spoken-for, no 40pt total. Shape/tags lock when in use; rename always. User kinds exclude loan/receivable. Fine Print is names/pets/roles only; accounts list and CoA oddities UI gone (`CoAMigration` engine kept). No delete. Empty Add lives on Accounts. **Supersedes** cheese title + Fine Print empty CTA from 2026-09-02 Money Sleeps row. | Operate; one room for instruments; accounting-map. |
 
 ## For later
 
