@@ -25,6 +25,14 @@ struct DisplayLabelsTests {
         #expect(DisplayLabels.displayDate(iso: "bad") == "bad")
     }
 
+    @Test("contribution caption uses the live name and peso amount")
+    func contributionSpokenFor() {
+        #expect(
+            DisplayLabels.contributionSpokenFor(personName: "Stark", amountC: 750_000)
+                == "Stark's 7,500 goes against what Stark is spoken for this cycle."
+        )
+    }
+
     @Test("settlement hint avoids engine vocabulary")
     func settlementHint() {
         #expect(DisplayLabels.settlementHint(isStatement: true, anchorISO: "2026-08-15")

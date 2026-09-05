@@ -12,6 +12,10 @@ struct AddEntryView: View {
 
     /// When false, view is presented as a sheet and dismisses after save.
     var presentsAsSheet: Bool = true
+    var wrapInNavigationStack: Bool = true
+    var formPetTitle: String? = nil
+    var capturePrefill: CaptureParse.Card? = nil
+    var onSaved: (() -> Void)? = nil
     /// When set, Save updates this row instead of inserting.
     var editingTransaction: TransactionRecord? = nil
 
@@ -62,7 +66,7 @@ struct AddEntryView: View {
 
     private var selectedCategory: CategoryRecord? {
         if cookieJarOn, let petty = pettyCashCategory { return petty }
-        return pickerCategories.first { $0.id == selectedCategoryId }
+        return categories.first { $0.id == selectedCategoryId }
     }
 
     private var pettyCashCategory: CategoryRecord? {
@@ -102,8 +106,17 @@ struct AddEntryView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
+        Group {
+            if wrapInNavigationStack {
+                NavigationStack { formScroll }
+            } else {
+                formScroll
+            }
+        }
+    }
+
+    private var formScroll: some View {
+        ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
                     heroAmount
                     detailsSection
@@ -126,17 +139,14 @@ struct AddEntryView: View {
             .toolbarBackground(.visible, for: .navigationBar)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                if presentsAsSheet {
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button("Cancel") { dismiss() }
-                    }
-                }
                 ToolbarItem(placement: .principal) {
                     VStack(spacing: 2) {
-                        PetTitle(isEditing ? "Edit the pile" : "Add to the pile")
-                        Text(isEditing ? "Update entry" : "New entry")
-                            .font(PantominaFont.caption)
-                            .foregroundStyle(Color.pantomina.muted)
+                        PetTitle(formPetTitle ?? (isEditing ? "Edit the pile" : "Add to the pile"))
+                        if formPetTitle == nil {
+                            Text(isEditing ? "Update entry" : "New entry")
+                                .font(PantominaFont.caption)
+                                .foregroundStyle(Color.pantomina.muted)
+                        }
                     }
                 }
             }
@@ -185,10 +195,13 @@ struct AddEntryView: View {
             .onAppear {
                 try? SeedCatalog.seedDemoJarIfNeeded(into: modelContext)
                 try? modelContext.save()
-                if let tx = editingTransaction, !didPrefillEdit {
+                if let capturePrefill, !didPrefillEdit {
+                    applyCapturePrefill(capturePrefill)
+                    didPrefillEdit = true
+                } else if let tx = editingTransaction, !didPrefillEdit {
                     prefill(from: tx)
                     didPrefillEdit = true
-                } else if editingTransaction == nil {
+                } else if editingTransaction == nil, capturePrefill == nil {
                     if selectedAccountId == nil {
                         selectedAccountId = orderedAccounts().first?.id
                     }
@@ -208,7 +221,6 @@ struct AddEntryView: View {
                 }
                 applyAccountDefaults()
             }
-        }
     }
 
     private var heroAmount: some View {
@@ -622,6 +634,21 @@ struct AddEntryView: View {
         }
     }
 
+    private func applyCapturePrefill(_ card: CaptureParse.Card) {
+        skipAccountDefaults = true
+        amountText = String(format: "%.2f", Double(card.amountC) / 100)
+        selectedAccountId = card.accountId
+        selectedCategoryId = card.categoryId
+        paidBy = card.paidBy
+        note = card.merchant ?? ""
+        switch card.split {
+        case .justMine, .contribution:
+            splitMode = 0
+        case .fiftyFifty:
+            splitMode = 1
+        }
+    }
+
     private func amountCentavos() -> Int? {
         InputBounds.centavos(fromPesosText: amountText)
     }
@@ -756,6 +783,7 @@ struct AddEntryView: View {
                 allocation: allocation,
                 settlementRole: settlementRole,
                 note: noteValue,
+                merchant: capturePrefill?.merchant,
                 jarKind: resolvedJarKind,
                 jarSourceId: cookieJarOn ? jarSourceId : nil,
                 jarReturned: resolvedJarReturned
@@ -783,6 +811,7 @@ struct AddEntryView: View {
                 try? await Task.sleep(nanoseconds: 1_200_000_000)
                 PantominaMotion.run(reduceMotion) { savedToast = false }
                 if presentsAsSheet { dismiss() }
+                onSaved?()
             }
         } catch {
             self.error = "Couldn't save. Try again."

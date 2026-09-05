@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		00D91CA514CDF247D9750577 /* WarChestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03680BE1ACE48C7E11CA3842 /* WarChestView.swift */; };
+		9A3C7E1F2B4D5068C9D0E1F2 /* AddCaptureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E6B8C1D4F5A7039B1C2D8E4 /* AddCaptureView.swift */; };
+		1B4E7A9C2D5F6083B7C1E4A8 /* CaptureParseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C8D1A3E7F2B4091A6C4D8E0 /* CaptureParseTests.swift */; };
+		7D18F4A0C3B94E2D8A1F6C90 /* CaptureParse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A91C2E8B7D04F1A9C3E5B62 /* CaptureParse.swift */; };
 		012AB156F8A5D3527E607D82 /* Layout.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB19BB64CC3C1ABB1DF02C4E /* Layout.swift */; };
 		058DF10F5B2262209C6F1C74 /* Primitives.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EFCF0FB550B4A59D85E89E4 /* Primitives.swift */; };
 		06BA394BDDB3D1B2307B9538 /* Fund.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBC592E0853CACC208B9AEB7 /* Fund.swift */; };
@@ -105,6 +108,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2E6B8C1D4F5A7039B1C2D8E4 /* AddCaptureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCaptureView.swift; sourceTree = "<group>"; };
 		03680BE1ACE48C7E11CA3842 /* WarChestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarChestView.swift; sourceTree = "<group>"; };
 		063875082A5AF605BF68F225 /* Fraunces.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fraunces.ttf; sourceTree = "<group>"; };
 		10D6EA6A3E6EB8EB388F949E /* InterestDriftTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterestDriftTests.swift; sourceTree = "<group>"; };
@@ -138,10 +142,12 @@
 		47BC12B62D1145BB79B1FDDB /* CatalogSheets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogSheets.swift; sourceTree = "<group>"; };
 		48FB7376E78D3CE23F7A083B /* Settlement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settlement.swift; sourceTree = "<group>"; };
 		4A17BB49D2ACC9E7787F7697 /* PocketMiniReportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PocketMiniReportView.swift; sourceTree = "<group>"; };
+		4A91C2E8B7D04F1A9C3E5B62 /* CaptureParse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureParse.swift; sourceTree = "<group>"; };
 		4C123A96441A24DE527E16E1 /* InputBoundsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputBoundsTests.swift; sourceTree = "<group>"; };
 		563EF0A949E8360B76391790 /* SnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotTests.swift; sourceTree = "<group>"; };
 		567E6985C02435A4FC2F7323 /* SettlementTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettlementTests.swift; sourceTree = "<group>"; };
 		59E2B3D59208996EE80587CF /* FundTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FundTests.swift; sourceTree = "<group>"; };
+		5C8D1A3E7F2B4091A6C4D8E0 /* CaptureParseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureParseTests.swift; sourceTree = "<group>"; };
 		5D5484EA8CCD16BC67295FB4 /* Snapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Snapshot.swift; sourceTree = "<group>"; };
 		6325E061F64F2C2AC149C4EC /* Bootstrap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bootstrap.swift; sourceTree = "<group>"; };
 		696CD15F7EFEAC0E10BE6B3A /* RealizationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealizationTests.swift; sourceTree = "<group>"; };
@@ -238,6 +244,7 @@
 			children = (
 				8712B6D306342B28E31BD3D3 /* AccountLabelsTests.swift */,
 				C3E691C1BF781061756C3D47 /* AllocationDefaultsTests.swift */,
+				5C8D1A3E7F2B4091A6C4D8E0 /* CaptureParseTests.swift */,
 				6A34EF3046046EC6B4BAC16A /* ChecklistTests.swift */,
 				13494702B3F803138913FE88 /* CoAMigrationTests.swift */,
 				45C5859EB08FEC5AFA36B722 /* CookieJarTests.swift */,
@@ -286,6 +293,7 @@
 			isa = PBXGroup;
 			children = (
 				9613E3878CE51A3D27079EE2 /* AccountsView.swift */,
+				2E6B8C1D4F5A7039B1C2D8E4 /* AddCaptureView.swift */,
 				E6CC6980CF58C89BB7D7B9FE /* AddEntryView.swift */,
 				479074B3B89012A210820BA1 /* BaggageView.swift */,
 				BD00C582ADA8430A87413CC1 /* BalanceDayView.swift */,
@@ -360,6 +368,7 @@
 			children = (
 				4489E4A000D2A16C43EA9D1F /* Checklist.swift */,
 				7EFD9E7141F46FA7130E90F8 /* CoAMigration.swift */,
+				4A91C2E8B7D04F1A9C3E5B62 /* CaptureParse.swift */,
 				11D28B0D4036AD013C2CD12A /* CookieJar.swift */,
 				F5CAA1BF8684554DB59D6838 /* Cycle.swift */,
 				22B8023D3CB8E4B30986D2F3 /* DisplayLabels.swift */,
@@ -477,6 +486,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				88E114B4B54FCA42D1545306 /* AccountsView.swift in Sources */,
+				9A3C7E1F2B4D5068C9D0E1F2 /* AddCaptureView.swift in Sources */,
 				C3E95F51368FD5AAA375FDE0 /* AddEntryView.swift in Sources */,
 				8A1F130BBF8F0C613FCC2421 /* AppEnvironment.swift in Sources */,
 				6FD35C027A430F53AE8166D8 /* BaggageView.swift in Sources */,
@@ -487,6 +497,7 @@
 				5ABE0004E38F7CD26E75711C /* CatalogSheets.swift in Sources */,
 				87B2462A07750A1ABD710247 /* Checklist.swift in Sources */,
 				6BC0EABFFBDD2FC20EA77EE7 /* CoAMigration.swift in Sources */,
+				7D18F4A0C3B94E2D8A1F6C90 /* CaptureParse.swift in Sources */,
 				D6E7015F5A609B97D9B8BB33 /* Colors.swift in Sources */,
 				643C46358F9FF73C3878C444 /* CookieJar.swift in Sources */,
 				74D5C292EE3945579559A222 /* CookieJarView.swift in Sources */,
@@ -540,6 +551,7 @@
 			files = (
 				633ADDCCC050E38BE657AC4B /* AccountLabelsTests.swift in Sources */,
 				3936D37B22728DD086E09C63 /* AllocationDefaultsTests.swift in Sources */,
+				1B4E7A9C2D5F6083B7C1E4A8 /* CaptureParseTests.swift in Sources */,
 				8FA015CBE95D1F061D14E57C /* ChecklistTests.swift in Sources */,
 				8C98C5507A11EC8EC389B310 /* CoAMigrationTests.swift in Sources */,
 				99092C2481DEA3667FA8F532 /* CookieJarTests.swift in Sources */,

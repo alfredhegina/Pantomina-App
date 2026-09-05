@@ -104,6 +104,11 @@ enum DisplayLabels {
         return "Counts on \(when)"
     }
 
+    static func contributionSpokenFor(personName: String, amountC: Int) -> String {
+        let pesos = formatPeso(amountC, fractionDigits: 0).replacingOccurrences(of: "₱", with: "")
+        return "\(personName)'s \(pesos) goes against what \(personName) is spoken for this cycle."
+    }
+
     static func settlementStatus(_ status: SettlementStatus) -> String {
         switch status {
         case .settled: return "Settled"
