@@ -586,3 +586,39 @@ Skills: Operate / Humanizer / Emil; Spec cheese quarantine.
 | Paper | `#FAF8F5` tab bar + nav + table/collection appearance |
 
 **Phase 6 complete** (A+B+C + Quiet ledger YTD). **Next:** Phase 7 when asked.
+
+---
+
+## Accounts catalog (2026-09-05)
+
+Skills: Impeccable Operate, Humanizer, apple-design / Emil, write-swift TDD, accounting-map, Greenlight (copy), input-bounds.
+
+**Status:** Implemented on `cursor/accounts-catalog`. Screen title **Accounts** supersedes Fraunces *Where the Money Sleeps*.
+
+### Remove
+
+| Item | Why |
+|---|---|
+| Pocket list + CoA oddities on The Fine Print | Settings is identity; engine jargon; split destinations |
+| Fine Print empty CTA / "Edit pockets on Receipts" | Both lied; Add is on Accounts |
+| Fraunces pet title on this screen | **Accounts** is an Operate noun, not cheese |
+| User-created loan / receivable pockets | Baggage and Love Tab own those |
+
+### Add
+
+| Item | Why |
+|---|---|
+| `LedgerCatalog` + DisplayLabels kind/flow/issue copy | UI never reimplements uniqueness, settlement, shape lock |
+| Create/edit sheets on Accounts | Skip-starters onboarding had nowhere to build a blank ledger |
+| Wider `inUse` (tx, rules, fund homes, loan pay-from, funding sources) | Changing a War Chest home's kind would lie about settlement |
+
+### Improve
+
+| Item | Why |
+|---|---|
+| One More room: map + manager | Empire stays NW; Fine Print stays names |
+| Spoken-for, unknown check-in, no 40pt total | Accounting-map; do not restate Empire |
+
+### Explicit non-changes
+
+Delete/archive; opening balances / Fund Moves; Add-picker create-while-typing; Business scope; editing system cats; Phase 7 backup/chat; Empire mini-report; household funds; raid add-to-due.

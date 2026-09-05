@@ -22,7 +22,7 @@ Phase 1 — identity, seed CoA/accounts, onboarding, Receipts filters, Add entry
 
 Open `Pantomina.xcodeproj` in Xcode (or regenerate with `xcodegen generate` from `project.yml`), select **Pantomina-Preprod**, run on an iPhone Simulator (iOS 17.6+).
 
-First launch: **Shall we dance?** (three steps: names + PHP chip, roles, optional starters). Then Home, Receipts, Add (sheet from the center tab), More → The Fine Print.
+First launch: **Shall we dance?** (three steps: names + PHP chip, roles, optional starters). Then Home, Receipts, Add (sheet from the center tab), More → Accounts (pockets and categories) or The Fine Print (names).
 
 ```bash
 xcodegen generate

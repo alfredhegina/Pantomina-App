@@ -105,6 +105,7 @@ final class CategoryRecord {
 
     var flow: FlowType { FlowType(rawValue: flowRaw) ?? .expense }
     var needWant: NeedWant? { needWantRaw.flatMap(NeedWant.init(rawValue:)) }
+    var fixedVariable: FixedVariable? { fixedVariableRaw.flatMap(FixedVariable.init(rawValue:)) }
     var displayName: String { "\(group) · \(item)" }
 }
 

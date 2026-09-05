@@ -5,21 +5,16 @@ struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Query private var people: [PersonRecord]
-    @Query private var accounts: [AccountRecord]
 
     @State private var fernName = ""
     @State private var starkName = ""
     @State private var fernPet = ""
     @State private var starkPet = ""
     @State private var showPets = false
-    @State private var showOddities = false
     @State private var toast: String?
 
     private var fern: PersonRecord? { people.first { $0.id == .fern } }
     private var stark: PersonRecord? { people.first { $0.id == .stark } }
-
-    private var displayFern: String { fernName.isEmpty ? (fern?.name ?? "") : fernName }
-    private var displayStark: String { starkName.isEmpty ? (stark?.name ?? "") : starkName }
 
     var body: some View {
         Form {
@@ -52,45 +47,6 @@ struct SettingsView: View {
                 Text("The Fine Print")
             } footer: {
                 Text("Roles stay payer / contributor. Renaming updates every account label and greeting. Nothing is stored with a name baked in.")
-            }
-
-            Section("Where the money sleeps") {
-                ForEach(accounts.filter { !$0.archived }, id: \.id) { account in
-                    HStack {
-                        Text(account.displayLabel(
-                            fernName: displayFern,
-                            starkName: displayStark
-                        ))
-                        Spacer()
-                        Chip(
-                            label: DisplayLabels.scope(
-                                account.scope,
-                                fernName: displayFern,
-                                starkName: displayStark
-                            ),
-                            tone: .neutral
-                        )
-                    }
-                }
-            }
-
-            Section {
-                DisclosureGroup("CoA migration oddities", isExpanded: $showOddities) {
-                    ForEach(SeedCatalog.migrationOddityPrompts, id: \.legacy) { row in
-                        let mapped = CoAMigration.map(legacy: row.legacy)
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(row.legacy).font(PantominaFont.body)
-                            Text(oddityCopy(row.oddity))
-                                .font(PantominaFont.caption)
-                                .foregroundStyle(Color.pantomina.muted)
-                            if let mapped {
-                                Text("→ \(mapped.group) · \(mapped.item)")
-                                    .font(PantominaFont.caption)
-                                    .foregroundStyle(Color.pantomina.sageDeep)
-                            }
-                        }
-                    }
-                }
             }
 
             Section("Roles") {
@@ -156,14 +112,6 @@ struct SettingsView: View {
         PantominaMotion.run(reduceMotion) { toast = message }
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
             PantominaMotion.run(reduceMotion) { toast = nil }
-        }
-    }
-
-    private func oddityCopy(_ oddity: CoAOddity) -> String {
-        switch oddity {
-        case .loanMarkedWant: return "Tagged as Want. Confirm that still feels right."
-        case .childSupportBirthdayWant: return "Birthday under Child Support is Want; Siblings Birthday is Need."
-        case .smartPostpaidWant: return "Only utility marked Want."
         }
     }
 }
