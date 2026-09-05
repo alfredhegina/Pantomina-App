@@ -77,7 +77,7 @@ struct MainTabView: View {
             }
         }
         .sheet(isPresented: $showAddSheet) {
-            AddEntryView(presentsAsSheet: true)
+            AddCaptureView()
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
                 .presentationBackground(Color.pantomina.ground)

@@ -585,7 +585,68 @@ Skills: Operate / Humanizer / Emil; Spec cheese quarantine.
 | Usual line | Prior up-to-3 months only; always caption vs latest |
 | Paper | `#FAF8F5` tab bar + nav + table/collection appearance |
 
-**Phase 6 complete** (A+B+C + Quiet ledger YTD). **Next:** Phase 7 when asked.
+**Phase 6 complete** (A+B+C + Quiet ledger YTD). **Phase 7 Slice A shipped.** Next: Room B when artboards land.
+
+---
+
+## Phase 7 Room A — chat capture (2026-09-05)
+
+Skills: Impeccable Operate, Humanizer, apple-design / Emil, write-swift TDD, accounting-map. Spec §4.12 + §6 Phase 7. Artboards: `redesigns/pantomina-phase-7/Pantomina Phase 7 Artboards.dc.html`. PRD: `docs/phase-7-prd.md`.
+
+**Status:** Slice A shipped 2026-09-05. Rooms B/C wait on artboards.
+
+### Slice A shipped
+
+| Item | Why |
+|---|---|
+| `CaptureParse` + three §4.12 goldens | Spec accept is offline cards |
+| `AddCaptureView` A1–A7 | Composer is the Add sheet; form is Fix something |
+| Things that work recents | Last three saved typed lines; goldens pad |
+| Card Save = form posting | Accounting-map; no parallel book |
+| Always “Using built-in shortcuts” | Gemini/Keychain is Slice B |
+
+Shorthand mapping list, inbox, and backup are **not** in Slice A.
+
+**Next:** Room B (inbox + BYOK) when artboards land. Then C (backup).
+
+### Remove
+
+| Item | Why |
+|---|---|
+| Form as the Add front door | Spec chat-first; 2026-09-02 Quiet ledger deferred chat |
+| Cancel on the Add sheet | Baseline pull-down; artboards have grabber only |
+| Ambiguity quiz / extra sheet | Exactly one inline two-choice row |
+| Gemini roast / reward-punish coach | Parser only; shame-free |
+| Type picker / recurring on Add | Keep Doing owns habits |
+
+### Add
+
+| Item | Why |
+|---|---|
+| Composer sheet A1–A7 | Human lock from artboards |
+| Confirmation card; never auto-save | Spec §4.12 |
+| “Using built-in shortcuts” when no key | Offline accept |
+| Fix something as a **pushed** form (A7) | Composer stays the sheet |
+
+### Improve
+
+| Item | Why |
+|---|---|
+| Batch carousel + count header | Human pick §13.4 |
+| Parse fail: Try again / Fill it in by hand | Un-cheesy error |
+
+### Slice shape
+
+| Slice | Scope | Artboards |
+|---|---|---|
+| A Capture | Rules parser + cards | A1–A7 shipped |
+| B Inbox + BYOK | Shortcuts inbox; Keychain | Not drawn |
+| C Backup / restore | JSON + CSV; last 5 = dated list | Not drawn |
+| Then polish / Archive | Vibe, a11y, empties | — |
+
+### Explicit non-changes
+
+Phase 8 sync; Home last-cycle commendation (after Phase 7); push notifications; household funds; raid add-to-due; inventing golden utterances; Room B/C chrome before artboards.
 
 ---
 
@@ -621,4 +682,4 @@ Skills: Impeccable Operate, Humanizer, apple-design / Emil, write-swift TDD, acc
 
 ### Explicit non-changes
 
-Delete/archive; opening balances / Fund Moves; Add-picker create-while-typing; Business scope; editing system cats; Phase 7 backup/chat; Empire mini-report; household funds; raid add-to-due.
+Delete/archive; opening balances / Fund Moves; Add-picker create-while-typing; Business scope; editing system cats; Phase 7 Rooms B/C artboards; Empire mini-report; household funds; raid add-to-due; Home last-cycle strip.
